@@ -1,0 +1,24 @@
+[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=22014146&assignment_repo_type=AssignmentRepo)
+# Introduction
+The purpose of this project is to perform a simplified simulation
+of high-energy particle storms. Read the handout.pdf and use the 
+sequential code (`energy_storms_seq.c`) as reference to study how the code works.
+
+You will implement parallel versions of the code by modifying the following files:
+- `energy_storms_mpi_omp_core.c` : MPI+OpenMP version
+- `energy_storms_cuda_core.cu`   : CUDA version
+
+In the submission, you are not allowed to modify any other files except those two.
+
+To see a description of the Makefile options execute:
+$ make help 
+
+Use the input files in the `test_files` directory for your first tests.
+Students are encouraged to manually write or automatically generate
+their own input files for more complete tests. See a description of
+the input files format in the handout.
+
+# Credits
+Code adapted from the EduHPC 2018 Peachy assignment materials
+by Arturo Gonzalez-Escribano and Eduardo Rodriguez-Gutiez,
+Group Trasgo, Universidad de Valladolid (Spain).
