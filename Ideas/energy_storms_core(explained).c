@@ -48,7 +48,8 @@ static void update( float *layer, int layer_size, int k, int pos, float energy )
  * IL CUORE DELLA SIMULAZIONE: Questa è la funzione in cui orchestrerai MPI e OpenMP.
  */
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
-    int i, j, k;
+    int i, j, k;          // Non ne sono sicuro, ma FORSE e' meglio se spostiamo le singole variabili dentro il for ( non vorrei che facessero casino con i threads... )
+    // Altrimenti potremmo lasciarle cosi ma renderle private(...), però così sarebbe uno spreco di memoria... vabbè hai capito brother. Vedremo
     
     /* ALLOCAZIONE MEMORIA: Crea la superficie (layer) e un array di supporto (layer_copy).
        -> ALERT MPI: Attualmente questo alloca tutta la superficie. In MPI, il rank dovrà 
@@ -61,10 +62,10 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
        ERGO: 25 per ogni processo con la differenza che il primo prenderà ne prenderà 26
        ( FOSSE STATO RESTO 3 ALLORA DISTRIBUIVA UNO CIASCUNO PER OGNI PROCESSO )
        P.S. -> spero di essere chiaro quando scrivo perchè ho timore di far cagare HAHAHA -----> X */
-    float *layer = (float *)malloc( sizeof(float) * layer_size );
-    float *layer_copy = (float *)malloc( sizeof(float) * layer_size );
+    float *layer = (float *)malloc( sizeof(float) * layer_size );               // Queste dichiarazioni dinamiche conviene suddividerle solo per i nodi/processi
+    float *layer_copy = (float *)malloc( sizeof(float) * layer_size );          // ergo, solo in MPI. OpenMP lo utilizzeremo solamente per manipolare i for e qualche altra info.
     if ( layer == NULL || layer_copy == NULL ) {
-        fprintf(stderr,"Error: Allocating the layer memory\n");
+        fprintf(stderr,"Error: Allocating the layer memory\n");                 // Ovviamente qui cambiamo anche la stringa da printare, in modo da capire quale nodo "crasha"
         exit( EXIT_FAILURE );
     }
     
