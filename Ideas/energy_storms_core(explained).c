@@ -123,8 +123,8 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         for( k=0; k<layer_size; k++ ) 
             layer_copy[k] = layer[k];
 
-        /* PASSO 2.2: Spalma l'energia facendo la media di 3 celle ( manco la nutella ). 
-           Nota i limiti del for: k parte da 1 e arriva a layer_size-1. I bordi estremi 
+        /* PASSO 2.2: Spalma l'energia facendo la media di 3 celle (manco la nutella).
+           Nota i limiti del for: k parte da 1 e arriva a layer_size-1 escluso. I bordi estremi
            della superficie non partecipano al rilassamento e restano immobili.
            -> ALERT MPI: Per calcolare layer[mio_inizio], ti servirà layer_copy[mio_inizio - 1], 
            che si trova nella memoria del processo vicino! Qui devi scambiare le celle fantasma. */
