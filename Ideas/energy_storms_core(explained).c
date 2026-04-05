@@ -16,6 +16,10 @@
     - L'energia irradiata
  */
 static void update( float *layer, int layer_size, int k, int pos, float energy ) {
+    /* Di per se questa funzione non può essere parallelizzata perché ogni istruzione richiede che la precedente sia gia stata eseguita.
+       Se forzassimo una parallelizzazione, un processo/thread dovrebbe aspettare il termine del calcolo da parte di un
+       altro processo. Il che richiederebbe anche una send/recv, e ovviamente questo richiederebbe molto più tempo
+       e risorse utilizzate dal sistema. Ergo, è meglio lasciare il codice così com'è */
     
     /* Calcola la distanza tra il punto di impatto della particella (pos) e la cella corrente (k).
        Usa un semplice valore assoluto per non avere distanze negative. */
@@ -45,11 +49,18 @@ static void update( float *layer, int layer_size, int k, int pos, float energy )
 
 
 /*
- * IL CUORE DELLA SIMULAZIONE: Questa è la funzione in cui orchestrerai MPI e OpenMP.
+ * IL CUORE DELLA SIMULAZIONE: Questa è la funzione in cui useremo MPI e OpenMP.
+ /* PARAMETRI:
+  * layer_size -> numero totale delle celle dell'array;
+  * num_storms -> numero totale di ondate di particelle da elaborare;
+  * *storms -> array di struct ( contiene tutti i dati letti dal file );
+  * *maximum -> per registrare i valori output piu alti misurati sulla superficie;
+  * *positions -> lavora al passo di *maximum e serve per salvare l'indice ( il punto ) in cui si
+  *               sono verificati i picchi più alti;
  */
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
-    int i, j, k;          // Non ne sono sicuro, ma FORSE e' meglio se spostiamo le singole variabili dentro il for ( non vorrei che facessero casino con i threads... )
-    // Altrimenti potremmo lasciarle cosi ma renderle private(...), però così sarebbe uno spreco di memoria... vabbè hai capito brother. Vedremo
+    int i, j, k;          // Non ne sono sicuro, ma FORSE è meglio se spostiamo le singole variabili dentro il for ( non vorrei che facessero casino con i threads... )
+    // Altrimenti potremmo lasciarle cosi ma renderle private(...), però così sarebbe uno spreco di memoria... vabbè hai capito brother. Vedremo.
     
     /* ALLOCAZIONE MEMORIA: Crea la superficie (layer) e un array di supporto (layer_copy).
        -> ALERT MPI: Attualmente questo alloca tutta la superficie. In MPI, il rank dovrà 
