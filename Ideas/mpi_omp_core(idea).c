@@ -35,7 +35,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     // PARTE NUOVA --------------------------------------------------------
     int rank, size;
 
-    // Controllo per vedere se viene inizializzato correttamente
+    // TODO Da eliminare perché il prof gia lo chiama per noi
     int p = MPI_Init(NULL, NULL);
     if ( p != MPI_SUCCESS ) {
         printf("MPI_Init() failed\n");
@@ -64,26 +64,40 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * Utilizziamo sempre due copie per la fase futura di "rilassamento"
      * Aggiungiamo inoltre 2 CELLE EXTRA per layer ( perché per la fase di rilassamento ci
      * serve sapere che valore ha la cella precedente ( che però risiede nel layer di un altro
-     * processo. APPLICARE RAGIONAMENTO DOPO BOMBARDAMENTO */
-    float *layer = ( float * )malloc( sizeof( float ) * local_size + 2 );
-    float *layer_copy = ( float * )malloc( sizeof( float ) * local_size + 2 );
-
-    // ---------------------------------------------------------------------
-
-    float *layer = (float *)malloc( sizeof(float) * layer_size );
-    float *layer_copy = (float *)malloc( sizeof(float) * layer_size );
+     * processo. APPLICARE RAGIONAMENTO DOPO BOMBARDAMENTO
+     *
+     * Va fatto ( local_size + 2 ) e non lasciando il 2 fuori dalla parentesi perché altrimenti
+     * si andrebbe incontro alla creazione di "n" celle di memoria ( da 4 byte ) piu 2 celle da 2
+     * Tutto questo perché l'operatore * con "sizeof" ha la precedenza
+     */
+    float *layer = ( float * )malloc( sizeof( float ) * (local_size + 2) );
+    float *layer_copy = ( float * )malloc( sizeof( float ) * (local_size + 2) );
     if ( layer == NULL || layer_copy == NULL ) {
-        fprintf(stderr,"Error: Allocating the layer memory\n");
+        fprintf(stderr,"Error_rank_%d: Allocating the layer memory\n", rank);
         exit( EXIT_FAILURE );
     }
-    for( k=0; k<layer_size; k++ ) layer[k] = 0.0f;
-    for( k=0; k<layer_size; k++ ) layer_copy[k] = 0.0f;
+
+    /* Due for staccati in questo modo funzionano bene in seriale. Ma in parallelo non possiamo
+     * saperlo. Forse converrebbe unificare tutto (?). Perché facendo "pragma" due volte vado incontro
+     * al "set" dei threads per due volte ( e non so se questo comporta rallentamenti )
+     * TODO Proviamo a fine parallelizzazione! */
+    #pragma omp parallel for
+        for ( k = 0; k < local_size + 2; k++ ) layer[k] = 0.0f;
+
+    #pragma omp parallel for
+        for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
+
+
+    // ---------------------------------------------------------------------
     
-    /* 4. Storms simulation */
+    /* Le storms non possono essere parallelizzate perché vale come "fattore temporale".
+     * C'è la storm_0 che avviene PRIMA della storm_1. Se le parallelizzassimo allora i core e threads
+     * andrebbero a lavorare su dati sbagliati. Il che non va bene perché uscirebbero risultati errati
+     * ( magari ogni volta diversi )
+     */
     for( i=0; i<num_storms; i++) {
 
-        /* 4.1. Add impacts energies to layer cells */
-        /* For each particle */
+        /* TODO Parallelizzare con OpenMP */
         for( j=0; j<storms[i].size; j++ ) {
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
