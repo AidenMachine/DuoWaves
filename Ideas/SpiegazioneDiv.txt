@@ -1,0 +1,42 @@
+ESEMPIO PRATICO:
+layer_size = 14
+size = 4 processi (Rank 0, 1, 2, 3)
+
+Calcoli iniziali:
+- base_chunk = 14 / 4 = 3
+- remainder  = 14 % 4 = 2 (Ci sono 2 celle extra da distribuire)
+
+Distribuzione per Rank:
+
+> RANK 0 (rank < remainder -> 0 < 2: VERO)
+  - local_size = 3 + 1 = 4
+  - offset     = 0 * 4 = 0
+  [Indici Globali Calcolati: 0, 1, 2, 3]
+
+> RANK 1 (rank < remainder -> 1 < 2: VERO)
+  - local_size = 3 + 1 = 4
+  - offset     = 1 * 4 = 4
+  [Indici Globali Calcolati: 4, 5, 6, 7]
+
+> RANK 2 (rank < remainder -> 2 < 2: FALSO)
+  - local_size = 3
+  - offset     = (2 * 3) + 2 = 8
+  [Indici Globali Calcolati: 8, 9, 10]
+
+> RANK 3 (rank < remainder -> 3 < 2: FALSO)
+  - local_size = 3
+  - offset     = (3 * 3) + 2 = 11
+  [Indici Globali Calcolati: 11, 12, 13]
+
+========================================================
+NOTA BENE PER L'ALLOCAZIONE MEMORIA (MALLOC):
+========================================================
+Questo calcolo serve per la logica matematica. 
+Quando allochi fisicamente la memoria per questo rank:
+
+float *layer = malloc(sizeof(float) * (local_size + 2));
+
+Devi aggiungere +2 per ospitare le "Celle Fantasma" ai bordi
+necessarie per la fase di Rilassamento. I tuoi dati reali
+andranno dall'indice [1] all'indice [local_size].
+========================================================

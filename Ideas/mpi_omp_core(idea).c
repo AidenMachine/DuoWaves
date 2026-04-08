@@ -45,9 +45,28 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    // Calcolo layer_size_locale
-    int local_layer_size = layer_size / size;
-    int resto = layer_size % size;                  // Remainder come parola mi fa cagare quindi uso resto
+    // Calcolo chunk_locale
+    int local_chunk = layer_size / size;            // Il chunk è "per tutti"
+    int resto = layer_size % size;                  // Remainder come parola mi fa cagare quindi uso "resto"
+
+    int local_size;             // Quante celle devo calcolare
+    int offset;                 // Da quale indice ( della var. globale ) devo partire ( sul chunk locale )
+
+    if ( rank < resto ) {
+        local_size = local_chunk + 1;       // I primi rank ( processi ) prendono una cella extra
+        offset = rank * local_size;        // Anche quelli prima di me hanno una cella in piu? -> scalo l'offset
+    }else{
+        local_size = local_chunk;           // Non prendo la cella extra
+        offset = rank * local_chunk + resto;        // Scalo dai precedenti con
+    }
+
+    /* Ogni processo avrà il suo pezzo di layer sul quale farà i propri calcoli.
+     * Utilizziamo sempre due copie per la fase futura di "rilassamento"
+     * Aggiungiamo inoltre 2 CELLE EXTRA per layer ( perché per la fase di rilassamento ci
+     * serve sapere che valore ha la cella precedente ( che però risiede nel layer di un altro
+     * processo. APPLICARE RAGIONAMENTO DOPO BOMBARDAMENTO */
+    float *layer = ( float * )malloc( sizeof( float ) * local_size + 2 );
+    float *layer_copy = ( float * )malloc( sizeof( float ) * local_size + 2 );
 
     // ---------------------------------------------------------------------
 
