@@ -1,16 +1,21 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
 #include<mpi.h>
 #include<omp.h>
-#include "energy_storms.h"
+#include"energy_storms.h"
 
 /* THIS FUNCTION CAN BE MODIFIED */
 /* Function to update a single position of the layer */
-static void update( float *layer, int layer_size, int k, int pos, float energy ) {
-    /* 1. Compute the absolute value of the distance between the
-        impact position and the k-th position of the layer */
-    int distance = pos - k;
+static void update( float *layer, int layer_size, int k, int pos, float energy, int global_k) {
+    /* Il calcolo rimane lo stesso, solo che si utilizza l'indice k globale, altrimenti
+     * si andrebbe in Segmentation_fault */
+
+    /* Anche se i due processi non comunicano, le particelle vengono elaborate tutte allo stesso modo,
+     * dunque attraverso il calcolo di "distance", "sqrt(...)" etc... si ottiene quanta energia viene
+     * dispersa ( se è minore di THRESHOLD/layer_size allora non viene salvata )
+     */
+    int distance = pos - global_k;
     if ( distance < 0 ) distance = - distance;
 
     /* 2. Impact cell has a distance value of 1 */
@@ -24,13 +29,17 @@ static void update( float *layer, int layer_size, int k, int pos, float energy )
     /* 4. Compute attenuated energy */
     float energy_k = energy / layer_size / atenuacion;
 
-    /* 5. Do not add if its absolute value is lower than the threshold */
-    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size )
+    /* 5. Do not add if its absolute value is lower than the threshold
+     * TODO Probabilmente è l'unico punto dove inserirò ATOMIC ( per ora )
+     */
+    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size ) {
+        #pragma omp atomic
         layer[k] = layer[k] + energy_k;
+    }
 }
 
 
-// Ricorda di inserire nel "verbale" il fatto di aver aggiunto due parametri alla funzioni
+// Ricorda di inserire nel "verbale" il fatto di aver aggiunto due parametri alla funzione
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions, const int rank, const int size) {
     int i, j, k;
     // PARTE NUOVA --------------------------------------------------------
@@ -85,20 +94,33 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * andrebbero a lavorare su dati sbagliati. Il che non va bene perché uscirebbero risultati errati
      * ( magari ogni volta diversi )
      */
+    /* INTERA TEMPESTA */
     for( i=0; i<num_storms; i++) {
 
-        /* TODO Parallelizzare con OpenMP */
+        /* SINGOLA PARTICELLA */
         for( j=0; j<storms[i].size; j++ ) {
-            /* Get impact energy (expressed in thousandths) */
+
+            /* Energia dell'impatto, calcolata x 1000 */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
-            /* Get impact position */
+
+            /* Calcola la posizione dell'impatto sul layer */
             int position = storms[i].posval[j*2];
 
-            /* TODO Da vedere DA DOVE deve partire e FINO A DOVE deve arrivare */
-            for( k=0; k<layer_size; k++ ) {
-                /* Update the energy value for the cell */
-                update( layer, layer_size, k, position, energy );
-            }
+            /* TODO Da vedere DA DOVE deve partire e FINO A DOVE deve arrivare
+             *
+             * DISPERSIONE ENERGIA DELLA SINGOLA PARTICELLA
+             */
+            #pragma omp parallel for
+                for( k = 1; k <= local_size; k++ ) {
+                    /* Si parte da k = 1 per non contaminare le "celle fantasma" ma come k globale
+                     * consideriamo offset + k - 1 perché altrimenti si andrebbe a contare la cella
+                     * successiva
+                     *
+                     * k = 1 -> Dove dovrei partire con l'array normale
+                     * offset + k - 1 -> Parto dall'indice del pezzo che ha il processo
+                     */
+                    update( layer, layer_size, k, position, energy , offset + k - 1);
+                }
         }
 
         /* 4.2. Energy relaxation between storms */
