@@ -30,20 +30,10 @@ static void update( float *layer, int layer_size, int k, int pos, float energy )
 }
 
 
-void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
+// Ricorda di inserire nel "verbale" il fatto di aver aggiunto due parametri alla funzioni
+void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions, const int rank, const int size) {
     int i, j, k;
     // PARTE NUOVA --------------------------------------------------------
-    int rank, size;
-
-    // TODO Da eliminare perché il prof gia lo chiama per noi
-    int p = MPI_Init(NULL, NULL);
-    if ( p != MPI_SUCCESS ) {
-        printf("MPI_Init() failed\n");
-        MPI_Abort(MPI_COMM_WORLD, p);
-    }
-
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     // Calcolo chunk_locale
     int local_chunk = layer_size / size;            // Il chunk è "per tutti"
@@ -104,7 +94,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             /* Get impact position */
             int position = storms[i].posval[j*2];
 
-            /* For each cell in the layer */
+            /* TODO Da vedere DA DOVE deve partire e FINO A DOVE deve arrivare */
             for( k=0; k<layer_size; k++ ) {
                 /* Update the energy value for the cell */
                 update( layer, layer_size, k, position, energy );
