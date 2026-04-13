@@ -48,6 +48,8 @@ static void update( float *layer, int layer_size, int k, int pos, float energy, 
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions, const int rank, const int size) {
     int i, j, k;
     // PARTE NUOVA --------------------------------------------------------
+    omp_lock_t writelock;
+    omp_init_lock(&writelock);
 
     // Calcolo chunk_locale
     int local_chunk = layer_size / size;            // Il chunk è "per tutti"
@@ -98,6 +100,8 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * C'è la storm_0 che avviene PRIMA della storm_1. Se le parallelizzassimo allora i core e threads
      * andrebbero a lavorare su dati sbagliati. Il che non va bene perché uscirebbero risultati errati
      * ( magari ogni volta diversi )
+     *
+     * RICORDA: Ogni processo lavora sulle stesse particelle MA suddividendo l'effetto in layer diversi!ss
      */
     /* INTERA TEMPESTA */
     for( i=0; i<num_storms; i++) {
@@ -134,16 +138,26 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                   Skip updating the first and last positions */
         for( k=1; k<layer_size-1; k++ )
             layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+        
+        float local_maximum = -1.0f;
+        int local_positions = -1;
 
-        /* 4.3. Locate the maximum value in the layer, and its position */
-        for( k=1; k<layer_size-1; k++ ) {
-            /* Check it only if it is a local maximum */
+        int start = 1, end = local_size;
+        if ( rank == 0 ) start++;
+        if ( rank == size - 1 ) end--;
+
+        #pragma omp parallel for
+        for( k = start; k <= end; k++ ) {
             if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-                if ( layer[k] > maximum[i] ) {
-                    maximum[i] = layer[k];
-                    positions[i] = k;
+
+                omp_set_lock(&writelock);
+                if ( layer[k] > local_maximum ) {
+                    local_maximum = layer[k];
+                    local_positions = offset + k - 1;
                 }
+                omp_unset_lock(&writelock);
             }
         }
     }
+    omp_destroy_lock(&writelock);
 }
