@@ -103,7 +103,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     for( i=0; i<num_storms; i++) {
 
         /* SINGOLA PARTICELLA */
-        #pragma parallel for
+        #pragma omp parallel for
         for( j=0; j<storms[i].size; j++ ) {
 
             /* Energia dell'impatto, calcolata x 1000 */
