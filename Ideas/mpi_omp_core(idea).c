@@ -36,6 +36,11 @@ static void update( float *layer, int layer_size, int k, int pos, float energy, 
         #pragma omp atomic
         layer[k] = layer[k] + energy_k;
     }
+    /*
+     * Inserire #PRAGMA_OMP_ATOMIC qui sopra non è stato utile se il "parallel for" divide il layer della singola particella,
+     * per il semplice fatto che, tecnicamente, nessuna cella verrà mai visitata contemporaneamente.
+     * Diventa utile ora, passando il "parallel for" da quello "del layer" a quello delle particelle.
+     */
 }
 
 
@@ -98,6 +103,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     for( i=0; i<num_storms; i++) {
 
         /* SINGOLA PARTICELLA */
+        #pragma parrallel for
         for( j=0; j<storms[i].size; j++ ) {
 
             /* Energia dell'impatto, calcolata x 1000 */
@@ -106,21 +112,17 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             /* Calcola la posizione dell'impatto sul layer */
             int position = storms[i].posval[j*2];
 
-            /* TODO Da vedere DA DOVE deve partire e FINO A DOVE deve arrivare
-             *
-             * DISPERSIONE ENERGIA DELLA SINGOLA PARTICELLA
-             */
-            #pragma omp parallel for
-                for( k = 1; k <= local_size; k++ ) {
-                    /* Si parte da k = 1 per non contaminare le "celle fantasma" ma come k globale
-                     * consideriamo offset + k - 1 perché altrimenti si andrebbe a contare la cella
-                     * successiva
-                     *
-                     * k = 1 -> Dove dovrei partire con l'array normale
-                     * offset + k - 1 -> Parto dall'indice del pezzo che ha il processo
-                     */
-                    update( layer, layer_size, k, position, energy , offset + k - 1);
-                }
+            // DISPERSIONE ENERGIA DELLA SINGOLA PARTICELLA
+            for( k = 1; k <= local_size; k++ ) {
+                /* Si parte da k = 1 per non contaminare le "celle fantasma" ma come k globale
+                 * consideriamo offset + k - 1 perché altrimenti si andrebbe a contare la cella
+                 * successiva
+                 *
+                 * k = 1 -> Dove dovrei partire con l'array normale
+                 * offset + k - 1 -> Parto dall'indice del pezzo che ha il processo
+                 */
+                update( layer, layer_size, k, position, energy , offset + k - 1);
+            }
         }
 
         /* 4.2. Energy relaxation between storms */
