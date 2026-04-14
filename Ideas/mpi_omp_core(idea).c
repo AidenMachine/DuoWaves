@@ -5,6 +5,11 @@
 #include<omp.h>
 #include"energy_storms.h"
 
+typedef struct{
+    float local_maximum;
+    int local_positions;
+}LocalData;
+
 /* THIS FUNCTION CAN BE MODIFIED */
 /* Function to update a single position of the layer */
 static void update( float *layer, int layer_size, int k, int pos, float energy, int global_k) {
@@ -48,6 +53,9 @@ static void update( float *layer, int layer_size, int k, int pos, float energy, 
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions, const int rank, const int size) {
     int i, j, k;
     // PARTE NUOVA --------------------------------------------------------
+    float local_maximum = -1.0f;
+    int local_positions = -1;
+
     omp_lock_t writelock;
     omp_init_lock(&writelock);
 
@@ -129,6 +137,15 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             }
         }
 
+        /*
+         * Manca solo questa parte Zi
+         * Tocca riempire layer[0] e layer[local_size + 1] con i valori dei vicini.
+         * Ricorda che, giustamente, il primo e l'ultimo layer NON devono, rispettivamente,
+         * mandarsi nulla. Inoltre, usiamo Sendrecv() e non i singoli Send() e Recv().
+         * ( dobbiamo usare layer_copy ( credo solo in questo caso ).
+         * Il resto lo lascio a te ( anche perché non so alto ahah ).
+         * Ma confido in te, Brother.
+         */
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1. Copy values to the ancillary array */
         for( k=0; k<layer_size; k++ ) 
@@ -138,9 +155,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                   Skip updating the first and last positions */
         for( k=1; k<layer_size-1; k++ )
             layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-        
-        float local_maximum = -1.0f;
-        int local_positions = -1;
 
         int start = 1, end = local_size;
         if ( rank == 0 ) start++;
@@ -158,6 +172,17 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                 omp_unset_lock(&writelock);
             }
         }
+
+        LocalData data;
+        data.local_maximum = local_maximum;
+        data.local_positions = local_positions;
+
+        maximum[i] = data.local_maximum;
+        positions[i] = data.local_positions;
+
+        MPI_Allreduce(MPI_IN_PLACE, &data, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
     }
     omp_destroy_lock(&writelock);
+    free(layer);
+    free(layer_copy);
 }
