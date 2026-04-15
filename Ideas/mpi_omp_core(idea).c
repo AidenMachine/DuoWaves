@@ -146,15 +146,43 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
          * Il resto lo lascio a te ( anche perché non so alto ahah ).
          * Ma confido in te, Brother.
          */
-        /* 4.2. Energy relaxation between storms */
-        /* 4.2.1. Copy values to the ancillary array */
-        for( k=0; k<layer_size; k++ ) 
+
+        /* LUCA: parallelizzato senza troppi cazzi, é solo una copia */
+        # pragma omp parallel for
+        for( k=0; k<local_size; k++ ) 
             layer_copy[k] = layer[k];
 
-        /* 4.2.2. Update layer using the ancillary values.
-                  Skip updating the first and last positions */
-        for( k=1; k<layer_size-1; k++ )
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+        /* LUCA: qui invece i cazzoni rischiamo di prenderli se non si fa attenzione; il primo e l'ultimo
+         * GLOBALI non devono essere presi in considerazione, e bisogna mandare/ricevere tra processi
+         * la prima e ultima cella; OCCHIO (cit. Lele Adani)*/
+        int prev_rank = rank-1; int succ_rank = rank+1;
+        float my_first, my_last;
+        float prev_last, succ_first;
+
+        /* Fase 1: si fanno le SendRecv. Ovviamente, il primo rank non riceve/manda da/a quello precedente  
+         * l'ultimo rank non riceve/manda da/a quello dopo */
+        if (!(prev_rank==-1))
+          MPI_Sendrecv(&my_first, 1, MPI_FLOAT, prev_rank, 0,
+                       &prev_last, 1, MPI_FLOAT, prev_rank, 0,
+                       MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        if (!(succ_rank==size))
+          MPI_Sendrecv(&my_last, 1, MPI_FLOAT, succ_rank, local_size-1,
+                       &succ_first, 1, MPI_FLOAT, succ_rank, local_size-1,
+                       MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        for( k=0; k<local_size; k++ ) {
+            float prev, succ;
+            /* Fase 2: se sono la prima o l'ultima cella globali, salta */
+            if ((prev_rank == -1 && k==0) || (succ_rank == size && k == local_size-1)) continue;
+            
+            /* Fase 3: computa l'effettivo valore. Si fa adoperando prev (o il valore prima nell'array
+*              o il valore ricevuto dal rank precedente) e succ (o il valore dopo nell'array o il valore
+*              ricevuto dal rank successivo) */
+            prev = k == 0 ? prev_last : layer_copy[k-1];
+            prev = k == local_size ? succ_first : layer_copy[k-1];
+
+            layer[k] = ( prev + layer_copy[k] + succ ) / 3;
+          }       
 
         int start = 1, end = local_size;
         if ( rank == 0 ) start++;
