@@ -155,33 +155,37 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         /* LUCA: qui invece i cazzoni rischiamo di prenderli se non si fa attenzione; il primo e l'ultimo
          * GLOBALI non devono essere presi in considerazione, e bisogna mandare/ricevere tra processi
          * la prima e ultima cella; OCCHIO (cit. Lele Adani)*/
-        int prev_rank = rank-1; int succ_rank = rank+1;
-        float my_first, my_last;
-        float prev_last, succ_first;
+        int prev_rank = rank-1; int succ_rank = rank+1;                                     // TODO Letteralmente i "layer affianco a quello del processo"
+        float my_first, my_last;                                                            // TODO Contiene i valori da mandare ai vicini
+        float prev_last, succ_first;                                                        // TODO Riceve i valori dai vicini ( l'ultimo del processo precedente e il primo del processo successivo )
 
         /* Fase 1: si fanno le SendRecv. Ovviamente, il primo rank non riceve/manda da/a quello precedente  
          * l'ultimo rank non riceve/manda da/a quello dopo */
-        if (!(prev_rank==-1))
-          MPI_Sendrecv(&my_first, 1, MPI_FLOAT, prev_rank, 0,
+        if (!(prev_rank==-1)) // TODO Ma perche hai usato "!"? Non sarebbe meglio direttamente fare " != " ?
+            // TODO Non hai inserito il valore in my_first
+            MPI_Sendrecv(&my_first, 1, MPI_FLOAT, prev_rank, 0,
                        &prev_last, 1, MPI_FLOAT, prev_rank, 0,
                        MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        if (!(succ_rank==size))
-          MPI_Sendrecv(&my_last, 1, MPI_FLOAT, succ_rank, local_size-1,
+        if (!(succ_rank==size)) // TODO Idem qui Zi
+            // TODO Non hai inserito il valore in my_last
+            MPI_Sendrecv(&my_last, 1, MPI_FLOAT, succ_rank, local_size-1,
                        &succ_first, 1, MPI_FLOAT, succ_rank, local_size-1,
                        MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
         for( k=0; k<local_size; k++ ) {
-            float prev, succ;
             /* Fase 2: se sono la prima o l'ultima cella globali, salta */
             if ((prev_rank == -1 && k==0) || (succ_rank == size && k == local_size-1)) continue;
             
             /* Fase 3: computa l'effettivo valore. Si fa adoperando prev (o il valore prima nell'array
 *              o il valore ricevuto dal rank precedente) e succ (o il valore dopo nell'array o il valore
 *              ricevuto dal rank successivo) */
-            prev = k == 0 ? prev_last : layer_copy[k-1];
-            prev = k == local_size ? succ_first : layer_copy[k-1];
+            float prev = k == 0 ? prev_last : layer_copy[k-1];
+            float succ = k == local_size ? succ_first : layer_copy[k-1];              // TODO Avevi scritto "prev" di nuovo
 
             layer[k] = ( prev + layer_copy[k] + succ ) / 3;
+
+            // TODO Penso che per l'OpenMP ( per quanto riguarda il for ) si possa fare senza incappare a problemi
+            // TODO Al limite lo vediamo domani
           }       
 
         int start = 1, end = local_size;
@@ -205,10 +209,9 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         data.local_maximum = local_maximum;
         data.local_positions = local_positions;
 
+        MPI_Allreduce(MPI_IN_PLACE, &data, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
         maximum[i] = data.local_maximum;
         positions[i] = data.local_positions;
-
-        MPI_Allreduce(MPI_IN_PLACE, &data, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
     }
     omp_destroy_lock(&writelock);
     free(layer);
