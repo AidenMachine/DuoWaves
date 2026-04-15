@@ -53,8 +53,6 @@ static void update( float *layer, int layer_size, int k, int pos, float energy, 
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions, const int rank, const int size) {
     int i, j, k;
     // PARTE NUOVA --------------------------------------------------------
-    float local_maximum = -1.0f;
-    int local_positions = -1;
 
     omp_lock_t writelock;
     omp_init_lock(&writelock);
@@ -146,43 +144,39 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
          * Il resto lo lascio a te ( anche perché non so alto ahah ).
          * Ma confido in te, Brother.
          */
+        int left_neighbor = (rank == 0) ? MPI_PROC_NULL : rank - 1;
+        int right_neighbor = (rank == size - 1) ? MPI_PROC_NULL : rank + 1;
 
-        /* LUCA: parallelizzato senza troppi cazzi, é solo una copia */
-        # pragma omp parallel for
-        for( k=0; k<local_size; k++ ) 
+        MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 0,
+                     &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
+                     &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        #pragma omp parallel for
+        for( k=0; k <= local_size + 1; k++ )
             layer_copy[k] = layer[k];
 
-        /* LUCA: qui invece i cazzoni rischiamo di prenderli se non si fa attenzione; il primo e l'ultimo
-         * GLOBALI non devono essere presi in considerazione, e bisogna mandare/ricevere tra processi
-         * la prima e ultima cella; OCCHIO (cit. Lele Adani)*/
-        int prev_rank = rank-1; int succ_rank = rank+1;
-        float my_first, my_last;
-        float prev_last, succ_first;
+        #pragma omp parallel for
+        for (k = 1; k <= local_size; k++) {
+            if (rank == 0 && k == 1) continue;
+            if (rank == size - 1 && k == local_size) continue;
+            layer[k] = (layer_copy[k-1] + layer_copy[k] + layer_copy[k+1]) / 3.0f;
+        }
 
-        /* Fase 1: si fanno le SendRecv. Ovviamente, il primo rank non riceve/manda da/a quello precedente  
-         * l'ultimo rank non riceve/manda da/a quello dopo */
-        if (!(prev_rank==-1))
-          MPI_Sendrecv(&my_first, 1, MPI_FLOAT, prev_rank, 0,
-                       &prev_last, 1, MPI_FLOAT, prev_rank, 0,
-                       MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        if (!(succ_rank==size))
-          MPI_Sendrecv(&my_last, 1, MPI_FLOAT, succ_rank, local_size-1,
-                       &succ_first, 1, MPI_FLOAT, succ_rank, local_size-1,
-                       MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        /* --- MODIFICA: SECONDO SCAMBIO MPI (Per la ricerca del massimo) --- */
+        /* Serve a far sapere ai vicini che la tua energia è cambiata dopo la media */
+        MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 0,
+                     &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
+                     &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-        for( k=0; k<local_size; k++ ) {
-            float prev, succ;
-            /* Fase 2: se sono la prima o l'ultima cella globali, salta */
-            if ((prev_rank == -1 && k==0) || (succ_rank == size && k == local_size-1)) continue;
-            
-            /* Fase 3: computa l'effettivo valore. Si fa adoperando prev (o il valore prima nell'array
-*              o il valore ricevuto dal rank precedente) e succ (o il valore dopo nell'array o il valore
-*              ricevuto dal rank successivo) */
-            prev = k == 0 ? prev_last : layer_copy[k-1];
-            prev = k == local_size ? succ_first : layer_copy[k-1];
-
-            layer[k] = ( prev + layer_copy[k] + succ ) / 3;
-          }       
+        float local_maximum = -1.0f;
+        int local_positions = -1;
 
         int start = 1, end = local_size;
         if ( rank == 0 ) start++;
@@ -205,10 +199,9 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         data.local_maximum = local_maximum;
         data.local_positions = local_positions;
 
+        MPI_Allreduce(MPI_IN_PLACE, &data, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
         maximum[i] = data.local_maximum;
         positions[i] = data.local_positions;
-
-        MPI_Allreduce(MPI_IN_PLACE, &data, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
     }
     omp_destroy_lock(&writelock);
     free(layer);
