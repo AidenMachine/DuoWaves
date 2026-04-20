@@ -5,6 +5,7 @@
   </component>
   <component name="BackendCodeEditorMiscSettings">
     <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
   </component>
   <component name="CMakeProjectFlavorService">
     <option name="flavorId" value="CMakePlainProjectFlavor" />
@@ -18,7 +19,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc848f26-8edc-4042-b34a-4ecae755d021" name="Changes" comment="Ng" />
+    <list default="true" id="cc848f26-8edc-4042-b34a-4ecae755d021" name="Changes" comment="Ng">
+      <change beforePath="$PROJECT_DIR$/energy_storms_mpi_omp.c" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_mpi_omp.c" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -107,6 +110,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "v1-da-runnare",
     "git.auto.fetch.suggestion.counter": "1",
     "last_opened_file_path": "/home/aiden/Desktop/DuoWaves",
     "node.js.detected.package.eslint": "true",
