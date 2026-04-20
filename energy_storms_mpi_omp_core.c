@@ -50,9 +50,13 @@ static void update( float *layer, int layer_size, int k, int pos, float energy, 
 
 
 // Ricorda di inserire nel "verbale" il fatto di aver aggiunto due parametri alla funzione
-void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions, const int rank, const int size) {
+void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     int i, j, k;
     // PARTE NUOVA --------------------------------------------------------
+
+    int size, rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     omp_lock_t writelock;
     omp_init_lock(&writelock);
