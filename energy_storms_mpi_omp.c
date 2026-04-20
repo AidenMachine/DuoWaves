@@ -24,7 +24,7 @@
 #include <mpi.h>
 #include "energy_storms.h"
 
-void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions);
+void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions, int rank, int size);
 
 /*
  * MAIN PROGRAM
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     double ttotal = cp_Wtime();
 
     /* START: Do NOT optimize/parallelize the code of the main program above this point */
-    core(layer_size, num_storms, storms, maximum, positions);
+    core(layer_size, num_storms, storms, maximum, positions, rank, size);
     /* END: Do NOT optimize/parallelize the code below this point */
 
     /* 5. End time measurement */
