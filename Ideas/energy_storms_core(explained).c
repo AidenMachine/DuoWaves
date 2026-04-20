@@ -54,9 +54,10 @@ static void update( float *layer, int layer_size, int k, int pos, float energy )
   * layer_size -> numero totale delle celle dell'array;
   * num_storms -> numero totale di ondate di particelle da elaborare;
   * *storms -> array di struct ( contiene tutti i dati letti dal file );
-  * *maximum -> per registrare i valori output piu alti misurati sulla superficie;
-  * *positions -> lavora al passo di *maximum e serve per salvare l'indice ( il punto ) in cui si
-  *               sono verificati i picchi più alti;
+  * *maximum -> è un array che memorizza il valore di energia più alto registrato in
+  *             assoluto per ogni singola ondata;
+  * *positions -> è un array che memorizza l'indice (la posizione esatta) della cella in cui si è
+  *               verificato quel picco di energia.
  */
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     int i, j, k;          // Non ne sono sicuro, ma FORSE è meglio se spostiamo le singole variabili dentro il for ( non vorrei che facessero casino con i threads... )
@@ -122,8 +123,8 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         for( k=0; k<layer_size; k++ ) 
             layer_copy[k] = layer[k];
 
-        /* PASSO 2.2: Spalma l'energia facendo la media di 3 celle ( manco la nutella ). 
-           Nota i limiti del for: k parte da 1 e arriva a layer_size-1. I bordi estremi 
+        /* PASSO 2.2: Spalma l'energia facendo la media di 3 celle (manco la nutella).
+           Nota i limiti del for: k parte da 1 e arriva a layer_size-1 escluso. I bordi estremi
            della superficie non partecipano al rilassamento e restano immobili.
            -> ALERT MPI: Per calcolare layer[mio_inizio], ti servirà layer_copy[mio_inizio - 1], 
            che si trova nella memoria del processo vicino! Qui devi scambiare le celle fantasma. */
