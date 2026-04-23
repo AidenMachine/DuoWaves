@@ -97,10 +97,10 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * saperlo. Forse converrebbe unificare tutto (?). Perché facendo "pragma" due volte vado incontro
      * al "set" dei threads per due volte ( e non so se questo comporta rallentamenti )
      * TODO Proviamo a fine parallelizzazione! */
-    #pragma omp parallel for
+    #pragma omp parallel for private(k)
         for ( k = 0; k < local_size + 2; k++ ) layer[k] = 0.0f;
 
-    #pragma omp parallel for
+    #pragma omp parallel for private(k)
         for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
 
 
@@ -117,7 +117,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     for( i=0; i<num_storms; i++) {
 
         /* SINGOLA PARTICELLA */
-        #pragma omp parallel for
+        #pragma omp parallel for private(j,k)
         for( j=0; j<storms[i].size; j++ ) {
 
             /* Energia dell'impatto, calcolata x 1000 */
@@ -159,11 +159,11 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                      &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0,
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-        #pragma omp parallel for
+        #pragma omp parallel for private(k)
         for( k=0; k <= local_size + 1; k++ )
             layer_copy[k] = layer[k];
 
-        #pragma omp parallel for
+        #pragma omp parallel for private(k)
         for (k = 1; k <= local_size; k++) {
             if (rank == 0 && k == 1) continue;
             if (rank == size - 1 && k == local_size) continue;
@@ -186,7 +186,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         if ( rank == 0 ) start++;
         if ( rank == size - 1 ) end--;
 
-        #pragma omp parallel for
+        #pragma omp parallel for private(k)
         for( k = start; k <= end; k++ ) {
             if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
 
