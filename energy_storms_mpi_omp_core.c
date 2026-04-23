@@ -27,7 +27,7 @@ static void update( float *layer, int layer_size, int k, int pos, float energy, 
     distance = distance + 1;
 
     /* 3. Square root of the distance */
-    /* NOTE: Real world atenuation typically depends on the square of the distance.
+    /* NOTE:  Real world atenuation typically depends on the square of the distance.
        We use here a tailored equation that affects a much wider range of cells */
     float atenuacion = sqrtf( (float)distance );
 
