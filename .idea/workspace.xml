@@ -30,11 +30,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc848f26-8edc-4042-b34a-4ecae755d021" name="Changes" comment="Inseriti file sbatch per runnare piu facilmente">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="cc848f26-8edc-4042-b34a-4ecae755d021" name="Changes" comment="Ho reso privati gli indici i,j,k dei vari for">
       <change beforePath="$PROJECT_DIR$/energy_storms_mpi_omp" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_mpi_omp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/energy_storms_mpi_omp_core.c" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_mpi_omp_core.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/energy_storms_mpi_omp_core.o" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_mpi_omp_core.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job_test.sh" beforeDir="false" afterPath="$PROJECT_DIR$/job_test.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/student.mk" beforeDir="false" afterPath="$PROJECT_DIR$/student.mk" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -222,7 +221,7 @@
       <workItem from="1776787525878" duration="735000" />
       <workItem from="1776948145422" duration="370000" />
       <workItem from="1776948657524" duration="7000" />
-      <workItem from="1776958401278" duration="1229000" />
+      <workItem from="1776958401278" duration="2039000" />
     </task>
     <task id="LOCAL-00001" summary="Added some extra comments and a part of new code">
       <option name="closed" value="true" />
@@ -264,7 +263,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776958448561</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Ho reso privati gli indici i,j,k dei vari for">
+      <option name="closed" value="true" />
+      <created>1776960506035</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1776960506035</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -275,7 +282,8 @@
     <MESSAGE value="Ng" />
     <MESSAGE value="nigeria" />
     <MESSAGE value="Inseriti file sbatch per runnare piu facilmente" />
-    <option name="LAST_COMMIT_MESSAGE" value="Inseriti file sbatch per runnare piu facilmente" />
+    <MESSAGE value="Ho reso privati gli indici i,j,k dei vari for" />
+    <option name="LAST_COMMIT_MESSAGE" value="Ho reso privati gli indici i,j,k dei vari for" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
