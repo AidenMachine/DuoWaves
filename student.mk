@@ -4,7 +4,7 @@ MPI_PROCS=10
 
 # --- MPI Run Flags ---
 MPIRUN_FLAGS = -np $(MPI_PROCS) \
-               --bind-to none
+               --bind-to none \
 
 # --- Compiler Flags ---
 # Flags for MPI+OpenMP code
