@@ -1,15 +1,15 @@
 # --- Execution Parameters ---
-export OMP_NUM_THREADS=2
+export OMP_NUM_THREADS=32
 MPI_PROCS=10
 
 # --- MPI Run Flags ---
 MPIRUN_FLAGS = -np $(MPI_PROCS) \
-               --bind-to none \
+               --bind-to none
 
 # --- Compiler Flags ---
 # Flags for MPI+OpenMP code
 # Uncomment and add extra flags if you need them
-MPI_OMP_EXTRA_CFLAGS = -O3
+MPI_OMP_EXTRA_CFLAGS =-O3
 #MPI_OMP_EXTRA_LIBS =
 
 # Flags for CUDA code
