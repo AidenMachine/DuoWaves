@@ -151,6 +151,19 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         int left_neighbor = (rank == 0) ? MPI_PROC_NULL : rank - 1;
         int right_neighbor = (rank == size - 1) ? MPI_PROC_NULL : rank + 1;
 
+
+        // 1. Tutti mandano il proprio bordo destro al vicino di destra,
+        // e ricevono il bordo sinistro dal vicino di sinistra (Tag 0)
+        MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
+                     &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        // 2. Tutti mandano il proprio bordo sinistro al vicino di sinistra,
+        // e ricevono il bordo destro dal vicino di destra (Tag 1)
+        MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 1,
+                     &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 1,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        /* METODO VECCHIO
         MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 0,
                      &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -158,10 +171,29 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
                      &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0,
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        */
 
+        /*
+        // TODO Da inserire il pointerswap qui ( e possibilmente altrove ma non credo ci sia bisogno a prima occhiata )
         #pragma omp parallel for private(k)
         for( k=0; k <= local_size + 1; k++ )
             layer_copy[k] = layer[k];
+        */
+
+        // TEST_1 Pointer_swaps
+        // TODO Va rivisto ma l'idea è questa ( ho provato ma non worka Zi, per il semplice fatto che poi facciamo lavorare la roba su dati sbagliati )
+        // TODO Ergo... escono valori errati ( i tempi sono bene o male simili, ma devo ancora testare su Cluster. Ho fatto solo in locale )
+        /*
+        float temp = *layer_copy;
+        *layer_copy = *layer;
+        *layer = temp;
+        * TODO NO WAY FRA... Avevo sbagliato a passare i valori... avevo scambiato solo il valore della PRIMA cella... so proprio ricchione
+        */
+
+        // TEST_2
+        float *temp = layer_copy;
+        layer_copy = layer;
+        layer = temp;
 
         #pragma omp parallel for private(k)
         for (k = 1; k <= local_size; k++) {
@@ -170,14 +202,26 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             layer[k] = (layer_copy[k-1] + layer_copy[k] + layer_copy[k+1]) / 3.0f;
         }
 
+
         /* --- MODIFICA: SECONDO SCAMBIO MPI (Per la ricerca del massimo) --- */
-        /* Serve a far sapere ai vicini che la tua energia è cambiata dopo la media */
+        /* Serve a far sapere ai vicini che la tua energia  cambiata dopo la media */
+        MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
+                     &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 1,
+                     &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 1,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        /* --- MODIFICA: SECONDO SCAMBIO MPI (Per la ricerca del massimo) --- */
+        /* Serve a far sapere ai vicini che la tua energia è cambiata dopo la media
         MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 0,
                      &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
                      &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0,
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        */
 
         float local_maximum = -1.0f;
         int local_positions = -1;
@@ -199,13 +243,13 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             }
         }
 
-        LocalData data;
-        data.local_maximum = local_maximum;
-        data.local_positions = local_positions;
+        LocalData data_send, data_recv;
+        data_send.local_maximum = local_maximum;
+        data_send.local_positions = local_positions;
 
-        MPI_Allreduce(MPI_IN_PLACE, &data, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
-        maximum[i] = data.local_maximum;
-        positions[i] = data.local_positions;
+        MPI_Allreduce(&data_send, &data_recv, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
+        maximum[i] = data_recv.local_maximum;
+        positions[i] = data_recv.local_positions;
     }
     omp_destroy_lock(&writelock);
     free(layer);

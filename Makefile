@@ -78,6 +78,26 @@ run_seq:
 
 run_mpi:
 		mpirun $(MPIRUN_FLAGS) ./energy_storms_mpi_omp 20000 test_files/test_02_a30k_p20k_w1 test_files/test_02_a30k_p20k_w2 test_files/test_02_a30k_p20k_w3 test_files/test_02_a30k_p20k_w4 test_files/test_02_a30k_p20k_w5 test_files/test_02_a30k_p20k_w6
+		
+run_local_avg: energy_storms_mpi_omp
+	@echo "--- INIZIO 10 ESECUZIONI SUL PC LOCALE (10 CORE) ---"; \
+	export OMP_NUM_THREADS=5; \
+	TOTAL=0; \
+	for i in $$(seq 1 10); do \
+		OUT=$$(mpirun --bind-to none -np 2 ./energy_storms_mpi_omp 20000 test_files/test_02_a30k_p20k_w1 test_files/test_02_a30k_p20k_w2 test_files/test_02_a30k_p20k_w3 test_files/test_02_a30k_p20k_w4 test_files/test_02_a30k_p20k_w5 test_files/test_02_a30k_p20k_w6); \
+		T=$$(echo "$$OUT" | grep -oP 'Time:\s*\K[0-9.eE+-]+' | tail -n1); \
+		if [ -z "$$T" ]; then \
+			echo "Run $$i: Errore o tempo non trovato. Output:"; \
+			echo "$$OUT"; \
+			exit 1; \
+		fi; \
+		echo "Run $$i completato: $$T secondi"; \
+		TOTAL=$$(awk -v tot="$$TOTAL" -v t="$$T" 'BEGIN {print tot + t}'); \
+	done; \
+	AVG=$$(awk -v tot="$$TOTAL" 'BEGIN {printf "%.6f", tot / 10}'); \
+	echo "----------------------------------------"; \
+	echo "--- TEMPO MEDIO SU 10 RUN: $$AVG s ---"; \
+	echo "----------------------------------------"
 
 run_cuda:
 		srun -N 1 -n 1 ./energy_storms_cuda 20000 test_files/test_02_a30k_p20k_w1 test_files/test_02_a30k_p20k_w2 test_files/test_02_a30k_p20k_w3 test_files/test_02_a30k_p20k_w4 test_files/test_02_a30k_p20k_w5 test_files/test_02_a30k_p20k_w6
