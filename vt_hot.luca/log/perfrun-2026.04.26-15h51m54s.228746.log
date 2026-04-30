@@ -1,0 +1,37 @@
+0 [139685159668032] INFO perfrun.launcher <> - Launcher main begin
+0 [139685159668032] INFO perfrun.launcher <> - MessageCatalogInit finished
+0 [139685159668032] INFO perfrun.launcher <> - Launcher instance created
+0 [139685159668032] INFO perfrun.launcher <> - argc = 6; cmdline = /opt/intel/oneapi/vtune/2025.8/bin64/amplxe-runss -dump-vdso -r /home/luca/Documents/uni/PEM/DuoWaves/vt_hot.luca --tmp-dir /tmp/amplxe-tmp-luca 
+306 [139685159668032] INFO perfrun.perfcollector <> - SEP tool path: /opt/intel/oneapi/vtune/2025.8/bin64/sep
+309 [139685159668032] INFO perfrun.launcher <> - create msngr2::ICliToolContext
+310 [139685159668032] INFO perfrun.launcher <> - create file finder object
+310 [139684994868928] INFO perfrun.launcher <> - plugin [remoteplug] was disabled because it doesn't support the given collection type.
+310 [139684994868928] INFO perfrun.launcher <> - plugin [system] was disabled because it doesn't support the given collection type.
+310 [139684994868928] INFO perfrun.vdso <> - dumping [vdso] pseudomodule
+311 [139684994868928] INFO perfrun.launcher <> - plugin [itt] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [ptracecollector] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [gpu] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [mrte] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [emon] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [cuscol] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [stdsrc] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [sep] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [vtsspp] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [perf] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [aoclprofile] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [tpss] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [media] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [parallelfs] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [power] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [l0_metrics] was disabled because it doesn't support the given collection type.
+311 [139684994868928] INFO perfrun.launcher <> - plugin [stall_reasons] was disabled because it doesn't support the given collection type.
+311 [139685159668032] INFO perfrun.launcher <> - Application exit code: 0
+311 [139685159668032] INFO perfrun.launcher <> - Exit code: 0

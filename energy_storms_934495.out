@@ -1,0 +1,20 @@
+=== JOB INFO ===
+Job ID:        934495
+Nodes:         4 (node[130,132-134])
+MPI tasks:     8
+CPUs per task: 30 (OMP_NUM_THREADS=30)
+================
+--- COMPILAZIONE ---
+mpicc  -fopenmp -O3 energy_storms_mpi_omp.c energy_storms_mpi_omp_core.o -lm  -o energy_storms_mpi_omp
+--- ESECUZIONE (10 run) ---
+Run 1: 22.873664 s
+Run 2: 23.234615 s
+Run 3: 23.974668 s
+Run 4: 22.847542 s
+Run 5: 23.141087 s
+Run 6: 23.533850 s
+Run 7: 23.807811 s
+Run 8: 23.860444 s
+Run 9: 23.306103 s
+Run 10: 23.783388 s
+--- TEMPO MEDIO SU 10 RUN: 23.436317 s ---
