@@ -187,7 +187,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         float temp = *layer_copy;
         *layer_copy = *layer;
         *layer = temp;
-        * TODO NO WAY FRA... Avevo sbagliato a passare i valori... avevo scambiato solo il valore della PRIMA cella... so proprio ricchione
+        * TODO NO WAY FRA... Avevo sbagliato a passare i valori... avevo scambiato solo il valore della PRIMA cella... 
         */
 
         // TEST_2

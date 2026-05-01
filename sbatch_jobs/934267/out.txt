@@ -1,3 +1,0 @@
---- COMPILAZIONE ---
-make: 'energy_storms_mpi_omp' is up to date.
---- ESECUZIONE (10 run, target: run_mpi) ---
