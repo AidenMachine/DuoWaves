@@ -102,6 +102,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
     #pragma omp parallel for private(k)
         for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
+    // TODO Si potrebbe provare ad inserire un "memset". Ciò però porterebbe tutto il lavoro al singolo Core 0...
 
 
     // ---------------------------------------------------------------------

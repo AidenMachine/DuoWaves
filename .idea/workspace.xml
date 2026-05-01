@@ -13,9 +13,7 @@
   <component name="CMakeRunConfigurationManager">
     <generated>
       <config projectName="DuoWaves" targetName="all" />
-      <config projectName="DuoWaves" targetName="run_local_avg" />
       <config projectName="DuoWaves" targetName="energy_storms_cuda" />
-      <config projectName="DuoWaves" targetName="run_seq" />
       <config projectName="DuoWaves" targetName="energy_storms_mpi_omp" />
       <config projectName="DuoWaves" targetName="run_mpi" />
       <config projectName="DuoWaves" targetName="energy_storms_seq" />
@@ -31,15 +29,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc848f26-8edc-4042-b34a-4ecae755d021" name="Changes" comment="Le versioni non cambiano. La directory ora contiene però un file sbatch aggiuntivo">
+    <list default="true" id="cc848f26-8edc-4042-b34a-4ecae755d021" name="Changes" comment="Inserito il pointer-swap al posto della copia del layer.&#10;Ci siamo risparmiati un O(n) fratm!">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/energy_storms_core.o" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/energy_storms_mpi_omp_core.c" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_mpi_omp_core.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/energy_storms_mpi_omp_core.o" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_mpi_omp_core.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/energy_storms_seq" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/job_test.sh" beforeDir="false" afterPath="$PROJECT_DIR$/job_test.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_avg.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_avg.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,6 +49,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -154,7 +148,22 @@
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Makefile" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="Makefile" CONFIG_NAME="Makefile" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="Makefile">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="all" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="all" CONFIG_NAME="all" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="all">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="all" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="all" CONFIG_NAME="all" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="all">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="debug" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="debug" CONFIG_NAME="debug" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="debug">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
@@ -169,7 +178,22 @@
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
     </configuration>
+    <configuration name="energy_storms_cuda" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="energy_storms_cuda" CONFIG_NAME="energy_storms_cuda" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="energy_storms_cuda">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="energy_storms_mpi_omp" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="energy_storms_mpi_omp" CONFIG_NAME="energy_storms_mpi_omp" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="energy_storms_mpi_omp">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="energy_storms_mpi_omp" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="energy_storms_mpi_omp" CONFIG_NAME="energy_storms_mpi_omp" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="energy_storms_mpi_omp">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="energy_storms_seq" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="energy_storms_seq" CONFIG_NAME="energy_storms_seq" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="energy_storms_seq">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
@@ -184,12 +208,17 @@
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
     </configuration>
+    <configuration name="help" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="help" CONFIG_NAME="help" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="help">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="run_cuda" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="run_cuda" CONFIG_NAME="run_cuda" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="run_cuda">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration name="run_local_avg" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="run_local_avg" CONFIG_NAME="run_local_avg" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="run_local_avg">
+    <configuration name="run_cuda" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="run_cuda" CONFIG_NAME="run_cuda" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="run_cuda">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
@@ -199,9 +228,14 @@
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration name="run_seq" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="run_seq" CONFIG_NAME="run_seq" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="run_seq">
+    <configuration name="run_mpi" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DuoWaves" TARGET_NAME="run_mpi" CONFIG_NAME="run_mpi" version="1" RUN_TARGET_PROJECT_NAME="DuoWaves" RUN_TARGET_NAME="run_mpi">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -213,9 +247,7 @@
       <item itemvalue="Native Application.energy_storms_seq" />
       <item itemvalue="Native Application.help" />
       <item itemvalue="Native Application.run_cuda" />
-      <item itemvalue="Native Application.run_local_avg" />
       <item itemvalue="Native Application.run_mpi" />
-      <item itemvalue="Native Application.run_seq" />
     </list>
   </component>
   <component name="TaskManager">
@@ -235,7 +267,8 @@
       <workItem from="1776958401278" duration="2039000" />
       <workItem from="1777209914266" duration="6128000" />
       <workItem from="1777293454468" duration="960000" />
-      <workItem from="1777489652690" duration="1372000" />
+      <workItem from="1777489652690" duration="1477000" />
+      <workItem from="1777656328106" duration="1393000" />
     </task>
     <task id="LOCAL-00001" summary="Added some extra comments and a part of new code">
       <option name="closed" value="true" />
@@ -293,7 +326,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777210097523</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Inserito il pointer-swap al posto della copia del layer.&#10;Ci siamo risparmiati un O(n) fratm!">
+      <option name="closed" value="true" />
+      <created>1777491123848</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1777491123848</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -306,7 +347,8 @@
     <MESSAGE value="Inseriti file sbatch per runnare piu facilmente" />
     <MESSAGE value="Ho reso privati gli indici i,j,k dei vari for" />
     <MESSAGE value="Le versioni non cambiano. La directory ora contiene però un file sbatch aggiuntivo" />
-    <option name="LAST_COMMIT_MESSAGE" value="Le versioni non cambiano. La directory ora contiene però un file sbatch aggiuntivo" />
+    <MESSAGE value="Inserito il pointer-swap al posto della copia del layer.&#10;Ci siamo risparmiati un O(n) fratm!" />
+    <option name="LAST_COMMIT_MESSAGE" value="Inserito il pointer-swap al posto della copia del layer.&#10;Ci siamo risparmiati un O(n) fratm!" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
