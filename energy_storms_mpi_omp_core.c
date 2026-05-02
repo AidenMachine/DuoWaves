@@ -88,8 +88,10 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * si andrebbe incontro alla creazione di "n" celle di memoria ( da 4 byte ) piu 2 celle da 2
      * Tutto questo perché l'operatore * con "sizeof" ha la precedenza
      */
-    float *layer = ( float * )malloc( sizeof( float ) * (local_size + 2) );
-    float *layer_copy = ( float * )malloc( sizeof( float ) * (local_size + 2) );
+    //float *layer = ( float * )malloc( sizeof( float ) * (local_size + 2) );
+    //float *layer_copy = ( float * )malloc( sizeof( float ) * (local_size + 2) );
+    float *layer = calloc( (local_size + 2), sizeof( float ));
+    float *layer_copy = calloc( (local_size + 2), sizeof( float ));
     if ( layer == NULL || layer_copy == NULL ) {
         fprintf(stderr,"Error_rank_%d: Allocating the layer memory\n", rank);
         exit( EXIT_FAILURE );
@@ -99,19 +101,19 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * saperlo. Forse converrebbe unificare tutto (?). Perché facendo "pragma" due volte vado incontro
      * al "set" dei threads per due volte ( e non so se questo comporta rallentamenti )
      * TODO Proviamo a fine parallelizzazione! */
-    #pragma omp parallel for private(k)
-        for ( k = 0; k < local_size + 2; k++ ) layer[k] = 0.0f;
+    //#pragma omp parallel for private(k)
+    //    for ( k = 0; k < local_size + 2; k++ ) layer[k] = 0.0f;
 
-    #pragma omp parallel for private(k)
-        for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
+    //#pragma omp parallel for private(k)
+    //    for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
     // TODO Si potrebbe provare ad inserire un "memset". Ciò però porterebbe tutto il lavoro al singolo Core 0...
 
     // IDEA: Magari potremmo mettere un controllo che, se viene superata una certa grandezza, viene usato un metodo.
     // Altrimenti viene utilizzato l'altro ( che ne dici )??
 
     // Test_1 ( da provare ancora, LO "0" dovrebbe corrispondere allo stesso modo allo 0.0f, senza portare problemi alle operazioni future )
-    // memset(layer, 0, (local_size + 2) * sizeof(float));
-    // memset(layer_copy, 0, (local_size + 2) * sizeof(float));
+    //memset(layer, 0, (local_size + 2) * sizeof(float));
+    //memset(layer_copy, 0, (local_size + 2) * sizeof(float));
 
     // Test_2 ( commentare la parte superiore ed utilizzare DIRETTAMENTE "calloc" )
     // In teoria dovrebbe essere più rapida se gli array sono grandi
