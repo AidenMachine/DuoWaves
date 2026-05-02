@@ -3,6 +3,8 @@
 #include<math.h>
 #include<mpi.h>
 #include<omp.h>
+#include <string.h>
+
 #include"energy_storms.h"
 
 typedef struct{
@@ -104,6 +106,17 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
     // TODO Si potrebbe provare ad inserire un "memset". Ciò però porterebbe tutto il lavoro al singolo Core 0...
 
+    // IDEA: Magari potremmo mettere un controllo che, se viene superata una certa grandezza, viene usato un metodo.
+    // Altrimenti viene utilizzato l'altro ( che ne dici )??
+
+    // Test_1 ( da provare ancora, LO "0" dovrebbe corrispondere allo stesso modo allo 0.0f, senza portare problemi alle operazioni future )
+    // memset(layer, 0, (local_size + 2) * sizeof(float));
+    // memset(layer_copy, 0, (local_size + 2) * sizeof(float));
+
+    // Test_2 ( commentare la parte superiore ed utilizzare DIRETTAMENTE "calloc" )
+    // In teoria dovrebbe essere più rapida se gli array sono grandi
+    // float *layer = calloc( (local_size + 2), sizeof( float ));
+    // float *layer_copy = calloc( (local_size + 2), sizeof( float ));
 
     // ---------------------------------------------------------------------
     

@@ -29,10 +29,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc848f26-8edc-4042-b34a-4ecae755d021" name="Changes" comment="Inserito il pointer-swap al posto della copia del layer.&#10;Ci siamo risparmiati un O(n) fratm!">
+    <list default="true" id="cc848f26-8edc-4042-b34a-4ecae755d021" name="Changes" comment="Aggiunta commenti per i &quot;malloc&quot; e per l'inizializzazione 0.0f">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/energy_storms_mpi_omp_core.c" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_mpi_omp_core.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job_test.sh" beforeDir="false" afterPath="$PROJECT_DIR$/job_test.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -233,11 +232,6 @@
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="Native Application.Makefile" />
       <item itemvalue="Native Application.all" />
@@ -268,7 +262,8 @@
       <workItem from="1777209914266" duration="6128000" />
       <workItem from="1777293454468" duration="960000" />
       <workItem from="1777489652690" duration="1477000" />
-      <workItem from="1777656328106" duration="1393000" />
+      <workItem from="1777656328106" duration="1724000" />
+      <workItem from="1777713194312" duration="1916000" />
     </task>
     <task id="LOCAL-00001" summary="Added some extra comments and a part of new code">
       <option name="closed" value="true" />
@@ -334,7 +329,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777491123848</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Aggiunta commenti per i &quot;malloc&quot; e per l'inizializzazione 0.0f">
+      <option name="closed" value="true" />
+      <created>1777658020113</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1777658020113</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -348,7 +351,8 @@
     <MESSAGE value="Ho reso privati gli indici i,j,k dei vari for" />
     <MESSAGE value="Le versioni non cambiano. La directory ora contiene però un file sbatch aggiuntivo" />
     <MESSAGE value="Inserito il pointer-swap al posto della copia del layer.&#10;Ci siamo risparmiati un O(n) fratm!" />
-    <option name="LAST_COMMIT_MESSAGE" value="Inserito il pointer-swap al posto della copia del layer.&#10;Ci siamo risparmiati un O(n) fratm!" />
+    <MESSAGE value="Aggiunta commenti per i &quot;malloc&quot; e per l'inizializzazione 0.0f" />
+    <option name="LAST_COMMIT_MESSAGE" value="Aggiunta commenti per i &quot;malloc&quot; e per l'inizializzazione 0.0f" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
