@@ -62,6 +62,19 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     omp_lock_t writelock;
     omp_init_lock(&writelock);
 
+    // NUOVA PARTE --------------------------------------------------------------------------------------------------------
+    // In poche parole, calcolo le sqrt() tutte ora di tutti i valori possibili, senza richiami a funzioni
+    // IN TEORIA dovrebbe migliorare il tempo perché viene fatto tutto insieme. Bisogna vedere però, ovviamente, se questa cosa ha effetto positivo.
+    // Faccio "layer_size + 10" perché, in questo modo, vado a coprire possibbili valori di distance non coperti da layer_size ( quelli calcolati con modulo )
+    int all_distances = layer_size + 10;
+    float *sqrt_table = malloc(all_distances * sizeof(float));
+
+    #pragma omp parallel for private(i)
+    for ( i = 0; i < all_distances; i++ ) {
+        sqrt_table[i] = sqrtf((float)i);
+    }
+    // --------------------------------------------------------------------------------------------------------------------
+
     // Calcolo chunk_locale
     int local_chunk = layer_size / size;            // Il chunk è "per tutti"
     int resto = layer_size % size;                  // Remainder come parola mi fa cagare quindi uso "resto"
@@ -154,7 +167,24 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                  * k = 1 -> Dove dovrei partire con l'array normale
                  * offset + k - 1 -> Parto dall'indice del pezzo che ha il processo
                  */
-                update( layer, layer_size, k, position, energy , offset + k - 1);
+
+                // PARTE NUOVA ----------------------------------------------------------------------------------------
+                // Evito i commenti perché tanto stanno sopra ( calcoli equivalenti )
+                // Faccio cosi perché, in teoria, non vi è chiamata alla funzione, dunque, nessuna creazione e copia di parametri etc...
+                int global_k = offset + k - 1;
+                int distance = position - global_k;
+                if ( distance < 0 ) distance = - distance;
+                distance = distance + 1;
+                float atenuacion = sqrt_table[distance];               // Speriamo sia piu fast
+
+                float energy_k = energy / layer_size / atenuacion;
+
+                if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size ) {
+                    #pragma omp atomic
+                    layer[k] += energy_k;
+                }
+                // ----------------------------------------------------------------------------------------------------
+                //update( layer, layer_size, k, position, energy , offset + k - 1);
             }
         }
 
@@ -271,6 +301,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         positions[i] = data_recv.local_positions;
     }
     omp_destroy_lock(&writelock);
+    free(sqrt_table);
     free(layer);
     free(layer_copy);
 }
