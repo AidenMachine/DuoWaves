@@ -29,8 +29,7 @@ static void update( float *layer, int layer_size, int k, int pos, float energy, 
     distance = distance + 1;
 
     /* 3. Square root of the distance */
-    /* NOTE:  Real world atenuation typically depends on the square of the distance.
-       We use here a tailored equation that affects a much wider range of cells */
+    /* TODO Da cambiare, in qualche modo, questa funzione. Credo sia una delle poche cose che al momento rallenti molto il codice */
     float atenuacion = sqrtf( (float)distance );
 
     /* 4. Compute attenuated energy */
@@ -90,6 +89,10 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      */
     //float *layer = ( float * )malloc( sizeof( float ) * (local_size + 2) );
     //float *layer_copy = ( float * )malloc( sizeof( float ) * (local_size + 2) );
+
+    // Secondo un utente di GitHub -> calloc() in alcuni casi skippa una parte di lavoro ed ottiene gli stessi risultati
+    // Ergo, dovrebbe essere più veloce. In questi casi meglio utilizzare questo metodo
+    // https://gist.github.com/jadia/0806b7232773695b41f0e5c8a7fc9e0b
     float *layer = calloc( (local_size + 2), sizeof( float ));
     float *layer_copy = calloc( (local_size + 2), sizeof( float ));
     if ( layer == NULL || layer_copy == NULL ) {
