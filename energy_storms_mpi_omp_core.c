@@ -12,44 +12,6 @@ typedef struct{
     int local_positions;
 }LocalData;
 
-/* THIS FUNCTION CAN BE MODIFIED */
-/* Function to update a single position of the layer */
-static void update( float *layer, int layer_size, int k, int pos, float energy, int global_k) {
-    /* Il calcolo rimane lo stesso, solo che si utilizza l'indice k globale, altrimenti
-     * si andrebbe in Segmentation_fault */
-
-    /* Anche se i due processi non comunicano, le particelle vengono elaborate tutte allo stesso modo,
-     * dunque attraverso il calcolo di "distance", "sqrt(...)" etc... si ottiene quanta energia viene
-     * dispersa ( se è minore di THRESHOLD/layer_size allora non viene salvata )
-     */
-    int distance = pos - global_k;
-    if ( distance < 0 ) distance = - distance;
-
-    /* 2. Impact cell has a distance value of 1 */
-    distance = distance + 1;
-
-    /* 3. Square root of the distance */
-    /* TODO Da cambiare, in qualche modo, questa funzione. Credo sia una delle poche cose che al momento rallenti molto il codice */
-    float atenuacion = sqrtf( (float)distance );
-
-    /* 4. Compute attenuated energy */
-    float energy_k = energy / layer_size / atenuacion;
-
-    /* 5. Do not add if its absolute value is lower than the threshold
-     * TODO Probabilmente è l'unico punto dove inserirò ATOMIC ( per ora )
-     */
-    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size ) {
-        #pragma omp atomic
-        layer[k] = layer[k] + energy_k;
-    }
-    /*
-     * Inserire #PRAGMA_OMP_ATOMIC qui sopra non è stato utile se il "parallel for" divide il layer della singola particella,
-     * per il semplice fatto che, tecnicamente, nessuna cella verrà mai visitata contemporaneamente.
-     * Diventa utile ora, passando il "parallel for" da quello "del layer" a quello delle particelle.
-     */
-}
-
-
 // Ricorda di inserire nel "verbale" il fatto di aver aggiunto due parametri alla funzione
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     int i, j, k;
@@ -61,20 +23,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
     omp_lock_t writelock;
     omp_init_lock(&writelock);
-
-    // NUOVA PARTE --------------------------------------------------------------------------------------------------------
-    // In poche parole, calcolo le sqrt() tutte ora di tutti i valori possibili, senza richiami a funzioni
-    // IN TEORIA dovrebbe migliorare il tempo perché viene fatto tutto insieme. Bisogna vedere però, ovviamente, se questa cosa ha effetto positivo.
-    // Faccio "layer_size + 10" perché, in questo modo, vado a coprire possibbili valori di distance non coperti da layer_size ( quelli calcolati con modulo )
-    /* TODO QUESTA PARTE SEMBRA RALLENTARE DI PARECCHIO IL CODICE ( rip )
-    int all_distances = layer_size + 10;
-    float *sqrt_table = malloc(all_distances * sizeof(float));
-
-    #pragma omp parallel for private(i)
-    for ( i = 0; i < all_distances; i++ ) {
-        sqrt_table[i] = sqrtf((float)i);
-    }*/
-    // --------------------------------------------------------------------------------------------------------------------
 
     // Calcolo chunk_locale
     int local_chunk = layer_size / size;            // Il chunk è "per tutti"
@@ -107,35 +55,22 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     // Secondo un utente di GitHub -> calloc() in alcuni casi skippa una parte di lavoro ed ottiene gli stessi risultati
     // Ergo, dovrebbe essere più veloce. In questi casi meglio utilizzare questo metodo
     // https://gist.github.com/jadia/0806b7232773695b41f0e5c8a7fc9e0b
-    float *layer = calloc( (local_size + 2), sizeof( float ));
-    float *layer_copy = calloc( (local_size + 2), sizeof( float ));
+    float *layer = malloc( sizeof( float ) * (local_size + 2) );
+    float *layer_copy = malloc( sizeof( float ) * (local_size + 2) );
     if ( layer == NULL || layer_copy == NULL ) {
         fprintf(stderr,"Error_rank_%d: Allocating the layer memory\n", rank);
         exit( EXIT_FAILURE );
     }
 
-    /* Due for staccati in questo modo funzionano bene in seriale. Ma in parallelo non possiamo
-     * saperlo. Forse converrebbe unificare tutto (?). Perché facendo "pragma" due volte vado incontro
-     * al "set" dei threads per due volte ( e non so se questo comporta rallentamenti )
-     * TODO Proviamo a fine parallelizzazione! */
-    //#pragma omp parallel for private(k)
-    //    for ( k = 0; k < local_size + 2; k++ ) layer[k] = 0.0f;
+    /* TODO Tramite parallelizzazione sembra che questa rimanga l'opzione migliore...
+     * peccato... tutte quelle ricerche sono state inutili. Almeno "chiamo" i threads una volta sola, cosi mi risparmio il tempo di
+     * "richiamarli" in futuro.
+     */
+    #pragma omp parallel for private(k)
+       for ( k = 0; k < local_size + 2; k++ ) layer[k] = 0.0f;
 
-    //#pragma omp parallel for private(k)
-    //    for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
-    // TODO Si potrebbe provare ad inserire un "memset". Ciò però porterebbe tutto il lavoro al singolo Core 0...
-
-    // IDEA: Magari potremmo mettere un controllo che, se viene superata una certa grandezza, viene usato un metodo.
-    // Altrimenti viene utilizzato l'altro ( che ne dici )??
-
-    // Test_1 ( da provare ancora, LO "0" dovrebbe corrispondere allo stesso modo allo 0.0f, senza portare problemi alle operazioni future )
-    //memset(layer, 0, (local_size + 2) * sizeof(float));
-    //memset(layer_copy, 0, (local_size + 2) * sizeof(float));
-
-    // Test_2 ( commentare la parte superiore ed utilizzare DIRETTAMENTE "calloc" )
-    // In teoria dovrebbe essere più rapida se gli array sono grandi
-    // float *layer = calloc( (local_size + 2), sizeof( float ));
-    // float *layer_copy = calloc( (local_size + 2), sizeof( float ));
+    #pragma omp parallel for private(k)
+        for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
 
     // ---------------------------------------------------------------------
     
@@ -185,7 +120,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                     layer[k] += energy_k;
                 }
                 // ----------------------------------------------------------------------------------------------------
-                //update( layer, layer_size, k, position, energy , offset + k - 1);
             }
         }
 
@@ -223,24 +157,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         */
 
-        /*
-        // TODO Da inserire il pointerswap qui ( e possibilmente altrove ma non credo ci sia bisogno a prima occhiata )
-        #pragma omp parallel for private(k)
-        for( k=0; k <= local_size + 1; k++ )
-            layer_copy[k] = layer[k];
-        */
-
-        // TEST_1 Pointer_swaps
-        // TODO Va rivisto ma l'idea è questa ( ho provato ma non worka Zi, per il semplice fatto che poi facciamo lavorare la roba su dati sbagliati )
-        // TODO Ergo... escono valori errati ( i tempi sono bene o male simili, ma devo ancora testare su Cluster. Ho fatto solo in locale )
-        /*
-        float temp = *layer_copy;
-        *layer_copy = *layer;
-        *layer = temp;
-        * TODO NO WAY FRA... Avevo sbagliato a passare i valori... avevo scambiato solo il valore della PRIMA cella... 
-        */
-
-        // TEST_2
+        // Pointer-swap ( risparmia un bel pò di tempo utile )
         float *temp = layer_copy;
         layer_copy = layer;
         layer = temp;
@@ -302,7 +219,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         positions[i] = data_recv.local_positions;
     }
     omp_destroy_lock(&writelock);
-    //free(sqrt_table);
     free(layer);
     free(layer_copy);
 }
