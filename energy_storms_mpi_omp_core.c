@@ -14,15 +14,15 @@ typedef struct{
 
 // Ricorda di inserire nel "verbale" il fatto di aver aggiunto due parametri alla funzione
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
-    int i, j, k;
-    // PARTE NUOVA --------------------------------------------------------
+    int i, j, k, size, rank;
 
-    int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    omp_lock_t writelock;
-    omp_init_lock(&writelock);
+    // Per eliminazione lock(), vedi a fine codice ( nella zona parallela con dentro anche un "for" ) ------------------
+    int n_threads = omp_get_max_threads();
+    LocalData *threads_results = malloc( n_threads * sizeof( LocalData ) );
+    // -----------------------------------------------------------------------------------------------------------------
 
     // Calcolo chunk_locale
     int local_chunk = layer_size / size;            // Il chunk è "per tutti"
@@ -49,12 +49,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * si andrebbe incontro alla creazione di "n" celle di memoria ( da 4 byte ) piu 2 celle da 2
      * Tutto questo perché l'operatore * con "sizeof" ha la precedenza
      */
-    //float *layer = ( float * )malloc( sizeof( float ) * (local_size + 2) );
-    //float *layer_copy = ( float * )malloc( sizeof( float ) * (local_size + 2) );
-
-    // Secondo un utente di GitHub -> calloc() in alcuni casi skippa una parte di lavoro ed ottiene gli stessi risultati
-    // Ergo, dovrebbe essere più veloce. In questi casi meglio utilizzare questo metodo
-    // https://gist.github.com/jadia/0806b7232773695b41f0e5c8a7fc9e0b
     float *layer = malloc( sizeof( float ) * (local_size + 2) );
     float *layer_copy = malloc( sizeof( float ) * (local_size + 2) );
     if ( layer == NULL || layer_copy == NULL ) {
@@ -64,13 +58,13 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
     /* TODO Tramite parallelizzazione sembra che questa rimanga l'opzione migliore...
      * peccato... tutte quelle ricerche sono state inutili. Almeno "chiamo" i threads una volta sola, cosi mi risparmio il tempo di
-     * "richiamarli" in futuro.
+     * "richiamarli" in futuro ( vedi branch precedenti per capire di cosa sto parlando )
      */
     #pragma omp parallel for private(k)
-       for ( k = 0; k < local_size + 2; k++ ) layer[k] = 0.0f;
-
-    #pragma omp parallel for private(k)
-        for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
+       for ( k = 0; k < local_size + 2; k++ ) {
+           layer[k] = 0.0f;
+           layer_copy[k] = 0.0f;
+       }
 
     // ---------------------------------------------------------------------
     
@@ -190,35 +184,54 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         */
 
-        float local_maximum = -1.0f;
-        int local_positions = -1;
+        // PARTE NUOVA ( per eliminare i locks ) -----------------------------------------------------------------------
+        for ( k = 0; k < n_threads; k++ ) {
+            threads_results[k].local_maximum = -1.0f;
+            threads_results[k].local_positions = -1;
+        }
 
         int start = 1, end = local_size;
         if ( rank == 0 ) start++;
         if ( rank == size - 1 ) end--;
 
-        #pragma omp parallel for private(k)
-        for( k = start; k <= end; k++ ) {
-            if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+        #pragma omp parallel
+        {
+            // Ogni thread calcola il singolo
+            int my_id = omp_get_thread_num();
+            LocalData my_data = { -1.0,-1 };
 
-                omp_set_lock(&writelock);
-                if ( layer[k] > local_maximum ) {
-                    local_maximum = layer[k];
-                    local_positions = offset + k - 1;
+            // Il calcolo è praticamente lo stesso, solo che si va a scrivere i dati in un array condiviso, evitando il delay delle attese
+            #pragma omp for private(k)
+            for( k = start; k <= end; k++ ) {
+                if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+
+                    if ( layer[k] > my_data.local_maximum ) {
+                        my_data.local_maximum = layer[k];
+                        my_data.local_positions = offset + k - 1;
+                    }
                 }
-                omp_unset_lock(&writelock);
+            }
+            // A fine "zona parallela" si va a scrivere tutto sull'array
+            threads_results[my_id] = my_data;
+        }
+
+        // Calcolo del massimo dell'array ( evito di usare OMP perché tanto il tempo di settarlo che perdo solo tempo )
+        LocalData global_max = { -1.0,-1 };
+        for ( k = 0; k < n_threads; k++ ) {
+            if ( threads_results[k].local_maximum > global_max.local_maximum ) {
+                global_max = threads_results[k];
             }
         }
 
-        LocalData data_send, data_recv;
-        data_send.local_maximum = local_maximum;
-        data_send.local_positions = local_positions;
 
-        MPI_Allreduce(&data_send, &data_recv, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
+        LocalData data_recv;        // Sarà la var. dove il processo MPI riceverà global_max
+        MPI_Allreduce(&global_max, &data_recv, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
+
         maximum[i] = data_recv.local_maximum;
         positions[i] = data_recv.local_positions;
+        // ------------------------------------------------------------------------------------------------------------
     }
-    omp_destroy_lock(&writelock);
+    free(threads_results);
     free(layer);
     free(layer_copy);
 }
