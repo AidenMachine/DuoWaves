@@ -66,13 +66,14 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     // In poche parole, calcolo le sqrt() tutte ora di tutti i valori possibili, senza richiami a funzioni
     // IN TEORIA dovrebbe migliorare il tempo perché viene fatto tutto insieme. Bisogna vedere però, ovviamente, se questa cosa ha effetto positivo.
     // Faccio "layer_size + 10" perché, in questo modo, vado a coprire possibbili valori di distance non coperti da layer_size ( quelli calcolati con modulo )
+    /* TODO QUESTA PARTE SEMBRA RALLENTARE DI PARECCHIO IL CODICE ( rip )
     int all_distances = layer_size + 10;
     float *sqrt_table = malloc(all_distances * sizeof(float));
 
     #pragma omp parallel for private(i)
     for ( i = 0; i < all_distances; i++ ) {
         sqrt_table[i] = sqrtf((float)i);
-    }
+    }*/
     // --------------------------------------------------------------------------------------------------------------------
 
     // Calcolo chunk_locale
@@ -175,7 +176,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                 int distance = position - global_k;
                 if ( distance < 0 ) distance = - distance;
                 distance = distance + 1;
-                float atenuacion = sqrt_table[distance];               // Speriamo sia piu fast
+                float atenuacion = sqrtf((float)distance);//sqrt_table[distance];               // Speriamo sia piu fast ( spoiler, non lo era )
 
                 float energy_k = energy / layer_size / atenuacion;
 
@@ -301,7 +302,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         positions[i] = data_recv.local_positions;
     }
     omp_destroy_lock(&writelock);
-    free(sqrt_table);
+    //free(sqrt_table);
     free(layer);
     free(layer_copy);
 }
