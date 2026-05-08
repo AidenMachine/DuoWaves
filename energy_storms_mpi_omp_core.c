@@ -79,7 +79,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     for( i=0; i<num_storms; i++) {
 
         /* SINGOLA PARTICELLA */
-        #pragma omp parallel for private(j,k)
         for( j=0; j<storms[i].size; j++ ) {
 
             /* Energia dell'impatto, calcolata x 1000 */
@@ -89,6 +88,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             int position = storms[i].posval[j*2];
 
             // DISPERSIONE ENERGIA DELLA SINGOLA PARTICELLA
+            #pragma omp parallel for private(k)
             for( k = 1; k <= local_size; k++ ) {
                 /* Si parte da k = 1 per non contaminare le "celle fantasma" ma come k globale
                  * consideriamo offset + k - 1 perché altrimenti si andrebbe a contare la cella
@@ -110,7 +110,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                 float energy_k = energy / layer_size / atenuacion;
 
                 if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size ) {
-                    #pragma omp atomic
                     layer[k] += energy_k;
                 }
                 // ----------------------------------------------------------------------------------------------------
