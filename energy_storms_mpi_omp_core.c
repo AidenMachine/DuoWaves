@@ -105,7 +105,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                 int distance = position - global_k;
                 if ( distance < 0 ) distance = - distance;
                 distance = distance + 1;
-                float atenuacion = sqrtf((float)distance);//sqrt_table[distance];               // Speriamo sia piu fast ( spoiler, non lo era )
+                float atenuacion = sqrtf((float)distance);
 
                 float energy_k = energy / layer_size / atenuacion;
 
@@ -117,15 +117,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             }
         }
 
-        /*
-         * Manca solo questa parte Zi
-         * Tocca riempire layer[0] e layer[local_size + 1] con i valori dei vicini.
-         * Ricorda che, giustamente, il primo e l'ultimo layer NON devono, rispettivamente,
-         * mandarsi nulla. Inoltre, usiamo Sendrecv() e non i singoli Send() e Recv().
-         * ( dobbiamo usare layer_copy ( credo solo in questo caso ).
-         * Il resto lo lascio a te ( anche perché non so alto ahah ).
-         * Ma confido in te, Brother.
-         */
         int left_neighbor = (rank == 0) ? MPI_PROC_NULL : rank - 1;
         int right_neighbor = (rank == size - 1) ? MPI_PROC_NULL : rank + 1;
 
@@ -185,6 +176,8 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         */
 
         // PARTE NUOVA ( per eliminare i locks ) -----------------------------------------------------------------------
+        // Onestamente... le "entrate" nella zona critica era gia di per se limitata a pochissime volte...
+        // ragion per cui il tempo non è praticamente ne peggiorato ne migliorato
         for ( k = 0; k < n_threads; k++ ) {
             threads_results[k].local_maximum = -1.0f;
             threads_results[k].local_positions = -1;
