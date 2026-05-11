@@ -12,56 +12,21 @@ typedef struct{
     int local_positions;
 }LocalData;
 
-/* THIS FUNCTION CAN BE MODIFIED */
-/* Function to update a single position of the layer */
-static void update( float *layer, int layer_size, int k, int pos, float energy, int global_k) {
-    /* Il calcolo rimane lo stesso, solo che si utilizza l'indice k globale, altrimenti
-     * si andrebbe in Segmentation_fault */
-
-    /* Anche se i due processi non comunicano, le particelle vengono elaborate tutte allo stesso modo,
-     * dunque attraverso il calcolo di "distance", "sqrt(...)" etc... si ottiene quanta energia viene
-     * dispersa ( se è minore di THRESHOLD/layer_size allora non viene salvata )
-     */
-    int distance = pos - global_k;
-    if ( distance < 0 ) distance = - distance;
-
-    /* 2. Impact cell has a distance value of 1 */
-    distance = distance + 1;
-
-    /* 3. Square root of the distance */
-    /* NOTE:  Real world atenuation typically depends on the square of the distance.
-       We use here a tailored equation that affects a much wider range of cells */
-    float atenuacion = sqrtf( (float)distance );
-
-    /* 4. Compute attenuated energy */
-    float energy_k = energy / layer_size / atenuacion;
-
-    /* 5. Do not add if its absolute value is lower than the threshold
-     * TODO Probabilmente è l'unico punto dove inserirò ATOMIC ( per ora )
-     */
-    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size ) {
-        #pragma omp atomic
-        layer[k] = layer[k] + energy_k;
-    }
-    /*
-     * Inserire #PRAGMA_OMP_ATOMIC qui sopra non è stato utile se il "parallel for" divide il layer della singola particella,
-     * per il semplice fatto che, tecnicamente, nessuna cella verrà mai visitata contemporaneamente.
-     * Diventa utile ora, passando il "parallel for" da quello "del layer" a quello delle particelle.
-     */
-}
-
-
 // Ricorda di inserire nel "verbale" il fatto di aver aggiunto due parametri alla funzione
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
-    int i, j, k;
-    // PARTE NUOVA --------------------------------------------------------
+    int i, j, k, size, rank;
 
-    int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    omp_lock_t writelock;
-    omp_init_lock(&writelock);
+    // Le variabili le ho dovute spostare qui perché altrimenti avrebbero mandato in crash il programma ( le avevo create in una zona parallela "single" )
+    int left_neighbor = (rank == 0) ? MPI_PROC_NULL : rank - 1;
+    int right_neighbor = (rank == size - 1) ? MPI_PROC_NULL : rank + 1;
+
+    // Per eliminazione lock(), vedi a fine codice ( nella zona parallela con dentro anche un "for" ) ------------------
+    int n_threads = omp_get_max_threads();
+    LocalData *threads_results = malloc( n_threads * sizeof( LocalData ) );
+    // -----------------------------------------------------------------------------------------------------------------
 
     // Calcolo chunk_locale
     int local_chunk = layer_size / size;            // Il chunk è "per tutti"
@@ -88,184 +53,153 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * si andrebbe incontro alla creazione di "n" celle di memoria ( da 4 byte ) piu 2 celle da 2
      * Tutto questo perché l'operatore * con "sizeof" ha la precedenza
      */
-    float *layer = ( float * )malloc( sizeof( float ) * (local_size + 2) );
-    float *layer_copy = ( float * )malloc( sizeof( float ) * (local_size + 2) );
+    float *layer = malloc( sizeof( float ) * (local_size + 2) );
+    float *layer_copy = malloc( sizeof( float ) * (local_size + 2) );
     if ( layer == NULL || layer_copy == NULL ) {
         fprintf(stderr,"Error_rank_%d: Allocating the layer memory\n", rank);
         exit( EXIT_FAILURE );
     }
 
-    /* Due for staccati in questo modo funzionano bene in seriale. Ma in parallelo non possiamo
-     * saperlo. Forse converrebbe unificare tutto (?). Perché facendo "pragma" due volte vado incontro
-     * al "set" dei threads per due volte ( e non so se questo comporta rallentamenti )
-     * TODO Proviamo a fine parallelizzazione! */
-    #pragma omp parallel for private(k)
-        for ( k = 0; k < local_size + 2; k++ ) layer[k] = 0.0f;
-
-    #pragma omp parallel for private(k)
-        for ( k = 0; k < local_size + 2; k++ ) layer_copy[k] = 0.0f;
-    // TODO Si potrebbe provare ad inserire un "memset". Ciò però porterebbe tutto il lavoro al singolo Core 0...
-
-    // IDEA: Magari potremmo mettere un controllo che, se viene superata una certa grandezza, viene usato un metodo.
-    // Altrimenti viene utilizzato l'altro ( che ne dici )??
-
-    // Test_1 ( da provare ancora, LO "0" dovrebbe corrispondere allo stesso modo allo 0.0f, senza portare problemi alle operazioni future )
-    // memset(layer, 0, (local_size + 2) * sizeof(float));
-    // memset(layer_copy, 0, (local_size + 2) * sizeof(float));
-
-    // Test_2 ( commentare la parte superiore ed utilizzare DIRETTAMENTE "calloc" )
-    // In teoria dovrebbe essere più rapida se gli array sono grandi
-    // float *layer = calloc( (local_size + 2), sizeof( float ));
-    // float *layer_copy = calloc( (local_size + 2), sizeof( float ));
-
-    // ---------------------------------------------------------------------
-    
-    /* Le storms non possono essere parallelizzate perché vale come "fattore temporale".
-     * C'è la storm_0 che avviene PRIMA della storm_1. Se le parallelizzassimo allora i core e threads
-     * andrebbero a lavorare su dati sbagliati. Il che non va bene perché uscirebbero risultati errati
-     * ( magari ogni volta diversi )
-     *
-     * RICORDA: Ogni processo lavora sulle stesse particelle MA suddividendo l'effetto in layer diversi!ss
+    /* TODO Tramite parallelizzazione sembra che questa rimanga l'opzione migliore...
+     * peccato... tutte quelle ricerche sono state inutili. Almeno "chiamo" i threads una volta sola, cosi mi risparmio il tempo di
+     * "richiamarli" in futuro ( vedi branch precedenti per capire di cosa sto parlando )
      */
-    /* INTERA TEMPESTA */
-    for( i=0; i<num_storms; i++) {
 
-        /* SINGOLA PARTICELLA */
-        #pragma omp parallel for private(j,k)
-        for( j=0; j<storms[i].size; j++ ) {
-
-            /* Energia dell'impatto, calcolata x 1000 */
-            float energy = (float)storms[i].posval[j*2+1] * 1000;
-
-            /* Calcola la posizione dell'impatto sul layer */
-            int position = storms[i].posval[j*2];
-
-            // DISPERSIONE ENERGIA DELLA SINGOLA PARTICELLA
-            for( k = 1; k <= local_size; k++ ) {
-                /* Si parte da k = 1 per non contaminare le "celle fantasma" ma come k globale
-                 * consideriamo offset + k - 1 perché altrimenti si andrebbe a contare la cella
-                 * successiva
-                 *
-                 * k = 1 -> Dove dovrei partire con l'array normale
-                 * offset + k - 1 -> Parto dall'indice del pezzo che ha il processo
-                 */
-                update( layer, layer_size, k, position, energy , offset + k - 1);
-            }
+    #pragma omp parallel private(i,j,k)
+    {
+        #pragma omp for
+        for ( k = 0; k < local_size + 2; k++ ) {
+            layer[k] = 0.0f;
+            layer_copy[k] = 0.0f;
         }
 
-        /*
-         * Manca solo questa parte Zi
-         * Tocca riempire layer[0] e layer[local_size + 1] con i valori dei vicini.
-         * Ricorda che, giustamente, il primo e l'ultimo layer NON devono, rispettivamente,
-         * mandarsi nulla. Inoltre, usiamo Sendrecv() e non i singoli Send() e Recv().
-         * ( dobbiamo usare layer_copy ( credo solo in questo caso ).
-         * Il resto lo lascio a te ( anche perché non so alto ahah ).
-         * Ma confido in te, Brother.
-         */
-        int left_neighbor = (rank == 0) ? MPI_PROC_NULL : rank - 1;
-        int right_neighbor = (rank == size - 1) ? MPI_PROC_NULL : rank + 1;
+        /* INTERA TEMPESTA. Qui ogni thread fa la stessa cosa aimé... che spreco Zi ------------------------------------*/
+        for( i=0; i<num_storms; i++) {
 
+            #pragma omp for
+            for (k = 1; k <= local_size; k++) {
+                int global_k = offset + k - 1;
+                float save_cell_energy = 0.0f;                  // Salva in un registro, non in RAM
 
-        // 1. Tutti mandano il proprio bordo destro al vicino di destra,
-        // e ricevono il bordo sinistro dal vicino di sinistra (Tag 0)
-        MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
-                     &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
-                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                for (j=0; j<storms[i].size; j++) {
+                    /* Energia dell'impatto, calcolata x 1000 */
+                    float energy = (float)storms[i].posval[j*2+1] * 1000;
 
-        // 2. Tutti mandano il proprio bordo sinistro al vicino di sinistra,
-        // e ricevono il bordo destro dal vicino di destra (Tag 1)
-        MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 1,
-                     &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 1,
-                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        /* METODO VECCHIO
-        MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 0,
-                     &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
-                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                    /* Calcola la posizione dell'impatto sul layer */
+                    int position = storms[i].posval[j*2];
 
-        MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
-                     &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0,
-                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        */
+                    int distance = position - global_k;
+                    if ( distance < 0 ) distance = - distance;
+                    distance = distance + 1;
+                    float atenuacion = sqrtf((float)distance);
 
-        /*
-        // TODO Da inserire il pointerswap qui ( e possibilmente altrove ma non credo ci sia bisogno a prima occhiata )
-        #pragma omp parallel for private(k)
-        for( k=0; k <= local_size + 1; k++ )
-            layer_copy[k] = layer[k];
-        */
+                    float energy_k = energy / layer_size / atenuacion;
 
-        // TEST_1 Pointer_swaps
-        // TODO Va rivisto ma l'idea è questa ( ho provato ma non worka Zi, per il semplice fatto che poi facciamo lavorare la roba su dati sbagliati )
-        // TODO Ergo... escono valori errati ( i tempi sono bene o male simili, ma devo ancora testare su Cluster. Ho fatto solo in locale )
-        /*
-        float temp = *layer_copy;
-        *layer_copy = *layer;
-        *layer = temp;
-        * TODO NO WAY FRA... Avevo sbagliato a passare i valori... avevo scambiato solo il valore della PRIMA cella... 
-        */
-
-        // TEST_2
-        float *temp = layer_copy;
-        layer_copy = layer;
-        layer = temp;
-
-        #pragma omp parallel for private(k)
-        for (k = 1; k <= local_size; k++) {
-            if (rank == 0 && k == 1) continue;
-            if (rank == size - 1 && k == local_size) continue;
-            layer[k] = (layer_copy[k-1] + layer_copy[k] + layer_copy[k+1]) / 3.0f;
-        }
-
-
-        /* --- MODIFICA: SECONDO SCAMBIO MPI (Per la ricerca del massimo) --- */
-        /* Serve a far sapere ai vicini che la tua energia  cambiata dopo la media */
-        MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
-                     &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
-                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-        MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 1,
-                     &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 1,
-                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-        /* --- MODIFICA: SECONDO SCAMBIO MPI (Per la ricerca del massimo) --- */
-        /* Serve a far sapere ai vicini che la tua energia è cambiata dopo la media
-        MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 0,
-                     &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
-                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
-                     &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0,
-                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        */
-
-        float local_maximum = -1.0f;
-        int local_positions = -1;
-
-        int start = 1, end = local_size;
-        if ( rank == 0 ) start++;
-        if ( rank == size - 1 ) end--;
-
-        #pragma omp parallel for private(k)
-        for( k = start; k <= end; k++ ) {
-            if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-
-                omp_set_lock(&writelock);
-                if ( layer[k] > local_maximum ) {
-                    local_maximum = layer[k];
-                    local_positions = offset + k - 1;
+                    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size ) {
+                        // Invece che entrare in RAM, volta per volta, andiamo a salvare in "save_cell_energy" i valori di ogni particella che cade in quella specifica cella
+                        save_cell_energy += energy_k;
+                    }
                 }
-                omp_unset_lock(&writelock);
+                // Ogni thread ha un PEZZO DI LAYER DIVERSO ma stesse particelle.
+                // Nel vecchio metodo invece si aveva che ogni thread aveva UNA PARTE DI PARTICELLE ma che OPERAVANO SULLO STESSO LAYER -> rischio di toccare
+                // la stessa cella nello stesso tempo e generare race_conditions ( e quindi valori sballati ).
+                layer[k] += save_cell_energy;
             }
+            // ---------------------------------------------------------------------------------------------------------
+
+            // Solo un thread fa questa parte ( anche perché altrimenti volerebbero pacchetti a destra e sinistra )     <- #pragma omp single
+            // Dato che però è il "thread master" che deve entrare per primo, cambio in #pragma omp master ( ma devo aggiungere la barriera manualmente perché non la ha )
+            #pragma omp master
+            {
+                // 1. Tutti mandano il proprio bordo destro al vicino di destra,
+                // e ricevono il bordo sinistro dal vicino di sinistra (Tag 0)
+                MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
+                             &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
+                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+                // 2. Tutti mandano il proprio bordo sinistro al vicino di sinistra,
+                // e ricevono il bordo destro dal vicino di destra (Tag 1)
+                MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 1,
+                             &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 1,
+                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+                // Pointer-swap ( risparmia un bel pò di tempo utile )
+                float *temp = layer_copy;
+                layer_copy = layer;
+                layer = temp;
+            }
+            #pragma omp barrier
+
+            #pragma omp for
+            for (k = 1; k <= local_size; k++) {
+                if (rank == 0 && k == 1) continue;
+                if (rank == size - 1 && k == local_size) continue;
+                layer[k] = (layer_copy[k-1] + layer_copy[k] + layer_copy[k+1]) / 3.0f;
+            }
+
+            #pragma omp master
+            {
+                /* --- MODIFICA: SECONDO SCAMBIO MPI (Per la ricerca del massimo) --- */
+                /* Serve a far sapere ai vicini che la tua energia  cambiata dopo la media */
+                MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
+                             &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
+                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+                MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 1,
+                             &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 1,
+                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+                // Per eliminare i locks  ----------------------------------------------------------------------------------
+                // Proviamo a dividere lo stesso il lavoro
+                for ( k = 0; k < n_threads; k++ ) {
+                    threads_results[k].local_maximum = -1.0f;
+                    threads_results[k].local_positions = -1;
+                }
+            }
+            #pragma omp barrier
+
+            int start = 1, end = local_size;
+            if ( rank == 0 ) start++;
+            if ( rank == size - 1 ) end--;
+
+            // Ogni thread calcola il singolo
+            int my_id = omp_get_thread_num();
+            LocalData my_data = { -1.0,-1 };
+
+            // Il calcolo è praticamente lo stesso, solo che si va a scrivere i dati in un array condiviso, evitando il delay delle attese
+            #pragma omp for
+            for( k = start; k <= end; k++ ) {
+                if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+                    if ( layer[k] > my_data.local_maximum ) {
+                        my_data.local_maximum = layer[k];
+                        my_data.local_positions = offset + k - 1;
+                    }
+                }
+            }
+            // A fine "zona parallela" si va a scrivere tutto sull'array
+            threads_results[my_id] = my_data;
+
+            #pragma omp master
+            {
+                // Calcolo del massimo dell'array ( evito di usare OMP perché tanto il tempo di settarlo che perdo solo tempo )
+                LocalData global_max = { -1.0,-1 };
+                for ( k = 0; k < n_threads; k++ ) {
+                    if ( threads_results[k].local_maximum > global_max.local_maximum ) {
+                        global_max = threads_results[k];
+                    }
+                }
+
+
+                LocalData data_recv;        // Sarà la var. dove il processo MPI riceverà global_max
+                MPI_Allreduce(&global_max, &data_recv, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
+
+                maximum[i] = data_recv.local_maximum;
+                positions[i] = data_recv.local_positions;
+            }
+            #pragma omp barrier
         }
-
-        LocalData data_send, data_recv;
-        data_send.local_maximum = local_maximum;
-        data_send.local_positions = local_positions;
-
-        MPI_Allreduce(&data_send, &data_recv, 1, MPI_FLOAT_INT, MPI_MAXLOC, MPI_COMM_WORLD);
-        maximum[i] = data_recv.local_maximum;
-        positions[i] = data_recv.local_positions;
     }
-    omp_destroy_lock(&writelock);
+    free(threads_results);
     free(layer);
     free(layer_copy);
 }

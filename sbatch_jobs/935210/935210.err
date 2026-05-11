@@ -1,0 +1,338 @@
+[node103:2879186:0:2879226]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+[node103:2879188:0:2879231]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+[node106:2509037:0:2509082]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+[node106:2509043:0:2509081]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+==== backtrace (tid:2879226) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x7f7e24235074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x7f7e24231f22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x7f7e24232052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x7f7e243694f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x7f7e24c5ee0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x7f7e25c52927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x606ced2ebd2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x7f7e25b8f79f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x7f7e2589caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x7f7e25929c3c]
+=================================
+==== backtrace (tid:2879231) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x748f5b492074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x748f5b48ef22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x748f5b48f052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x748f5a3694f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x748f5b4d6e0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x748f5c4d1927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x606a86880d2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x748f5c40e79f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x748f5c09caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x748f5c129c3c]
+=================================
+[node103:2879186] *** Process received signal ***
+[node103:2879186] Signal: Aborted (6)
+[node103:2879186] Signal code:  (-6)
+[node103:2879186] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x7f7e25845330]
+[node103:2879186] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7f7e2589eb2c]
+[node103:2879186] [ 2] [node103:2879188] *** Process received signal ***
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7f7e2584527e]
+[node103:2879186] [ 3] [node103:2879188] Signal: Aborted (6)
+[node103:2879188] Signal code:  (-6)
+[node103:2879188] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x748f5c045330]
+[node103:2879188] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x748f5c09eb2c]
+[node103:2879188] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x748f5c04527e]
+[node103:2879188] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x748f5c0288ff]
+[node103:2879188] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x748f5b48ef27]
+[node103:2879188] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x748f5b48f052]
+[node103:2879188] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x748f5a3694f8]
+[node103:2879188] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x748f5b4d6e0b]
+[node103:2879188] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x748f5c4d1927]
+[node103:2879188] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x606a86880d2a]
+[node103:2879188] [10] /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x748f5c40e79f]
+[node103:2879188] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x748f5c09caa4]
+[node103:2879188] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x748f5c129c3c]
+[node103:2879188] *** End of error message ***
+/lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7f7e258288ff]
+[node103:2879186] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x7f7e24231f27]
+[node103:2879186] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x7f7e24232052]
+[node103:2879186] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x7f7e243694f8]
+[node103:2879186] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x7f7e24c5ee0b]
+[node103:2879186] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x7f7e25c52927]
+[node103:2879186] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x606ced2ebd2a]
+[node103:2879186] [10] /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x7f7e25b8f79f]
+[node103:2879186] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7f7e2589caa4]
+[node103:2879186] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7f7e25929c3c]
+[node103:2879186] *** End of error message ***
+==== backtrace (tid:2509081) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x7a91341f4074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x7a91341f0f22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x7a91341f1052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x7a91343284f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x7a91343c9e0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x7a91357bc927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x5a9b7d0bdd2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x7a91356f979f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x7a913549caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x7a9135529c3c]
+=================================
+==== backtrace (tid:2509082) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x7b0a82dbf074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x7b0a82dbbf22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x7b0a82dbc052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x7b0a83f024f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x7b0a83fa3e0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x7b0a88f9a927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x61db43741d2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x7b0a88ed779f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x7b0a88c9caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x7b0a88d29c3c]
+=================================
+[node106:2509037] *** Process received signal ***
+[node106:2509037] Signal: Aborted (6)
+[node106:2509037] Signal code:  (-6)
+[node106:2509043] *** Process received signal ***
+[node106:2509043] Signal: Aborted (6)
+[node106:2509043] Signal code:  (-6)
+[node106:2509043] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x7a9135445330]
+[node106:2509043] [ 1] [node106:2509037] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x7b0a88c45330]
+[node106:2509037] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7b0a88c9eb2c]
+[node106:2509037] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7b0a88c4527e]
+[node106:2509037] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7b0a88c288ff]
+[node106:2509037] [ 4] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7a913549eb2c]
+[node106:2509043] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7a913544527e]
+[node106:2509043] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7a91354288ff]
+[node106:2509043] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x7a91341f0f27]
+[node106:2509043] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x7a91341f1052]
+[node106:2509043] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x7a91343284f8]
+[node106:2509043] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x7a91343c9e0b]
+[node106:2509043] [ 8] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x7b0a82dbbf27]
+[node106:2509037] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x7b0a82dbc052]
+[node106:2509037] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x7b0a83f024f8]
+[node106:2509037] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x7b0a83fa3e0b]
+[node106:2509037] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x7a91357bc927]
+[node106:2509043] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x5a9b7d0bdd2a]
+[node106:2509043] [10] /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x7a91356f979f]
+[node106:2509043] [11] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x7b0a88f9a927]
+[node106:2509037] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x61db43741d2a]
+[node106:2509037] [10] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7a913549caa4]
+[node106:2509043] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7a9135529c3c]
+[node106:2509043] *** End of error message ***
+/lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x7b0a88ed779f]
+[node106:2509037] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7b0a88c9caa4]
+[node106:2509037] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7b0a88d29c3c]
+[node106:2509037] *** End of error message ***
+[node106:2509035:0:2509092]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+==== backtrace (tid:2509092) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x7a5f91e98074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x7a5f91e94f22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x7a5f91e95052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x7a5f90d694f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x7a5f91ee3e0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x7a5f92ed7927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x5bdf77afdd2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x7a5f92e1479f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x7a5f92a9caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x7a5f92b29c3c]
+=================================
+[node106:2509035] *** Process received signal ***
+[node106:2509035] Signal: Aborted (6)
+[node106:2509035] Signal code:  (-6)
+[node106:2509035] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x7a5f92a45330]
+[node106:2509035] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7a5f92a9eb2c]
+[node106:2509035] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7a5f92a4527e]
+[node106:2509035] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7a5f92a288ff]
+[node106:2509035] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x7a5f91e94f27]
+[node106:2509035] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x7a5f91e95052]
+[node106:2509035] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x7a5f90d694f8]
+[node106:2509035] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x7a5f91ee3e0b]
+[node106:2509035] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x7a5f92ed7927]
+[node106:2509035] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x5bdf77afdd2a]
+[node106:2509035] [10] /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x7a5f92e1479f]
+[node106:2509035] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7a5f92a9caa4]
+[node106:2509035] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7a5f92b29c3c]
+[node106:2509035] *** End of error message ***
+[node106:2509030:0:2509090]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+==== backtrace (tid:2509090) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x7155ee835074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x7155ee831f22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x7155ee832052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x7155ee9694f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x7155efa52e0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x7155f0a45927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x590ed52ded2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x7155f098279f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x7155f069caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x7155f0729c3c]
+=================================
+[node106:2509030] *** Process received signal ***
+[node106:2509030] Signal: Aborted (6)
+[node106:2509030] Signal code:  (-6)
+[node106:2509030] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x7155f0645330]
+[node106:2509030] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7155f069eb2c]
+[node106:2509030] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7155f064527e]
+[node106:2509030] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7155f06288ff]
+[node106:2509030] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x7155ee831f27]
+[node106:2509030] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x7155ee832052]
+[node106:2509030] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x7155ee9694f8]
+[node106:2509030] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x7155efa52e0b]
+[node106:2509030] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x7155f0a45927]
+[node106:2509030] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x590ed52ded2a]
+[node106:2509030] [10] /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x7155f098279f]
+[node106:2509030] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7155f069caa4]
+[node106:2509030] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7155f0729c3c]
+[node106:2509030] *** End of error message ***
+[node103:2879180:0:2879232]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+[node103:2879179:0:2879234]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+[node106:2509034:0:2509075]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+==== backtrace (tid:2879232) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x7bea40635074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x7bea40631f22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x7bea40632052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x7bea407694f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x7bea41822e0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x7bea42812927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x5e1e9f652d2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x7bea4274f79f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x7bea4249caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x7bea42529c3c]
+=================================
+==== backtrace (tid:2879234) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x7fca07fbf074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x7fca07fbbf22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x7fca07fbc052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x7fca0c0f64f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x7fca0c197e0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x7fca0e18b927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x5c94f21b4d2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x7fca0e0c879f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x7fca0de9caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x7fca0df29c3c]
+=================================
+[node103:2879180] *** Process received signal ***
+[node103:2879180] Signal: Aborted (6)
+[node103:2879180] Signal code:  (-6)
+[node103:2879180] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x7bea42445330]
+[node103:2879180] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7bea4249eb2c]
+[node103:2879180] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7bea4244527e]
+[node103:2879180] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7bea424288ff]
+[node103:2879180] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x7bea40631f27]
+[node103:2879180] [ 5] ==== backtrace (tid:2509075) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x791eb6435074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x791eb6431f22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x791eb6432052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x791eb65694f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x791eb763ce0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x791eb862c927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x5a3791e3dd2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x791eb856979f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x791eb829caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x791eb8329c3c]
+=================================
+/home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x7bea40632052]
+[node103:2879180] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x7bea407694f8]
+[node106:2509034] *** Process received signal ***
+[node106:2509034] Signal: Aborted (6)
+[node106:2509034] Signal code:  (-6)
+[node103:2879179] *** Process received signal ***
+[node103:2879179] Signal: Aborted (6)
+[node103:2879179] Signal code:  (-6)
+[node103:2879179] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x7fca0de45330]
+[node103:2879179] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7fca0de9eb2c]
+[node103:2879179] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7fca0de4527e]
+[node103:2879179] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7fca0de288ff]
+[node103:2879179] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x7fca07fbbf27]
+[node103:2879179] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x7fca07fbc052]
+[node103:2879179] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x7fca0c0f64f8]
+[node103:2879179] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x7fca0c197e0b]
+[node103:2879179] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x7fca0e18b927]
+[node103:2879179] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x5c94f21b4d2a]
+[node103:2879179] [10] /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x7fca0e0c879f]
+[node103:2879179] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7fca0de9caa4]
+[node103:2879179] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7fca0df29c3c]
+[node103:2879179] *** End of error message ***
+[node103:2879180] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x7bea41822e0b]
+[node103:2879180] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x7bea42812927]
+[node103:2879180] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x5e1e9f652d2a]
+[node103:2879180] [10] /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x7bea4274f79f]
+[node103:2879180] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7bea4249caa4]
+[node103:2879180] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7bea42529c3c]
+[node103:2879180] *** End of error message ***
+[node106:2509034] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x791eb8245330]
+[node106:2509034] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x791eb829eb2c]
+[node106:2509034] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x791eb824527e]
+[node106:2509034] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x791eb82288ff]
+[node106:2509034] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x791eb6431f27]
+[node106:2509034] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x791eb6432052]
+[node106:2509034] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x791eb65694f8]
+[node106:2509034] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x791eb763ce0b]
+[node106:2509034] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x791eb862c927]
+[node106:2509034] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x5a3791e3dd2a]
+[node106:2509034] [10] [node103:2879181:0:2879242]    tag_recv.c:238  Assertion `ucs_async_check_owner_thread(&(worker)->async)' failed
+/lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x791eb856979f]
+[node106:2509034] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x791eb829caa4]
+[node106:2509034] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x791eb8329c3c]
+[node106:2509034] *** End of error message ***
+==== backtrace (tid:2879242) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x722e46035074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x722e46031f22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x722e46032052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8) [0x722e461694f8]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb) [0x722e4724de0b]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137) [0x722e4823e927]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x5f282e8b6d2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x722e4817b79f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x722e47e9caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x722e47f29c3c]
+=================================
+[node103:2879181] *** Process received signal ***
+[node103:2879181] Signal: Aborted (6)
+[node103:2879181] Signal code:  (-6)
+[node103:2879181] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x722e47e45330]
+[node103:2879181] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x722e47e9eb2c]
+[node103:2879181] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x722e47e4527e]
+[node103:2879181] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x722e47e288ff]
+[node103:2879181] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x722e46031f27]
+[node103:2879181] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x722e46032052]
+[node103:2879181] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_recv_nbx+0x4b8)[0x722e461694f8]
+[node103:2879181] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_irecv+0xbb)[0x722e4724de0b]
+[node103:2879181] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x137)[0x722e4823e927]
+[node103:2879181] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x5f282e8b6d2a]
+[node103:2879181] [10] /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x722e4817b79f]
+[node103:2879181] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x722e47e9caa4]
+[node103:2879181] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x722e47f29c3c]
+[node103:2879181] *** End of error message ***
+[node103:2879177:0:2879246]    tag_send.c:248  Assertion `ucs_async_check_owner_thread(&(ep->worker)->async)' failed
+==== backtrace (tid:2879246) ====
+ 0  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_handle_error+0x304) [0x7799621af074]
+ 1  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_message+0xc2) [0x7799621abf22]
+ 2  /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122) [0x7799621ac052]
+ 3  /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_send_nbx+0x215) [0x7799622e7a05]
+ 4  /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_send+0x146) [0x779962386646]
+ 5  /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x1f6) [0x7799643789e6]
+ 6  ./energy_storms_mpi_omp(+0x1d2a) [0x5955d4d5ad2a]
+ 7  /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f) [0x7799642b579f]
+ 8  /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4) [0x77996409caa4]
+ 9  /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c) [0x779964129c3c]
+=================================
+[node103:2879177] *** Process received signal ***
+[node103:2879177] Signal: Aborted (6)
+[node103:2879177] Signal code:  (-6)
+[node103:2879177] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x779964045330]
+[node103:2879177] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x77996409eb2c]
+[node103:2879177] [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x77996404527e]
+[node103:2879177] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7799640288ff]
+[node103:2879177] [ 4] /home/guest/ucx-1.18.0/lib/libucs.so.0(+0x38f27)[0x7799621abf27]
+[node103:2879177] [ 5] /home/guest/ucx-1.18.0/lib/libucs.so.0(ucs_fatal_error_format+0x122)[0x7799621ac052]
+[node103:2879177] [ 6] /home/guest/ucx-1.18.0/lib/libucp.so.0(ucp_tag_send_nbx+0x215)[0x7799622e7a05]
+[node103:2879177] [ 7] /home/guest/openmpi-4.1.6/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_send+0x146)[0x779962386646]
+[node103:2879177] [ 8] /home/guest/openmpi-4.1.6/lib/libmpi.so.40(MPI_Sendrecv+0x1f6)[0x7799643789e6]
+[node103:2879177] [ 9] ./energy_storms_mpi_omp(+0x1d2a)[0x5955d4d5ad2a]
+[node103:2879177] [10] /lib/x86_64-linux-gnu/libgomp.so.1(+0x2279f)[0x7799642b579f]
+[node103:2879177] [11] /lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x77996409caa4]
+[node103:2879177] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x779964129c3c]
+[node103:2879177] *** End of error message ***
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpirun noticed that process rank 15 with PID 2509043 on node node106 exited on signal 6 (Aborted).
+--------------------------------------------------------------------------
+make: *** [Makefile:77: run_mpi] Error 134
