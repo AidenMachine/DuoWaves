@@ -1,0 +1,20 @@
+=== JOB INFO ===
+Job ID:        934557
+Nodes:         1 (node103)
+MPI tasks:     1
+CPUs per task: 16 (OMP_NUM_THREADS=16)
+================
+--- COMPILAZIONE ---
+make: 'energy_storms_mpi_omp' is up to date.
+--- ESECUZIONE (10 run) ---
+Run 1: 4.326872 s
+Run 2: 4.463882 s
+Run 3: 4.274752 s
+Run 4: 4.471701 s
+Run 5: 4.368968 s
+Run 6: 4.297620 s
+Run 7: 4.253255 s
+Run 8: 4.024063 s
+Run 9: 3.886279 s
+Run 10: 3.936915 s
+--- TEMPO MEDIO SU 10 RUN: 4.230431 s ---

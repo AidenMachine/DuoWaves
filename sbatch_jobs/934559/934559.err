@@ -1,0 +1,10 @@
+[node114:2653186] pml_ucx.c:188  Error: Failed to receive UCX worker address: Take next option (-46)
+[node114:2653187] pml_ucx.c:188  Error: Failed to receive UCX worker address: Take next option (-46)
+[node114:2653187] pml_ucx.c:188  Error: Failed to receive UCX worker address: Take next option (-46)
+[node114:2653186] pml_ucx.c:188  Error: Failed to receive UCX worker address: Take next option (-46)
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 934559.0 ON node108 CANCELLED AT 2026-04-30T11:40:53 ***
+srun: error: node108: tasks 0-1: Killed
+srun: error: node114: tasks 2-3: Exited with exit code 16
+srun: error: node116: tasks 4-5: Killed
+srun: error: node120: tasks 6-7: Killed
