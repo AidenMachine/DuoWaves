@@ -1,10 +1,11 @@
 # --- Execution Parameters ---
-export OMP_NUM_THREADS=32
-MPI_PROCS=10
+export OMP_NUM_THREADS=2
+MPI_PROCS=32
 
 # --- MPI Run Flags ---
 MPIRUN_FLAGS = -np $(MPI_PROCS) \
-               --bind-to none
+               --bind-to none \
+	       --oversubscribe #assegna piu processi allo stesso nodo quando runnato su piu nodi
 
 # --- Compiler Flags ---
 # Flags for MPI+OpenMP code
