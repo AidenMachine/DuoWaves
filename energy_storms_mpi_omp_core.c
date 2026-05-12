@@ -16,6 +16,9 @@ typedef struct{
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     int i, j, k, size, rank;
 
+    // Invece che farla calcolare volta per volta nell'if, è possibile calcolarla una singola volta e risparmiare molti cicli
+    float local_threshold = THRESHOLD / layer_size;
+
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -79,7 +82,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             #pragma omp for
             for (k = 1; k <= local_size; k++) {
                 int global_k = offset + k - 1;
-                float save_cell_energy = 0.0f;                  // Salva in un registro, non in RAM
 
                 for (j=0; j<storms[i].size; j++) {
                     /* Energia dell'impatto, calcolata x 1000 */
@@ -95,15 +97,11 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
                     float energy_k = energy / layer_size / atenuacion;
 
-                    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size ) {
-                        // Invece che entrare in RAM, volta per volta, andiamo a salvare in "save_cell_energy" i valori di ogni particella che cade in quella specifica cella
-                        save_cell_energy += energy_k;
+                    // Qui dovremmo risparmiare un pò di tempo
+                    if ( energy_k >= local_threshold || energy_k <= -local_threshold ) {
+                        layer[k] += energy_k;
                     }
                 }
-                // Ogni thread ha un PEZZO DI LAYER DIVERSO ma stesse particelle.
-                // Nel vecchio metodo invece si aveva che ogni thread aveva UNA PARTE DI PARTICELLE ma che OPERAVANO SULLO STESSO LAYER -> rischio di toccare
-                // la stessa cella nello stesso tempo e generare race_conditions ( e quindi valori sballati ).
-                layer[k] += save_cell_energy;
             }
             // ---------------------------------------------------------------------------------------------------------
 
@@ -132,8 +130,15 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
             #pragma omp for
             for (k = 1; k <= local_size; k++) {
-                if (rank == 0 && k == 1) continue;
-                if (rank == size - 1 && k == local_size) continue;
+                // Con il pointer-swap i valori ai bordi rimangono del vecchio layer. Bisogna dunque copiarli per ottenere i valori corretti
+                if (rank == 0 && k == 1) {
+                    layer[k] = layer_copy[k];
+                    continue;
+                }
+                if (rank == size - 1 && k == local_size) {
+                    layer[k] = layer_copy[k];
+                    continue;
+                }
                 layer[k] = (layer_copy[k-1] + layer_copy[k] + layer_copy[k+1]) / 3.0f;
             }
 
@@ -178,6 +183,9 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             }
             // A fine "zona parallela" si va a scrivere tutto sull'array
             threads_results[my_id] = my_data;
+
+            // Per provare a fixare la non-associatività dei float
+            #pragma omp barrier
 
             #pragma omp master
             {
