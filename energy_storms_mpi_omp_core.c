@@ -56,8 +56,19 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * si andrebbe incontro alla creazione di "n" celle di memoria ( da 4 byte ) piu 2 celle da 2
      * Tutto questo perché l'operatore * con "sizeof" ha la precedenza
      */
-    float *layer = malloc( sizeof( float ) * (local_size + 2) );
-    float *layer_copy = malloc( sizeof( float ) * (local_size + 2) );
+    //float *layer = malloc( sizeof( float ) * (local_size + 2) );
+    //float *layer_copy = malloc( sizeof( float ) * (local_size + 2) );
+
+    // PROVA CON POSIX_MEMALIGN PER EVITARE FALSE_SHARING
+    float *layer = NULL, *layer_copy = NULL;
+    int err_layer = posix_memalign((void**) &layer, 64, sizeof( float ) * (local_size + 2));
+    int err_layer_copy = posix_memalign((void**) &layer_copy, 64, sizeof( float ) * (local_size + 2));
+
+    if ( err_layer != 0 || err_layer_copy != 0 ) {
+        fprintf(stderr,"Error_rank_%d: Posix-Memalign error\n", rank);
+        exit( EXIT_FAILURE );
+    }
+
     if ( layer == NULL || layer_copy == NULL ) {
         fprintf(stderr,"Error_rank_%d: Allocating the layer memory\n", rank);
         exit( EXIT_FAILURE );
@@ -83,6 +94,12 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             for (k = 1; k <= local_size; k++) {
                 int global_k = offset + k - 1;
 
+                // L'idea è la stessa di prima ma con una roba diversa ovvero creiamo si la var. per salvare l'energia volta per vola
+                // ( essendo nel for e con -O3, in teoria, dovrebbe essere una var. salvata tra i registri del core )
+                // Andiamo a salvare il valore del layer[k] nel registro ( valore corretto ) -> andiamo ad aggiornare il registro volta per volta ( cosi non ci perdiamo nessun val. post virgola )
+                // SOLO ALLA FINE del ciclo mettiamo tutto in RAM. In teoria i valori dovrebbero uscire sempre corretti e saltiamo tanti passaggi in RAM
+                //float save_cell_energy = layer[k];
+
                 for (j=0; j<storms[i].size; j++) {
                     /* Energia dell'impatto, calcolata x 1000 */
                     float energy = (float)storms[i].posval[j*2+1] * 1000;
@@ -99,9 +116,11 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
                     // Qui dovremmo risparmiare un pò di tempo
                     if ( energy_k >= local_threshold || energy_k <= -local_threshold ) {
+                        //save_cell_energy += energy_k;
                         layer[k] += energy_k;
                     }
                 }
+                //layer[k] = save_cell_energy;
             }
             // ---------------------------------------------------------------------------------------------------------
 
