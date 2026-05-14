@@ -3,9 +3,10 @@
 #SBATCH --partition=students
 #SBATCH --qos=students_limit
 #SBATCH --nodes=4
-#SBATCH --ntasks=32
-#SBATCH --ntasks-per-node=8
-#SBATCH --cpus-per-task=4
+#SBATCH --ntasks=16
+#SBATCH --ntasks-per-node=4
+#SBATCH --cpus-per-task=8
+#SBATCH --cpu-freq=Performance
 #SBATCH --time=00:15:00
 #SBATCH --output=sbatch_jobs/%j/%j.out
 #SBATCH --error=sbatch_jobs/%j/%j.err
@@ -13,6 +14,9 @@
 source /home/guest/init-hpc.sh
 set -e
 cd "$SLURM_SUBMIT_DIR"
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=cores
 
 echo "=== JOB INFO ==="
 echo "Job ID:               $SLURM_JOB_ID"

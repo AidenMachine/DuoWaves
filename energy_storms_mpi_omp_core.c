@@ -98,7 +98,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                 // ( essendo nel for e con -O3, in teoria, dovrebbe essere una var. salvata tra i registri del core )
                 // Andiamo a salvare il valore del layer[k] nel registro ( valore corretto ) -> andiamo ad aggiornare il registro volta per volta ( cosi non ci perdiamo nessun val. post virgola )
                 // SOLO ALLA FINE del ciclo mettiamo tutto in RAM. In teoria i valori dovrebbero uscire sempre corretti e saltiamo tanti passaggi in RAM
-                //float save_cell_energy = layer[k];
+                float save_cell_energy = layer[k];
 
                 for (j=0; j<storms[i].size; j++) {
                     /* Energia dell'impatto, calcolata x 1000 */
@@ -116,11 +116,11 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
                     // Qui dovremmo risparmiare un pò di tempo
                     if ( energy_k >= local_threshold || energy_k <= -local_threshold ) {
-                        //save_cell_energy += energy_k;
-                        layer[k] += energy_k;
+                        save_cell_energy += energy_k;
+                        //layer[k] += energy_k;
                     }
                 }
-                //layer[k] = save_cell_energy;
+                layer[k] = save_cell_energy;
             }
             // ---------------------------------------------------------------------------------------------------------
 
