@@ -1,5 +1,5 @@
 # --- Execution Parameters ---
-OMP_NUM_THREADS=4
+OMP_NUM_THREADS=8
 MPI_PROCS=16
 
 # --- MPI Run Flags ---
