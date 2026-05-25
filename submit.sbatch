@@ -2,8 +2,7 @@
 #SBATCH --job-name=mpi-juice
 #SBATCH --partition=students
 #SBATCH --qos=students_limit
-#SBATCH --nodes=4
-#SBATCH --ntasks=16
+#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=8
 #SBATCH --cpu-freq=Performance

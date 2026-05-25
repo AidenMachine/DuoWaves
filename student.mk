@@ -1,6 +1,6 @@
 # --- Execution Parameters ---
 OMP_NUM_THREADS=8
-MPI_PROCS=16
+MPI_PROCS=8
 
 # --- MPI Run Flags ---
 MPIRUN_FLAGS = -np $(MPI_PROCS) --bind-to numa -map-by numa

@@ -1,0 +1,16 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               936413
+Nodes:                1 (node124)
+Tasks (MPI):          4
+Tasks per node:       4
+CPUs per task (OMP):  8
+OMP_NUM_THREADS:      32
+================
+--- COMPILAZIONE ---
+rm -rf energy_storms_seq energy_storms_mpi_omp energy_storms_cuda energy_storms_core.o energy_storms_mpi_omp_core.o energy_storms_cuda_core.o

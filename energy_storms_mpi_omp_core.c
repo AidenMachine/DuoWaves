@@ -128,17 +128,15 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             // Dato che però è il "thread master" che deve entrare per primo, cambio in #pragma omp master ( ma devo aggiungere la barriera manualmente perché non la ha )
             #pragma omp master
             {
-                // 1. Tutti mandano il proprio bordo destro al vicino di destra,
-                // e ricevono il bordo sinistro dal vicino di sinistra (Tag 0)
-                MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
-                             &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
-                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Isend(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0, 
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Irecv(&layer[0], 1, MPI_FLOAT, left_neighbor, 0, 
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-                // 2. Tutti mandano il proprio bordo sinistro al vicino di sinistra,
-                // e ricevono il bordo destro dal vicino di destra (Tag 1)
-                MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 1,
-                             &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 1,
-                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Isend(&layer[1], 1, MPI_FLOAT, left_neighbor, 0, 
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Irecv(&layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0, 
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
                 // Pointer-swap ( risparmia un bel pò di tempo utile )
                 float *temp = layer_copy;
@@ -163,15 +161,15 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
             #pragma omp master
             {
-                /* --- MODIFICA: SECONDO SCAMBIO MPI (Per la ricerca del massimo) --- */
-                /* Serve a far sapere ai vicini che la tua energia  cambiata dopo la media */
-                MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
-                             &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
-                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Isend(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0, 
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Irecv(&layer[0], 1, MPI_FLOAT, left_neighbor, 0, 
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-                MPI_Sendrecv(&layer[1], 1, MPI_FLOAT, left_neighbor, 1,
-                             &layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 1,
-                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Isend(&layer[1], 1, MPI_FLOAT, left_neighbor, 0, 
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Irecv(&layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0, 
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
                 // Per eliminare i locks  ----------------------------------------------------------------------------------
                 // Proviamo a dividere lo stesso il lavoro
