@@ -128,15 +128,22 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             // Dato che però è il "thread master" che deve entrare per primo, cambio in #pragma omp master ( ma devo aggiungere la barriera manualmente perché non la ha )
             #pragma omp master
             {
-                MPI_Isend(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0, 
-                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                MPI_Irecv(&layer[0], 1, MPI_FLOAT, left_neighbor, 0, 
-                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                // Bro, ti sei sbagliato ed hai messo MPI_STATUS_IGNORE quando in realtà li andava l'oggetto "request"
+                MPI_Request request[4];
 
-                MPI_Isend(&layer[1], 1, MPI_FLOAT, left_neighbor, 0, 
-                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Isend(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0, 
+                    MPI_COMM_WORLD, &request[0]);
+                MPI_Irecv(&layer[0], 1, MPI_FLOAT, left_neighbor, 0, 
+                    MPI_COMM_WORLD, &request[1]);
+
+                MPI_Isend(&layer[1], 1, MPI_FLOAT, left_neighbor, 0,
+                    MPI_COMM_WORLD, &request[2]);
                 MPI_Irecv(&layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0, 
-                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                    MPI_COMM_WORLD,  &request[3]);
+
+                // Attesa di fine di tutte e 4 le comunicazioni. Anche se la CPU è ferma, la scheda di rete in teoria fa viaggiare i "pacchetti"
+                // in parallelo. Ergo, il tempo totale non è più la somma dei 4 viaggi, ma è pari al tempo del pacco più lento.
+                MPI_Waitall(4, request, MPI_STATUSES_IGNORE);
 
                 // Pointer-swap ( risparmia un bel pò di tempo utile )
                 float *temp = layer_copy;
@@ -161,15 +168,19 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
             #pragma omp master
             {
+                MPI_Request request[4];
+
                 MPI_Isend(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0, 
-                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                    MPI_COMM_WORLD, &request[0]);
                 MPI_Irecv(&layer[0], 1, MPI_FLOAT, left_neighbor, 0, 
-                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                    MPI_COMM_WORLD, &request[1]);
 
                 MPI_Isend(&layer[1], 1, MPI_FLOAT, left_neighbor, 0, 
-                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                    MPI_COMM_WORLD, &request[2]);
                 MPI_Irecv(&layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0, 
-                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                    MPI_COMM_WORLD, &request[3]);
+
+                MPI_Waitall(4, request, MPI_STATUSES_IGNORE);
 
                 // Per eliminare i locks  ----------------------------------------------------------------------------------
                 // Proviamo a dividere lo stesso il lavoro

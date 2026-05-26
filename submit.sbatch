@@ -2,10 +2,10 @@
 #SBATCH --job-name=mpi-juice
 #SBATCH --partition=students
 #SBATCH --qos=students_limit
-#SBATCH --nodes=2
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=8
-#SBATCH --cpu-freq=Performance
+#SBATCH --cpu-freq=performance
 #SBATCH --time=00:15:00
 #SBATCH --output=sbatch_jobs/%j/%j.out
 #SBATCH --error=sbatch_jobs/%j/%j.err
