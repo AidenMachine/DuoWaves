@@ -81,7 +81,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
     #pragma omp parallel private(i,j,k)
     {
-        #pragma omp for
+        #pragma omp for simd aligned(layer, layer_copy: 64)
         for ( k = 0; k < local_size + 2; k++ ) {
             layer[k] = 0.0f;
             layer_copy[k] = 0.0f;
@@ -90,7 +90,8 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         /* INTERA TEMPESTA. Qui ogni thread fa la stessa cosa aimé... che spreco Zi ------------------------------------*/
         for( i=0; i<num_storms; i++) {
 
-            #pragma omp for
+            // Proviamo ad aggiungere la direttiva "simd" e vediamo se ci sono miglioramenti
+            #pragma omp for simd
             for (k = 1; k <= local_size; k++) {
                 int global_k = offset + k - 1;
 
@@ -147,17 +148,29 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             }
             #pragma omp barrier
 
-            #pragma omp for
-            for (k = 1; k <= local_size; k++) {
+            // ---------------------------------------------------------------------------------------------------------
+            // Per aggiungere le istruzioni "SIMD" devo fare in modo di non avere alcun "if-case" nel ciclo for. L'istruzione deve essere LA STESSA per ogni dato,
+            // ovvero la stessa in un singolo ciclo ( singolo ciclo di clock ). Se invece ci fosse l'if allora questa cosa non avviene.
+
+            // Calcolo bordo SINISTRO
+            if (rank == 0) {
+                layer[1] = layer_copy[1];
+            }else {
+                layer[1] = (layer_copy[0] + layer_copy[1] + layer_copy[2]) / 3.0f;
+            }
+
+            // Calcolo bordo DESTRO
+            if (rank == size - 1) {
+                layer[k] = layer_copy[k];
+            }else {
+                layer[local_size] = (layer_copy[local_size-1] + layer_copy[local_size] + layer_copy[local_size+1]) / 3.0f;
+            }
+            // ---------------------------------------------------------------------------------------------------------
+
+            #pragma omp for simd
+            for (k = 2; k <= local_size - 1; k++) {
                 // Con il pointer-swap i valori ai bordi rimangono del vecchio layer. Bisogna dunque copiarli per ottenere i valori corretti
-                if (rank == 0 && k == 1) {
-                    layer[k] = layer_copy[k];
-                    continue;
-                }
-                if (rank == size - 1 && k == local_size) {
-                    layer[k] = layer_copy[k];
-                    continue;
-                }
+
                 layer[k] = (layer_copy[k-1] + layer_copy[k] + layer_copy[k+1]) / 3.0f;
             }
 
@@ -190,8 +203,9 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             int my_id = omp_get_thread_num();
             LocalData my_data = { -1.0,-1 };
 
-            // Il calcolo è praticamente lo stesso, solo che si va a scrivere i dati in un array condiviso, evitando il delay delle attese
-            #pragma omp for
+            // "safelen" comunica al compilatore la "distanza di sicurezza" (la lunghezza del vettore) entro la quale non
+            // esistono dipendenze di tipo read-after-write (RAW) che impedirebbero la vettorizzazione.
+            #pragma omp for simd safelen(4)
             for( k = start; k <= end; k++ ) {
                 if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
                     if ( layer[k] > my_data.local_maximum ) {
