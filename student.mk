@@ -1,12 +1,12 @@
 # --- Execution Parameters ---
-OMP_NUM_THREADS=2
-MPI_PROCS=10
+#OMP_NUM_THREADS=4
+#MPI_PROCS=8
 
 # --- MPI Run Flags ---
-MPIRUN_FLAGS = -np $(MPI_PROCS) --bind-to numa -map-by numa
+#MPIRUN_FLAGS = -np $(MPI_PROCS) --bind-to numa -map-by numa
 
 # --- Compiler Flags ---
-MPI_OMP_EXTRA_CFLAGS = -O3 #-g	# Cancellare poi -g ( serve per Valgrind )
+MPI_OMP_EXTRA_CFLAGS = -O3 -march=znver1 -mtune=znver1#-g	# Cancellare poi -g ( serve per Valgrind )
 #MPI_OMP_EXTRA_LIBS =
 
 # Flags for CUDA code

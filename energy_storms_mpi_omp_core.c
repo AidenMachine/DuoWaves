@@ -81,7 +81,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
     #pragma omp parallel private(i,j,k)
     {
-        #pragma omp for simd aligned(layer, layer_copy: 64)
+        #pragma omp for simd aligned(layer, layer_copy: 64) schedule(static)
         for ( k = 0; k < local_size + 2; k++ ) {
             layer[k] = 0.0f;
             layer_copy[k] = 0.0f;
@@ -91,7 +91,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         for( i=0; i<num_storms; i++) {
 
             // Proviamo ad aggiungere la direttiva "simd" e vediamo se ci sono miglioramenti
-            #pragma omp for simd
+            #pragma omp for simd schedule(static)
             for (k = 1; k <= local_size; k++) {
                 int global_k = offset + k - 1;
 
@@ -167,7 +167,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             }
             // ---------------------------------------------------------------------------------------------------------
 
-            #pragma omp for simd
+            #pragma omp for simd schedule(static)
             for (k = 2; k <= local_size - 1; k++) {
                 // Con il pointer-swap i valori ai bordi rimangono del vecchio layer. Bisogna dunque copiarli per ottenere i valori corretti
 
@@ -205,7 +205,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
             // "safelen" comunica al compilatore la "distanza di sicurezza" (la lunghezza del vettore) entro la quale non
             // esistono dipendenze di tipo read-after-write (RAW) che impedirebbero la vettorizzazione.
-            #pragma omp for simd safelen(4)
+            #pragma omp for simd schedule(static) safelen(4)
             for( k = start; k <= end; k++ ) {
                 if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
                     if ( layer[k] > my_data.local_maximum ) {
