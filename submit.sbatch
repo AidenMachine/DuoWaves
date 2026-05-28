@@ -6,16 +6,17 @@
 #SBATCH --ntasks-per-node=8
 #SBATCH --cpus-per-task=4
 #SBATCH --cpu-freq=performance
-#SBATCH --nodelist=node[132-135]
 #SBATCH --time=00:15:00
 #SBATCH --output=sbatch_jobs/%j/%j.out
 #SBATCH --error=sbatch_jobs/%j/%j.err
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 source /home/guest/init-hpc.sh
 set -e
 cd "$SLURM_SUBMIT_DIR"
 
-export OMP_PROC_BIND=close
+export OMP_PROC_BIND=true
 export OMP_PLACES=cores
 
 echo "=== JOB INFO ==="
@@ -34,9 +35,23 @@ make energy_storms_mpi_omp
 RUNS=10
 echo "--- ESECUZIONE ($RUNS run) ---"
 times=()
+RUNS=10
+echo "--- ESECUZIONE ($RUNS run) ---"
+times=()
 for i in $(seq 1 $RUNS); do
-    out=$(make -s run_mpi)
+    # Nota: Ho rimesso i parametri espliciti per make, è importantissimo sul cluster!
+    out=$(make -s run_mpi MPI_PROCS=$SLURM_NTASKS OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK)
+    
+    # SE È LA PRIMA RUN, STAMPA TUTTO L'OUTPUT A SCHERMO!
+    if [ "$i" -eq 1 ]; then
+        echo ">>> OUTPUT COMPLETO DELLA RUN 1 PER VERIFICA RISULTATI <<<"
+        echo "$out"
+        echo ">>> FINE VERIFICA <<<"
+    fi
+
+    # Estrae il tempo
     t=$(echo "$out" | grep -oP 'Time:\s*\K[0-9eE.+-]+' | tail -n1)
+    
     if [ -z "$t" ]; then
         echo "Run $i: tempo non trovato. Output:"
         echo "$out"
