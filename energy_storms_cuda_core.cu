@@ -1,11 +1,8 @@
-#include <__clang_cuda_runtime_wrapper.h>
-#include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "energy_storms.h"
-
-#define BLOCK_SIZE 256
+#include <cuda.h>
 
 /* THIS FUNCTION CAN BE MODIFIED */
 /* Function to update a single position of the layer */
@@ -31,53 +28,28 @@ static void update( float *layer, int layer_size, int k, int pos, float energy )
         layer[k] = layer[k] + energy_k;
 }
 
-__global__
-void set_zeros_cuda(int layer_size, float *layer, float *layer_copy) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i > layer_size) return;
 
-    layer[i] = 0.0f;
-    layer_copy[i] = 0.0f;
-}
-
-__global__
-void phase1() {}
-
-
-/* Allocating the memory to the VRAM and transferring all the arrays */
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
-    int num_blocks = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
+    int i, j, k; // TBR
+    float *layer, *layer_copy, *d_storms;
+    size_t size = layer_size * sizeof(float);
+    
+    cudaError_t m1_err = cudaMalloc((void**)&layer, layer_size);
+    cudaError_t m2_err = cudaMalloc((void**)&layer_copy, layer_size);
+    cudaError_t memc_err = cudaMemcpy(d_storms, storms, num_storms * sizeof(Storm *), cudaMemcpyHostToDevice);
 
-    float *layer, *layer_copy, *maximum_cuda;
-    int *positions_cuda;
-    Storm *storms_cuda;
-    if (int alloc_layer = cudaMalloc(&layer, sizeof(float) * layer_size) != 0) {
-       fprintf(stderr, "[cudaMalloc]: error when allocating memory for layer, returned %d", alloc_layer);
-       exit(EXIT_FAILURE);
+    if (m1_err != cudaSuccess || m2_err != cudaSuccess || memc_err != cudaSuccess) {
+        
     }
+      
 
-    if (int alloc_layer_copy = cudaMalloc(&layer_copy, sizeof(float) * layer_size) != 0) {
-       fprintf(stderr, "[cudaMalloc]: error when allocating memory for layer_copy, returned %d", alloc_layer_copy);
-       exit(EXIT_FAILURE);
+      
+    if ( layer == NULL || layer_copy == NULL ) {
+        fprintf(stderr,"Error: Allocating the layer memory\n");
+        exit( EXIT_FAILURE );
     }
-
-    if (int maximum_error = cudaMemcpy(maximum_cuda, maximum , sizeof(maximum), cudaMemcpyHostToDevice) != 0) {
-       fprintf(stderr, "[cudaMalloc]: error when copying to device for maximum, returned %d", maximum_error);
-       exit(EXIT_FAILURE);
-    }
-
-    if (int positions_error = cudaMemcpy(positions_cuda, positions, sizeof(positions), cudaMemcpyHostToDevice) != 0) {
-       fprintf(stderr, "[cudaMalloc]: error when copying to device for positions, returned %d", positions_error);
-       exit(EXIT_FAILURE);
-    }
-
-    if (int storms_error = cudaMemcpy(storms_cuda, storms, sizeof(storms), cudaMemcpyHostToDevice) != 0) {
-       fprintf(stderr, "[cudaMalloc]: error when copying to device for storms, returned %d", storms_error);
-       exit(EXIT_FAILURE);
-    }
-
-    set_zeros_cuda<<<num_blocks, BLOCK_SIZE>>>(layer_size, layer, layer_copy);
-
+    for( k=0; k<layer_size; k++ ) layer[k] = 0.0f;
+    for( k=0; k<layer_size; k++ ) layer_copy[k] = 0.0f;
     
     /* 4. Storms simulation */
     for( i=0; i<num_storms; i++) {
