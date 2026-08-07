@@ -37,19 +37,19 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     cudaError_t m1_err = cudaMalloc((void**)&layer, layer_size);
     cudaError_t m2_err = cudaMalloc((void**)&layer_copy, layer_size);
     cudaError_t memc_err = cudaMemcpy(d_storms, storms, num_storms * sizeof(Storm *), cudaMemcpyHostToDevice);
+    cudaError_t mems1_err = cudaMemset(&layer, 0.0f, layer_size);
+    cudaError_t mems2_err = cudaMemset(&layer_copy, 0.0f, layer_size);
 
-    if (m1_err != cudaSuccess || m2_err != cudaSuccess || memc_err != cudaSuccess) {
-        
+    if (m1_err != cudaSuccess || m2_err != cudaSuccess ||
+            memc_err != cudaSuccess || 
+            mems1_err != cudaSuccess || mems2_err != cudaSuccess) {
+        printf("Error in device variables initialization:\n");                
+        printf("layer:%s, %s\n", cudaGetErrorName(m1_err), cudaGetErrorString(m1_err));                
+        printf("layer_copy:%s, %s\n", cudaGetErrorName(m2_err), cudaGetErrorString(m2_err));
+        printf("memcpy:%s, %s\n", cudaGetErrorName(memc_err), cudaGetErrorString(memc_err));
+        printf("memset layer:%s, %s\n", cudaGetErrorName(mems1_err), cudaGetErrorString(mems1_err));
+        printf("memset layer_copy:%s, %s\n", cudaGetErrorName(mems2_err), cudaGetErrorString(mems2_err));
     }
-      
-
-      
-    if ( layer == NULL || layer_copy == NULL ) {
-        fprintf(stderr,"Error: Allocating the layer memory\n");
-        exit( EXIT_FAILURE );
-    }
-    for( k=0; k<layer_size; k++ ) layer[k] = 0.0f;
-    for( k=0; k<layer_size; k++ ) layer_copy[k] = 0.0f;
     
     /* 4. Storms simulation */
     for( i=0; i<num_storms; i++) {
