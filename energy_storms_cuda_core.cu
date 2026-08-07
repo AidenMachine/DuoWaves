@@ -1,3 +1,4 @@
+#include <__clang_cuda_builtin_vars.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -28,17 +29,24 @@ static void update( float *layer, int layer_size, int k, int pos, float energy )
         layer[k] = layer[k] + energy_k;
 }
 
+__global__ void bomb(Storm *d_storms, float *d_layer, int layer_size, int num_storms) {
+    int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
+    int i_particle = blockIdx.y * blockDim.y + threadIdx.y;
+    int i_storm = blockIdx.z * blockDim.z + threadIdx.z;
+    
+    if (i_storm < num_storms && i_particle < d_storms[i_storm].size && i_layer < layer_size) {}
+}
 
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     int i, j, k; // TBR
-    float *layer, *layer_copy, *d_storms;
+    float *d_layer, *d_layer_copy, *d_storms;
     size_t size = layer_size * sizeof(float);
     
-    cudaError_t m1_err = cudaMalloc((void**)&layer, layer_size);
-    cudaError_t m2_err = cudaMalloc((void**)&layer_copy, layer_size);
+    cudaError_t m1_err = cudaMalloc((void**)&d_layer, layer_size);
+    cudaError_t m2_err = cudaMalloc((void**)&d_layer_copy, layer_size);
     cudaError_t memc_err = cudaMemcpy(d_storms, storms, num_storms * sizeof(Storm *), cudaMemcpyHostToDevice);
-    cudaError_t mems1_err = cudaMemset(&layer, 0.0f, layer_size);
-    cudaError_t mems2_err = cudaMemset(&layer_copy, 0.0f, layer_size);
+    cudaError_t mems1_err = cudaMemset(&d_layer, 0.0f, layer_size);
+    cudaError_t mems2_err = cudaMemset(&d_layer_copy, 0.0f, layer_size);
 
     if (m1_err != cudaSuccess || m2_err != cudaSuccess ||
             memc_err != cudaSuccess || 
@@ -65,26 +73,26 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             /* For each cell in the layer */
             for( k=0; k<layer_size; k++ ) {
                 /* Update the energy value for the cell */
-                update( layer, layer_size, k, position, energy );
+                update( d_layer, layer_size, k, position, energy );
             }
         }
 
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1. Copy values to the ancillary array */
         for( k=0; k<layer_size; k++ ) 
-            layer_copy[k] = layer[k];
+            d_layer_copy[k] = d_layer[k];
 
         /* 4.2.2. Update layer using the ancillary values.
                   Skip updating the first and last positions */
         for( k=1; k<layer_size-1; k++ )
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+            d_layer[k] = ( d_layer_copy[k-1] + d_layer_copy[k] + d_layer_copy[k+1] ) / 3;
 
         /* 4.3. Locate the maximum value in the layer, and its position */
         for( k=1; k<layer_size-1; k++ ) {
             /* Check it only if it is a local maximum */
-            if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-                if ( layer[k] > maximum[i] ) {
-                    maximum[i] = layer[k];
+            if ( d_layer[k] > d_layer[k-1] && d_layer[k] > d_layer[k+1] ) {
+                if ( d_layer[k] > maximum[i] ) {
+                    maximum[i] = d_layer[k];
                     positions[i] = k;
                 }
             }
