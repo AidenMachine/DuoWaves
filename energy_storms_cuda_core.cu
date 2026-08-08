@@ -28,6 +28,24 @@ __global__ void bomb(float *d_flattened, float *d_layer, int* d_offsets, int lay
     }
 }
 
+/* Kernel che copia i valori da layer a layer_copy */
+__global__ void copy(float *layer, float *layer_copy, int layer_size) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (i < layer_size) {
+        layer_copy[i] = layer[i];
+    }
+}
+
+/* Kernel per la fase di rilassamento */
+__global__ void relax(float * layer, float * layer_copy, int layer_size) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (i < layer_size -1 && i > 0) {
+       layer[i] = ( layer_copy[i-1] + layer_copy[i] + layer_copy[i+1] ) / 3;
+    }
+}
+
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     /* Prima parte: il problema principale da affrontare è che storms sia un array di strutture con
      * puntatori ad altri array, e  quindi allocare tutto nel device diventerebbe lungo. Per tale 
@@ -97,48 +115,19 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         if (gap > max_storm) max_storm = gap;
     }
 
+    /* 256 threads per block */
     dim3 block(32, 4, 2);
-    dim3 grid((layer_size + 31)/32, (max_storm + 4)/4, (num_storms + 1)/2);
+    dim3 grid_bomb((layer_size + 31)/32, (max_storm + 4)/4, (num_storms + 1)/2);
 
-    bomb<<<grid, block>>>(d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms);
+    bomb<<<grid_bomb, block>>>(d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms);
+    cudaDeviceSynchronize();
 
+    int grid_copy = (layer_size + 256 - 1)/256;
+
+    copy<<<grid_copy, block>>>(d_layer, d_layer_copy, layer_size);
+    cudaDeviceSynchronize();
     
-    /*SERIAL storm simulation, for reference purpose only*/
-    //for( i=0; i<num_storms; i++) {
-   // 
-    //    /* For each particle */
-     //   for( j=0; j<storms[i].size; j++ ) {
-      //      /* Get impact energy (expressed in thousandths) */
-       //     float energy = (float)storms[i].posval[j*2+1] * 1000;
-        //    /* Get impact position */
-         //   int position = storms[i].posval[j*2];
-//
- //           /* For each cell in the layer */
-  //          for( k=0; k<layer_size; k++ ) {
-   //             /* Update the energy value for the cell */
-    //            update( d_layer, layer_size, k, position, energy );
-     //       }
-      //  }
-//
- //       /* 4.2. Energy relaxation between storms */
-  //      /* 4.2.1. Copy values to the ancillary array */
-   //     for( k=0; k<layer_size; k++ ) 
-    //        d_layer_copy[k] = d_layer[k];
-//
- //       /* 4.2.2. Update layer using the ancillary values.
-  //                Skip updating the first and last positions */
-   //     for( k=1; k<layer_size-1; k++ )
-    //        d_layer[k] = ( d_layer_copy[k-1] + d_layer_copy[k] + d_layer_copy[k+1] ) / 3;
-//
- //       /* 4.3. Locate the maximum value in the layer, and its position */
-  //      for( k=1; k<layer_size-1; k++ ) {
-   //         /* Check it only if it is a local maximum */
-    //        if ( d_layer[k] > d_layer[k-1] && d_layer[k] > d_layer[k+1] ) {
-     //           if ( d_layer[k] > maximum[i] ) {
-      //              maximum[i] = d_layer[k];
-       //             positions[i] = k;
-        //        }
-         //   }
-        //}
-    //}
+    relax<<<grid_copy, block>>>(d_layer, d_layer_copy, layer_size);
+    cudaDeviceSynchronize();
+
 }
