@@ -6,10 +6,9 @@
 #include <cuda.h>
 
 /* Kernel per il bombardamento, al momento errato perché pensato per la vecchia versione*/
-__global__ void bomb(float *d_flattened, float *d_layer, int* d_offsets, int layer_size, int total_size, int num_storms) {
+__global__ void bomb(int i_storm, float *d_flattened, float *d_layer, int* d_offsets, int layer_size, int total_size, int num_storms) {
     int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
     int i_particle = blockIdx.y * blockDim.y + threadIdx.y;
-    int i_storm = blockIdx.z * blockDim.z + threadIdx.z;
     
     if (i_storm < num_storms && i_particle < (d_offsets[i_storm + 1] - d_offsets[i_storm]) && i_layer < layer_size) {
         float energy = (float)d_flattened[d_offsets[i_storm] + i_particle*2+1] * 1000;
@@ -117,17 +116,17 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
     /* 256 threads per block */
     dim3 block(32, 4, 2);
-    dim3 grid_bomb((layer_size + 31)/32, (max_storm + 4)/4, (num_storms + 1)/2);
-
-    bomb<<<grid_bomb, block>>>(d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms);
-    cudaDeviceSynchronize();
-
+    dim3 grid_bomb((layer_size + 31)/32, (max_storm + 4)/4, 1);
     int grid_copy = (layer_size + 256 - 1)/256;
 
-    copy<<<grid_copy, block>>>(d_layer, d_layer_copy, layer_size);
-    cudaDeviceSynchronize();
-    
-    relax<<<grid_copy, block>>>(d_layer, d_layer_copy, layer_size);
-    cudaDeviceSynchronize();
+    for (int i = 0; i < num_storms; i++) {
+        bomb<<<grid_bomb, block>>>(i, d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms);
+        cudaDeviceSynchronize();
 
+        copy<<<grid_copy, block>>>(d_layer, d_layer_copy, layer_size);
+        cudaDeviceSynchronize();
+        
+        relax<<<grid_copy, block>>>(d_layer, d_layer_copy, layer_size);
+        cudaDeviceSynchronize();
+    }
 }
