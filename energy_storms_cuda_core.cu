@@ -6,14 +6,14 @@
 #include <cuda.h>
 
 /* Kernel per il bombardamento, al momento errato perché pensato per la vecchia versione*/
-__global__ void bomb(Storm *d_storms, float *d_layer, int layer_size, int num_storms) {
+__global__ void bomb(float *d_flattened, float *d_layer, int* d_offsets, int layer_size, int total_size, int num_storms) {
     int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
     int i_particle = blockIdx.y * blockDim.y + threadIdx.y;
     int i_storm = blockIdx.z * blockDim.z + threadIdx.z;
     
-    if (i_storm < num_storms && i_particle < d_storms[i_storm].size && i_layer < layer_size) {
-        float energy = (float)d_storms[i_storm].posval[i_particle*2+1] * 1000;
-        float position = (float)d_storms[i_storm].posval[i_particle*2];
+    if (i_storm < num_storms && i_particle < (d_offsets[i_storm + 1] - d_offsets[i_storm]) && i_layer < layer_size) {
+        float energy = (float)d_flattened[d_offsets[i_storm] + i_particle*2+1] * 1000;
+        float position = (float)d_flattened[d_offsets[i_storm] + i_particle*2];
 
         int distance = position - i_layer;
         if ( distance < 0 ) distance = - distance;
@@ -58,7 +58,8 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
     /* Trasferimento nel device: creazione e popolazione di tutte le strutture che serviranno nel
      * device. VALUTARE SPOSTAMENTO IN UNA FUNZIONE A PARTE */
-    float *d_layer, *d_layer_copy, *d_offsets, *d_flattened;
+    float *d_layer, *d_layer_copy , *d_flattened;
+    int * d_offsets;
     size_t size = layer_size * sizeof(float);
 
     cudaError_t offsets_err = cudaMalloc((void **)&d_offsets, (num_storms + 1) * sizeof(int));
@@ -89,6 +90,17 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
         exit(1);
     }
+
+    int max_storm = 0;
+    for (int i = 0; i + 1 < num_storms + 1; i++) {
+        int gap = h_offsets[i + 1] - h_offsets[i];
+        if (gap > max_storm) max_storm = gap;
+    }
+
+    dim3 block(32, 4, 2);
+    dim3 grid((layer_size + 31)/32, (max_storm + 4)/4, (num_storms + 1)/2);
+
+    bomb<<<grid, block>>>(d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms);
 
     
     /*SERIAL storm simulation, for reference purpose only*/
