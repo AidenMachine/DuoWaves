@@ -180,5 +180,15 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
         maximum[i] = in[0];
         positions[i] = in_idx[0];
+
+        cudaFree(in);
+        cudaFree(in_idx);
     }
+
+    cudaFree(d_flattened);
+    cudaFree(d_offsets);
+    cudaFree(d_layer);
+    cudaFree(d_layer_copy);
+    free(h_offsets);
+    free(h_flattened);
 }
