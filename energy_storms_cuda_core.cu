@@ -85,9 +85,24 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * motivo, prima di allocare nel device si effettua una operazione di "flattening" dell'arrray 
      * di storms in un gigantesco array che contenga i valori di tutte le storms uno dietro l'altro,
      * con un array di offset che per ogni storm dice esattamente dove si trova l'inizio della storm */
-    int *h_offsets = (int *)malloc((num_storms + 1) * sizeof(int)); 
+
+    /* Spiegazione per me ( Anto )
+     * Essnzialmente, l'offset viene calcolato con una "tempesta extra" per capire dove finisce l'ultima tempesta ( ovvero la [num_storms - 1] )
+     * Con il "+1" abbiamo che:
+     * h_offset[0] = 0 ( T1 inizia a 0 )
+     * h_offset[1] = 4 ( finisce T1 ed inizia T2 )
+     * h_offset[2] = 10 ( finisce T2 ed inizia T3 )
+     * h_offset[3] = 12 ( finisce T3 e basta )
+     *
+     * Senza il "+1" abbiamo invece che:
+     * h_offset[0] = 0 ( T1 inizia a 0 )
+     * h_offset[1] = 4 ( finisce T1 ed inizia T2 )
+     * h_offset[2] = 10 ( finisce T2 ed inizia T3 ma cosi facendo non sappiamo dove finisce T3! )
+     */
+    int *h_offsets = (int *)malloc((num_storms + 1) * sizeof(int));                 // Contiene gli indici di partenza di ogni tempesta
     float* h_storms; 
 
+    // Qui inizia la prima tempesta
     h_offsets[0] = 0;
 
     /* Popolazione dell'array di offset nell'host. ATTENZIONE: per ogni struct di una Storm si ha
@@ -97,7 +112,13 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         h_offsets[i+1] = h_offsets[i] + (storms[i].size * 2);
     }
 
+    // Numero celle di memoria massime per contenere tutte le particelle di ogni tempesta
     int total_size = (h_offsets[num_storms] + (storms[num_storms -1].size * 2));
+    // Mi stavo facendo spiegare nel dettaglio riga per riga e mi ha detto che però il calcolo è errato e che quello corretto dovrebbe essere:
+    // int total_size = h_offsets[num_storms];
+    // Perché, in teoria, hai gia fatto il calcolo " + (storms[i].size ... ) nel for direttamente l'istruzione sopra
+
+    // Allocazione dell'array "flattato" nella dimensione appena calcolata. Conterrà tutti i dati ( posizione ed energia ) di tutte le tempeste
     float *h_flattened = (float *)malloc(total_size * sizeof(float));
 
     /* Popolazione dell'array flattened nell'host tramite memcpy dal posval corrispondente. Stesse
