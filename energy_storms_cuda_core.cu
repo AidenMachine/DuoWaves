@@ -5,10 +5,12 @@
 #include "energy_storms.h"
 #include <cuda.h>
 
-/* Kernel per il bombardamento, al momento errato perché pensato per la vecchia versione*/
+#define BLOCK_SIZE 256
+
+/* Kernel per il bombardamento */
 __global__ void bomb(int i_storm, float *d_flattened, float *d_layer, int* d_offsets, int layer_size, int total_size, int num_storms) {
-    int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
-    int i_particle = blockIdx.y * blockDim.y + threadIdx.y;
+    unsigned int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int i_particle = blockIdx.y * blockDim.y + threadIdx.y;
     
     if (i_storm < num_storms && i_particle < (d_offsets[i_storm + 1] - d_offsets[i_storm]) && i_layer < layer_size) {
         float energy = (float)d_flattened[d_offsets[i_storm] + i_particle*2+1] * 1000;
@@ -29,7 +31,7 @@ __global__ void bomb(int i_storm, float *d_flattened, float *d_layer, int* d_off
 
 /* Kernel che copia i valori da layer a layer_copy */
 __global__ void copy(float *layer, float *layer_copy, int layer_size) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i < layer_size) {
         layer_copy[i] = layer[i];
@@ -38,10 +40,41 @@ __global__ void copy(float *layer, float *layer_copy, int layer_size) {
 
 /* Kernel per la fase di rilassamento */
 __global__ void relax(float * layer, float * layer_copy, int layer_size) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i < layer_size -1 && i > 0) {
        layer[i] = ( layer_copy[i-1] + layer_copy[i] + layer_copy[i+1] ) / 3;
+    }
+}
+
+/* Kernel per il calcolo del massimo, sfrutta la tecnica di reduce */
+__global__ void reduce_argmax(float* in, int* in_idx, float* out, int* out_idx, int n, bool first_pass) {
+    unsigned int tid = threadIdx.x;
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+    __shared__ float sdata[BLOCK_SIZE];
+    __shared__ int   sidx[BLOCK_SIZE];
+
+    if (i < n) {
+        sdata[tid] = in[i];
+        sidx[tid]  = first_pass ? i : in_idx[i];
+    } else {
+        sdata[tid] = 0.0f;
+        sidx[tid]  = -1;
+    }
+    __syncthreads();
+
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (tid < s && sdata[tid + s] > sdata[tid]) {
+            sdata[tid] = sdata[tid + s];
+            sidx[tid]  = sidx[tid + s];
+        }
+        __syncthreads();
+    }
+
+    if (tid == 0) {
+        out[blockIdx.x]     = sdata[0];
+        out_idx[blockIdx.x] = sidx[0];
     }
 }
 
@@ -114,19 +147,38 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         if (gap > max_storm) max_storm = gap;
     }
 
-    /* 256 threads per block */
-    dim3 block(32, 4, 2);
     dim3 grid_bomb((layer_size + 31)/32, (max_storm + 4)/4, 1);
     int grid_copy = (layer_size + 256 - 1)/256;
 
     for (int i = 0; i < num_storms; i++) {
-        bomb<<<grid_bomb, block>>>(i, d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms);
+        bomb<<<grid_bomb, BLOCK_SIZE>>>(i, d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms);
         cudaDeviceSynchronize();
 
-        copy<<<grid_copy, block>>>(d_layer, d_layer_copy, layer_size);
+        copy<<<grid_copy, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
         cudaDeviceSynchronize();
         
-        relax<<<grid_copy, block>>>(d_layer, d_layer_copy, layer_size);
+        relax<<<grid_copy, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
         cudaDeviceSynchronize();
+    
+        float *in = d_layer;
+        int   *in_idx = nullptr;
+        int n = layer_size;
+        bool first = true;
+
+        while (n > 1) {
+            int nblocks = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
+            float *out;
+            int   *out_idx;
+            cudaMalloc(&out, nblocks * sizeof(float));
+            cudaMalloc(&out_idx, nblocks * sizeof(int));
+
+            reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, out, out_idx, n, first);
+
+            if (!first) { cudaFree(in); cudaFree(in_idx); }
+            in = out; in_idx = out_idx; n = nblocks; first = false;
+        }
+
+        maximum[i] = in[0];
+        positions[i] = in_idx[0];
     }
 }
