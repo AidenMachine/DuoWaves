@@ -8,11 +8,11 @@
 #define BLOCK_SIZE 256
 
 /* Kernel per il bombardamento */
-__global__ void bomb(int i_storm, float *d_flattened, float *d_layer, int* d_offsets, int layer_size, int total_size, int num_storms) {
+__global__ void bomb(int i_storm, float *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, int total_size, int num_storms) {
     unsigned int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
     unsigned int i_particle = blockIdx.y * blockDim.y + threadIdx.y;
     
-    if (i_storm < num_storms && i_particle < (d_offsets[i_storm + 1] - d_offsets[i_storm]) && i_layer < layer_size) {
+    if (i_storm < num_storms && i_particle < (d_offsets[i_storm + 1] - d_offsets[i_storm] / 2) && i_layer < layer_size) {
         float energy = (float)d_flattened[d_offsets[i_storm] + i_particle*2+1] * 1000;
         float position = (float)d_flattened[d_offsets[i_storm] + i_particle*2];
 
@@ -36,6 +36,7 @@ __global__ void copy(float *layer, float *layer_copy, int layer_size) {
     if (i < layer_size) {
         layer_copy[i] = layer[i];
     }
+
 }
 
 /* Kernel per la fase di rilassamento */
@@ -96,7 +97,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         h_offsets[i+1] = h_offsets[i] + (storms[i].size * 2);
     }
 
-    int total_size = h_offsets[num_storms];
+    int total_size = (h_offsets[num_storms] + (storms[num_storms -1].size * 2));
     float *h_flattened = (float *)malloc(total_size * sizeof(float));
 
     /* Popolazione dell'array flattened nell'host tramite memcpy dal posval corrispondente. Stesse
@@ -109,10 +110,10 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     /* Trasferimento nel device: creazione e popolazione di tutte le strutture che serviranno nel
      * device. VALUTARE SPOSTAMENTO IN UNA FUNZIONE A PARTE */
     float *d_layer, *d_layer_copy , *d_flattened;
-    int * d_offsets;
+    unsigned int * d_offsets;
     size_t size = layer_size * sizeof(float);
 
-    cudaError_t offsets_err = cudaMalloc((void **)&d_offsets, (num_storms + 1) * sizeof(int));
+    cudaError_t offsets_err = cudaMalloc((void **)&d_offsets, (num_storms + 1) * sizeof(unsigned int));
     cudaError_t flattened_err = cudaMalloc((void **)&d_flattened, total_size * sizeof(float));
     cudaError_t layer_err = cudaMalloc((void**)&d_layer, layer_size);
     cudaError_t layercopy_err = cudaMalloc((void**)&d_layer_copy, layer_size);
@@ -147,6 +148,9 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         if (gap > max_storm) max_storm = gap;
     }
 
+    free(h_offsets);
+    free(h_flattened);
+
     dim3 grid_bomb((layer_size + 31)/32, (max_storm + 4)/4, 1);
     int grid_copy = (layer_size + 256 - 1)/256;
 
@@ -156,6 +160,12 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
         copy<<<grid_copy, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
         cudaDeviceSynchronize();
+
+        /**
+        float *temp = layer_copy;
+        layer_copy = layer;
+        layer = temp;
+        **/
         
         relax<<<grid_copy, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
         cudaDeviceSynchronize();
@@ -189,6 +199,4 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     cudaFree(d_offsets);
     cudaFree(d_layer);
     cudaFree(d_layer_copy);
-    free(h_offsets);
-    free(h_flattened);
 }
