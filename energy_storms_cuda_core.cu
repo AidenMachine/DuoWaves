@@ -99,7 +99,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * h_offset[2] = 10 ( finisce T2 ed inizia T3 ma cosi facendo non sappiamo dove finisce T3! )
      */
     int *h_offsets = (int *)malloc((num_storms + 1) * sizeof(int));                 // Contiene gli indici di partenza di ogni tempesta
-    float* h_storms; 
 
     // Qui inizia la prima tempesta
     h_offsets[0] = 0;
@@ -131,7 +130,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * device. VALUTARE SPOSTAMENTO IN UNA FUNZIONE A PARTE */
     float *d_layer, *d_layer_copy , *d_flattened;
     unsigned int * d_offsets;
-    size_t size = layer_size * sizeof(float);
 
     cudaError_t offsets_err = cudaMalloc((void **)&d_offsets, (num_storms + 1) * sizeof(unsigned int));
     cudaError_t flattened_err = cudaMalloc((void **)&d_flattened, total_size * sizeof(float));
