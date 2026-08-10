@@ -1,0 +1,4 @@
+*.o
+energy_storms_cuda
+energy_storms_mpi_omp
+energy_storms_mpi_seq
