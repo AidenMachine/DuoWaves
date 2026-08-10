@@ -24,12 +24,9 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
         float energy_k = energy / layer_size / atenuacion;
 
         /* Cambiata la threshold con quella pre-calcolata. Almeno cosi facendo i calcoli non verranno ripetuti inutilmente */
-        if ( energy_k >= calc_threshold || energy_k <= -calc_threshold )
-            /* In teoria dovremmo aggiungere "AtomicAdd"
-             * atomicAdd(&d_layer[i_layer], energy_k);
-             * In questo modo andiamo ad eliminare la race_condition, rallentando però l'esecuzione. */
-            //d_layer[i_layer] = d_layer[i_layer] + energy_k;
-            d_layer[i_layer] = d_layer[i_layer] + energy_k;
+        if ( energy_k >= calc_threshold || energy_k <= -calc_threshold ) {
+            atomicAdd(&d_layer[i_layer], energy_k);
+        }
     }
 }
 
@@ -38,19 +35,12 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
 __global__ void relax(float * layer, float * layer_copy, int layer_size) {
     unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    /* Non dovremmo fare tipo cosi ?
-    * if (i == 0 || i == layer_size - 1) {
-        layer[i] = layer_copy[i]; // Mantiene il valore aggiornato dal bombardamento
+    if (i == 0 || i == layer_size - 1) {
+        layer[i] = layer_copy[i];
     } else if (i < layer_size - 1) {
         layer[i] = (layer_copy[i-1] + layer_copy[i] + layer_copy[i+1]) / 3.0f;
     }
-    */
-
-    if (i < layer_size -1 && i > 0) {
-       layer[i] = ( layer_copy[i-1] + layer_copy[i] + layer_copy[i+1] ) / 3.0f;            /* Ho cambiato il valore da 3 a 3.0f come in MPI/OMP */
-    }
 }
-
 /* Kernel per il calcolo del massimo, sfrutta la tecnica di reduce */
 __global__ void reduce_argmax(float* in, int* in_idx, float* out, int* out_idx, int n, bool first_pass) {
     unsigned int tid = threadIdx.x;
@@ -59,27 +49,37 @@ __global__ void reduce_argmax(float* in, int* in_idx, float* out, int* out_idx, 
     __shared__ float sdata[BLOCK_SIZE];
     __shared__ int   sidx[BLOCK_SIZE];
 
-    if (i < n) {
-        sdata[tid] = in[i];
-        sidx[tid]  = first_pass ? i : in_idx[i];
-    } else {
-        sdata[tid] = 0.0f;
-        sidx[tid]  = -1;
-    }
-    __syncthreads();
+    sdata[tid] = -INFINITY;
+      sidx[tid]  = -1;
 
-    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
-        if (tid < s && sdata[tid + s] > sdata[tid]) {
-            sdata[tid] = sdata[tid + s];
-            sidx[tid]  = sidx[tid + s];
-        }
-        __syncthreads();
-    }
+      if (i < n) {
+          if (!first_pass) {
+              sdata[tid] = in[i];
+              sidx[tid]  = in_idx[i];
+          } else if (i > 0 && i < n - 1 && in[i] > in[i-1] && in[i] > in[i+1]) {
+              sdata[tid] = in[i];
+              sidx[tid]  = (int)i;
+          }
+      }
+      __syncthreads();
 
-    if (tid == 0) {
-        out[blockIdx.x]     = sdata[0];
-        out_idx[blockIdx.x] = sidx[0];
-    }
+      for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+          if (tid < s) {
+              bool better = sdata[tid + s] > sdata[tid];
+              bool tie_lower = sdata[tid + s] == sdata[tid] && sidx[tid + s] >= 0 &&
+                               (sidx[tid] < 0 || sidx[tid + s] < sidx[tid]);
+              if (better || tie_lower) {
+                  sdata[tid] = sdata[tid + s];
+                  sidx[tid]  = sidx[tid + s];
+              }
+          }
+          __syncthreads();
+      }
+
+      if (tid == 0) {
+          out[blockIdx.x]     = sdata[0];
+          out_idx[blockIdx.x] = sidx[0];
+      }
 }
 
 /* SOLO PER DEBUG: stampa solamente i primi 35 elementi di un array
@@ -255,13 +255,24 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
             reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, out, out_idx, n, first);
 
-            if (!first) { cudaFree(in); cudaFree(in_idx); }
-            in = out; in_idx = out_idx; n = nblocks; first = false;
+            if (!first) 
+                cudaFree(in); cudaFree(in_idx); 
+            in = out;
+            in_idx = out_idx;
+            n = nblocks;
+            first = false;
         }
 
+        float h_max = 0.0f;
+        int h_pos = -1;
 
-        cudaMemcpy(&maximum[i], &in[0], sizeof(float),cudaMemcpyDeviceToHost);
-        cudaMemcpy(&positions[i], &in_idx[0], sizeof(float),cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_max, &in[0], sizeof(float),cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_pos, &in_idx[0], sizeof(int),cudaMemcpyDeviceToHost);
+
+        if (h_pos >= 0 && h_max > maximum[i]) {
+            maximum[i] = h_max;
+            positions[i] = h_pos;
+    }
 
         cudaFree(in);
         cudaFree(in_idx);
