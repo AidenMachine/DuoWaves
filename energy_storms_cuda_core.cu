@@ -7,13 +7,13 @@
 #define BLOCK_SIZE 256
 
 /* Kernel per il bombardamento */
-__global__ void bomb(int i_storm, float *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, int total_size, int num_storms, float calc_threshold) {
+__global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, int total_size, int num_storms, float calc_threshold) {
     unsigned int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
     unsigned int i_particle = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (i_storm < num_storms && i_particle < ((d_offsets[i_storm + 1] - d_offsets[i_storm]) / 2) && i_layer < layer_size) {
-        float energy = d_flattened[d_offsets[i_storm] + i_particle*2+1] * 1000;
-        float position = d_flattened[d_offsets[i_storm] + i_particle*2];
+        float energy = (float)d_flattened[d_offsets[i_storm] + i_particle*2+1] * 1000;
+        float position = (float)d_flattened[d_offsets[i_storm] + i_particle*2];
 
         int distance = position - i_layer;
         if ( distance < 0 ) distance = - distance;
@@ -28,21 +28,11 @@ __global__ void bomb(int i_storm, float *d_flattened, float *d_layer, unsigned i
             /* In teoria dovremmo aggiungere "AtomicAdd"
              * atomicAdd(&d_layer[i_layer], energy_k);
              * In questo modo andiamo ad eliminare la race_condition, rallentando però l'esecuzione. */
+            //d_layer[i_layer] = d_layer[i_layer] + energy_k;
             d_layer[i_layer] = d_layer[i_layer] + energy_k;
     }
 }
 
-/* Kernel che copia i valori da layer a layer_copy
- * DA ELIMINARE QUANDO VUOI, BROTHER
- */
-__global__ void copy(float *layer, float *layer_copy, int layer_size) {
-    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
-
-    if (i < layer_size) {
-        layer_copy[i] = layer[i];
-    }
-
-}
 
 /* Kernel per la fase di rilassamento */
 __global__ void relax(float * layer, float * layer_copy, int layer_size) {
@@ -92,9 +82,45 @@ __global__ void reduce_argmax(float* in, int* in_idx, float* out, int* out_idx, 
     }
 }
 
+/* SOLO PER DEBUG: stampa solamente i primi 35 elementi di un array
+ * in memoria del device, portandolo in memoria host */
+void DEBUG_print_device_array(float *d_layer, int layer_size) {
+    float *h_layer = (float *) malloc(layer_size * sizeof(float));
+    cudaMemcpy(h_layer, d_layer, layer_size * sizeof(float), cudaMemcpyDeviceToHost);
+
+    for (int i = 0; i < layer_size; i++) {
+        if (i > 35)
+            break;
+        printf("%f ", h_layer[i]);
+    }
+    printf("\n");
+    cudaFree(h_layer);
+}
+
+/* Stessa cosa di sopra ma per un array in memoria host */
+void DEBUG_print_host_array(int *h_layer, int layer_size) {
+    for (int i = 0; i < layer_size; i++) {
+        if (i > 35)
+            break;
+        printf("%d ", h_layer[i]);
+    }
+    printf("\n");
+}
+
+/* Versione con interi perché non so come cazzo se fa sennò */
+void DEBUG_print_host_array(unsigned int *h_layer, int layer_size) {
+    for (int i = 0; i < layer_size; i++) {
+        if (i > 35)
+            break;
+        printf("%d ", h_layer[i]);
+    }
+    printf("\n");
+}
+
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     /* Per ottimizzare un pò i calcoli, calcolo la "THRESHOLD" da controllare in "bomb" subito ed una sola volta */
     float calc_threshold = (float) THRESHOLD / layer_size;
+    printf("calc_threshold: %f\n", calc_threshold);
 
     /* Prima parte: il problema principale da affrontare è che storms sia un array di strutture con
      * puntatori ad altri array, e  quindi allocare tutto nel device diventerebbe lungo. Per tale 
@@ -115,7 +141,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * h_offset[1] = 4 ( finisce T1 ed inizia T2 )
      * h_offset[2] = 10 ( finisce T2 ed inizia T3 ma cosi facendo non sappiamo dove finisce T3! )
      */
-    unsigned int *h_offsets = (unsigned int *)malloc((num_storms + 1) * sizeof(int));                 // Contiene gli indici di partenza di ogni tempesta
+    unsigned int *h_offsets = (unsigned int *)malloc((num_storms + 1) * sizeof(unsigned int));                 // Contiene gli indici di partenza di ogni tempesta
 
     /* Qui inizia la prima tempesta */
     h_offsets[0] = 0;
@@ -131,7 +157,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     int total_size = (h_offsets[num_storms]);
 
     /* Allocazione dell'array "flattato" nella dimensione appena calcolata. Conterrà tutti i dati ( posizione ed energia ) di tutte le tempeste */
-    float *h_flattened = (float *)malloc(total_size * sizeof(float));
+    int *h_flattened = (int *)malloc(total_size * sizeof(int));
 
     /* Popolazione dell'array flattened nell'host tramite memcpy dal posval corrispondente. Stesse
      * attenzioni di cui sopra quando si tratta di definire la dimensione. */
@@ -141,22 +167,23 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
          * 2. Da dove copiare i dati
          * 3. Quanti byte incollare
          */
-        memcpy(h_flattened + h_offsets[i], storms[i].posval, storms[i].size * 2 * sizeof(unsigned int));
+        memcpy(h_flattened + h_offsets[i], storms[i].posval, storms[i].size * 2 * sizeof(int));
     }
 
 
     /* Trasferimento nel device: creazione e popolazione di tutte le strutture che serviranno nel
      * device. VALUTARE SPOSTAMENTO IN UNA FUNZIONE A PARTE */
-    float *d_layer, *d_layer_copy , *d_flattened;
+    float *d_layer, *d_layer_copy;
     unsigned int * d_offsets;
+    int *d_flattened;
 
     cudaError_t offsets_err = cudaMalloc((void **)&d_offsets, (num_storms + 1) * sizeof(unsigned int));
-    cudaError_t flattened_err = cudaMalloc((void **)&d_flattened, total_size * sizeof(float));
+    cudaError_t flattened_err = cudaMalloc((void **)&d_flattened, total_size * sizeof(int));
     cudaError_t layer_err = cudaMalloc((void**)&d_layer, layer_size * sizeof(float));
     cudaError_t layercopy_err = cudaMalloc((void**)&d_layer_copy, layer_size * sizeof(float));
 
-    cudaError_t offsetcpy_err = cudaMemcpy(d_offsets, h_offsets, num_storms + 1 * sizeof(unsigned int), cudaMemcpyHostToDevice);
-    cudaError_t flatcpy_err = cudaMemcpy(d_flattened, h_flattened, total_size * sizeof(float), cudaMemcpyHostToDevice);
+    cudaError_t offsetcpy_err = cudaMemcpy(d_offsets, h_offsets, (num_storms + 1) * sizeof(unsigned int), cudaMemcpyHostToDevice);
+    cudaError_t flatcpy_err = cudaMemcpy(d_flattened, h_flattened, total_size * sizeof(int), cudaMemcpyHostToDevice);
 
     cudaError_t mems1_err = cudaMemset(d_layer, 0, layer_size * sizeof(float));
     cudaError_t mems2_err = cudaMemset(d_layer_copy, 0, layer_size * sizeof(float));
@@ -199,27 +226,18 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * Il principio è praticamente lo stesso per la Y
      * La Z invece la manteniamo ad 1, cosi da avere una "griglia 2D ( a due dimensioni )
      */
+    dim3 block_bomb(32, 4, 1);
     dim3 grid_bomb((layer_size + 31)/32, (max_storm + 4)/4, 1);
     int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
 
     for (int i = 0; i < num_storms; i++) {
-        bomb<<<grid_bomb, BLOCK_SIZE>>>(i, d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms, calc_threshold);
+        bomb<<<grid_bomb, block_bomb>>>(i, d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms, calc_threshold);
         cudaDeviceSynchronize();
 
-        /* PER LUCA ----------------------------------------------------------------------------------------------------------- */
-        /* Tutta questa parte qui sotto la possiamo direttamente eliminare. Il pointer-swap si può fare anche in questo caso.
-         * Non solo in MPI/OMP */
-        copy<<<grid_copy, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
-        cudaDeviceSynchronize();
-        /* -------------------------------------------------------------------------------------------------------------------- */
+        float *temp = d_layer_copy;
+        d_layer_copy = d_layer;
+        d_layer = temp;
 
-        /* Scommenta come puoi ------------------------------------------------------------------------------------------------ */
-        /**
-        float *temp = layer_copy;
-        layer_copy = layer;
-        layer = temp;
-        * ---------------------------------------------------------------------------------------------------------------------- */
-        
         relax<<<grid_copy, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
         cudaDeviceSynchronize();
     
@@ -242,8 +260,8 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         }
 
 
-        cudaMemcpy((void *) &maximum[i], (void *) &in[0], sizeof(float),cudaMemcpyDeviceToHost);
-        cudaMemcpy((void *) &positions[i], (void *) &in_idx[0], sizeof(float),cudaMemcpyDeviceToHost);
+        cudaMemcpy(&maximum[i], &in[0], sizeof(float),cudaMemcpyDeviceToHost);
+        cudaMemcpy(&positions[i], &in_idx[0], sizeof(float),cudaMemcpyDeviceToHost);
 
         cudaFree(in);
         cudaFree(in_idx);
