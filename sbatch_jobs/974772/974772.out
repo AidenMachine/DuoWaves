@@ -1,0 +1,20 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               974772
+Nodes:                1 (node124)
+Tasks:                1
+CPUs per task:        1
+GPUs requested:       
+================
+Quadro RTX 6000, 23040 MiB, 570.124.04
+Quadro RTX 6000, 23040 MiB, 570.124.04
+--- COMPILAZIONE ---
+rm -rf energy_storms_seq energy_storms_mpi_omp energy_storms_cuda energy_storms_core.o energy_storms_mpi_omp_core.o energy_storms_cuda_core.o
+nvcc -arch=sm_75   -c energy_storms_cuda_core.cu -lm  -o energy_storms_cuda_core.o
+nvcc -arch=sm_75   energy_storms_cuda.cpp energy_storms_cuda_core.o -lm  -o energy_storms_cuda
+--- ESECUZIONE (10 run) ---

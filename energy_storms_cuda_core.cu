@@ -98,7 +98,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * h_offset[1] = 4 ( finisce T1 ed inizia T2 )
      * h_offset[2] = 10 ( finisce T2 ed inizia T3 ma cosi facendo non sappiamo dove finisce T3! )
      */
-    int *h_offsets = (int *)malloc((num_storms + 1) * sizeof(int));                 // Contiene gli indici di partenza di ogni tempesta
+    unsigned int *h_offsets = (unsigned int *)malloc((num_storms + 1) * sizeof(int));                 // Contiene gli indici di partenza di ogni tempesta
 
     // Qui inizia la prima tempesta
     h_offsets[0] = 0;
@@ -111,7 +111,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     }
 
     // Numero celle di memoria massime per contenere tutte le particelle di ogni tempesta
-    int total_size = (h_offsets[num_storms] + (storms[num_storms -1].size * 2));
+    int total_size = (h_offsets[num_storms]);
     // Mi stavo facendo spiegare nel dettaglio riga per riga e mi ha detto che però il calcolo è errato e che quello corretto dovrebbe essere:
     // int total_size = h_offsets[num_storms];
     // Perché, in teoria, hai gia fatto il calcolo " + (storms[i].size ... ) nel for direttamente l'istruzione sopra
@@ -122,7 +122,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     /* Popolazione dell'array flattened nell'host tramite memcpy dal posval corrispondente. Stesse
      * attenzioni di cui sopra quando si tratta di definire la dimensione. */
     for (int i = 0; i < num_storms; i++) {
-        memcpy(h_flattened + h_offsets[i], storms[i].posval, storms[i].size * 2);
+        memcpy(h_flattened + h_offsets[i], storms[i].posval, storms[i].size * 2 * sizeof(unsigned int));
     }
 
 
@@ -133,14 +133,14 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
     cudaError_t offsets_err = cudaMalloc((void **)&d_offsets, (num_storms + 1) * sizeof(unsigned int));
     cudaError_t flattened_err = cudaMalloc((void **)&d_flattened, total_size * sizeof(float));
-    cudaError_t layer_err = cudaMalloc((void**)&d_layer, layer_size);
-    cudaError_t layercopy_err = cudaMalloc((void**)&d_layer_copy, layer_size);
+    cudaError_t layer_err = cudaMalloc((void**)&d_layer, layer_size * sizeof(float));
+    cudaError_t layercopy_err = cudaMalloc((void**)&d_layer_copy, layer_size * sizeof(float));
 
-    cudaError_t offsetcpy_err = cudaMemcpy(d_offsets, h_offsets, num_storms + 1, cudaMemcpyHostToDevice);
-    cudaError_t flatcpy_err = cudaMemcpy(d_flattened, h_flattened, total_size, cudaMemcpyHostToDevice);
+    cudaError_t offsetcpy_err = cudaMemcpy(d_offsets, h_offsets, num_storms + 1 * sizeof(unsigned int), cudaMemcpyHostToDevice);
+    cudaError_t flatcpy_err = cudaMemcpy(d_flattened, h_flattened, total_size * sizeof(float), cudaMemcpyHostToDevice);
 
-    cudaError_t mems1_err = cudaMemset(&d_layer, 0.0f, layer_size);
-    cudaError_t mems2_err = cudaMemset(&d_layer_copy, 0.0f, layer_size);
+    cudaError_t mems1_err = cudaMemset(d_layer, 0, layer_size * sizeof(float));
+    cudaError_t mems2_err = cudaMemset(d_layer_copy, 0, layer_size * sizeof(float));
 
     if (offsets_err != cudaSuccess || flattened_err != cudaSuccess || 
             layer_err != cudaSuccess || layercopy_err != cudaSuccess ||
@@ -159,6 +159,8 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
         exit(1);
     }
+
+    printf("allocato tutto in device");
 
     int max_storm = 0;
     for (int i = 0; i + 1 < num_storms + 1; i++) {
@@ -206,8 +208,9 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             in = out; in_idx = out_idx; n = nblocks; first = false;
         }
 
-        maximum[i] = in[0];
-        positions[i] = in_idx[0];
+
+        cudaMemcpy((void *) &maximum[i], (void *) &in[0], sizeof(float),cudaMemcpyDeviceToHost);
+        cudaMemcpy((void *) &positions[i], (void *) &in_idx[0], sizeof(float),cudaMemcpyDeviceToHost);
 
         cudaFree(in);
         cudaFree(in_idx);

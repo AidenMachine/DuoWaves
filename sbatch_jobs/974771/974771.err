@@ -1,0 +1,2 @@
+srun: error: node124: task 0: Exited with exit code 1
+make: *** [Makefile:80: run_cuda] Error 1
