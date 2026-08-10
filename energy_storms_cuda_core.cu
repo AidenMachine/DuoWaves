@@ -255,8 +255,11 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
             reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, out, out_idx, n, first);
 
-            if (!first) 
-                cudaFree(in); cudaFree(in_idx); 
+            if (!first) {
+                cudaFree(in); 
+                cudaFree(in_idx); 
+            }
+
             in = out;
             in_idx = out_idx;
             n = nblocks;
