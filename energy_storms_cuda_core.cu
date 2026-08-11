@@ -6,12 +6,11 @@
 
 #define BLOCK_SIZE 256
 
-/* Kernel per il bombardamento */
-__global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, int total_size, int num_storms, float calc_threshold) {
+/* Kernel per il bombardamento. Ora 1D */
+__global__ void bomb(int i_storm, int i_particle, int *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, float calc_threshold) {
     unsigned int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
-    unsigned int i_particle = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (i_storm < num_storms && i_particle < ((d_offsets[i_storm + 1] - d_offsets[i_storm]) / 2) && i_layer < layer_size) {
+    if (i_layer < layer_size) {
         float energy = (float)d_flattened[d_offsets[i_storm] + i_particle*2+1] * 1000;
         float position = (float)d_flattened[d_offsets[i_storm] + i_particle*2];
 
@@ -231,7 +230,9 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
 
     for (int i = 0; i < num_storms; i++) {
-        bomb<<<grid_bomb, block_bomb>>>(i, d_flattened, d_layer, d_offsets, layer_size, total_size, num_storms, calc_threshold);
+        for (int j = 0; j <  storms[i].size; j++) {
+            bomb<<<grid_bomb, block_bomb>>>(i, j, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
+        }
         cudaDeviceSynchronize();
 
         float *temp = d_layer_copy;
