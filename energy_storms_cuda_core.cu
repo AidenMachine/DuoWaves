@@ -7,12 +7,15 @@
 #define BLOCK_SIZE 256
 
 /* Kernel per il bombardamento. Ora 1D */
-__global__ void bomb(int i_storm, int i_particle, int *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, float calc_threshold) {
+__global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, float calc_threshold) {
     unsigned int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i_layer < layer_size) {
-        float energy = (float)d_flattened[d_offsets[i_storm] + i_particle*2+1] * 1000;
-        float position = (float)d_flattened[d_offsets[i_storm] + i_particle*2];
+        for (int j = 0; 
+                j < (d_offsets[i_storm +1] - d_offsets[i_storm]) / 2;
+                    j++) {
+        float energy = (float)d_flattened[d_offsets[i_storm] + j*2+1] * 1000;
+        int position = d_flattened[d_offsets[i_storm] + j*2];
 
         int distance = position - i_layer;
         if ( distance < 0 ) distance = - distance;
@@ -24,9 +27,10 @@ __global__ void bomb(int i_storm, int i_particle, int *d_flattened, float *d_lay
 
         /* Cambiata la threshold con quella pre-calcolata. Almeno cosi facendo i calcoli non verranno ripetuti inutilmente */
         if ( energy_k >= calc_threshold || energy_k <= -calc_threshold ) {
-            atomicAdd(&d_layer[i_layer], energy_k);
+            d_layer[i_layer] = d_layer[i_layer] + energy_k;
         }
     }
+}
 }
 
 
@@ -93,7 +97,7 @@ void DEBUG_print_device_array(float *d_layer, int layer_size) {
         printf("%f ", h_layer[i]);
     }
     printf("\n");
-    cudaFree(h_layer);
+    free(h_layer);
 }
 
 /* Stessa cosa di sopra ma per un array in memoria host */
@@ -205,7 +209,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         exit(1);
     }
 
-    printf("allocato tutto in device\n");
 
     int max_storm = 0;
     for (int i = 0; i + 1 < num_storms + 1; i++) {
@@ -225,21 +228,17 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * Il principio è praticamente lo stesso per la Y
      * La Z invece la manteniamo ad 1, cosi da avere una "griglia 2D ( a due dimensioni )
      */
-    dim3 grid_bomb((layer_size + 31)/32, (max_storm + 4)/4, 1);
+    int grid_bomb = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
     int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
 
     for (int i = 0; i < num_storms; i++) {
-        for (int j = 0; j <  storms[i].size; j++) {
-            bomb<<<grid_bomb, BLOCK_SIZE>>>(i, j, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
-        }
-        cudaDeviceSynchronize();
+            bomb<<<grid_bomb, BLOCK_SIZE>>>(i, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
 
         float *temp = d_layer_copy;
         d_layer_copy = d_layer;
         d_layer = temp;
 
         relax<<<grid_copy, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
-        cudaDeviceSynchronize();
     
         float *in = d_layer;
         int   *in_idx = nullptr;
