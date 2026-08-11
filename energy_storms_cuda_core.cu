@@ -225,13 +225,12 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * Il principio è praticamente lo stesso per la Y
      * La Z invece la manteniamo ad 1, cosi da avere una "griglia 2D ( a due dimensioni )
      */
-    dim3 block_bomb(32, 4, 1);
     dim3 grid_bomb((layer_size + 31)/32, (max_storm + 4)/4, 1);
     int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
 
     for (int i = 0; i < num_storms; i++) {
         for (int j = 0; j <  storms[i].size; j++) {
-            bomb<<<grid_bomb, block_bomb>>>(i, j, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
+            bomb<<<grid_bomb, BLOCK_SIZE>>>(i, j, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
         }
         cudaDeviceSynchronize();
 
