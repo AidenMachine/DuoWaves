@@ -231,6 +231,18 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     int grid_bomb = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
     int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
 
+    /*TODO Numero massimo di blocchi lanciati nella prima passata della reduction
+     *int max_reduction_blocks = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
+     *
+     *Allocazione dei due buffer fissi, uno per il MASSIMO ed uno per gli INDICI
+     *float *d_max_output;
+     *int *d_pos_output;
+     *
+     *Alloco subito ( ed una volta sola ) lo spazio necessario. Invece che usare spazi diversi ogni volta, si va ad utilizzare sempre lo stesso
+     *cosi da risparmiare qualche ciclo di clock.
+     *cudaMalloc(&d_max_output, max_reduction_blocks * sizeof(float));
+     *cudaMalloc(&d_pos_output, max_reduction_blocks * sizeof(int));
+     */
     for (int i = 0; i < num_storms; i++) {
         /* Ora non utilizziamo più un kernel 2D. Passando con un kernel 1D possiamo calcolare in modo corretto i valori esatti dei bombardamenti
          * ed, inoltre, non vi è più race-condition.
@@ -257,27 +269,42 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         /* Riduce progressivamente la dimensione dei dati su cui lavorare. Da "n" fino ad 1. */
         while (n > 1) {
             int nblocks = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;                            /* Calcolo progressivo dei blocchi che servono per lavorare su "n" elementi */
+            /* Queste due variabili vanno commentate/cancellate perché sopra, poche righe prima del for, ne ho create altre che ci servono ora */
             float *out;                                                                 /* ( Questo ed il successivo ) sono puntatori temporanei per contenere i risultati intermedi di questa specifica passata */
             int   *out_idx;
 
-            /* Allocazione dinamica in VRAM dei buffer di output per i massimi/indici parziali (uno per ogni blocco) */
+            /* Allocazione dinamica in VRAM dei buffer di output per i massimi/indici parziali (uno per ogni blocco)
+             * TODO Tecnicamente basta eliminare i due cudaMalloc() qui sotto.
+             */
             cudaMalloc(&out, nblocks * sizeof(float));
             cudaMalloc(&out_idx, nblocks * sizeof(int));
 
+            /* Utilizzare questa chiamata di reduce invece che quella sotto
+             *reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, d_max_output, d_pos_output, n, first);*/
             reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, out, out_idx, n, first);
+
+            /* TODO Per i passaggi successivi della reduction:
+             * l'input del prossimo giro diventerà l'output di questo giro
+             * in = d_max_output;
+             * in_idx = d_pos_output;
+             */
 
             /* GESTIONE DELLA MEMORIA TEMPORANEA
              * Se non siamo al primo passaggio, 'in' e 'in_idx' puntano a buffer intermedi creati
              * nelle iterazioni precedenti del while, che ora non servono più e vanno liberati per evitare memory leak.
              * NOTA: Al primo passaggio (first == true) 'in' punta a d_layer, quindi NON deve essere liberato qui!
+             *
+             * TODO TEORICAMENTE QUESTA PARTE NON DOVREBBE SERVIRE PIU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
              */
             if (!first) {
                 cudaFree(in); 
                 cudaFree(in_idx); 
             }
 
+            /* TODO Queste due possono essere eliminate perché tanto le ho riscritte nel commento sopra */
             in = out;
             in_idx = out_idx;
+
             n = nblocks;
             first = false;
         }
@@ -328,7 +355,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
  * ------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 /* Possibile ottimizzazione:
- * Invece che chiamare CudaMalloc() nel while per cosi tante volte, non sarebbe male chiamarlo una singola volta.ù
+ * Invece che chiamare CudaMalloc() nel while per cosi tante volte, non sarebbe male chiamarlo una singola volta?
  * Limitando le chiamate, in teoria, andiamo a risparmiare qualche ms.
  * In teoria credo si faccia prima del ciclo for finale.
  */
