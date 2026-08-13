@@ -14,21 +14,21 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
         for (int j = 0; 
                 j < (d_offsets[i_storm +1] - d_offsets[i_storm]) / 2;
                     j++) {
-        float energy = (float)d_flattened[d_offsets[i_storm] + j*2+1] * 1000;
-        int position = d_flattened[d_offsets[i_storm] + j*2];
+            float energy = (float)d_flattened[d_offsets[i_storm] + j*2+1] * 1000;
+            int position = d_flattened[d_offsets[i_storm] + j*2];
 
-        int distance = position - i_layer;
-        if ( distance < 0 ) distance = - distance;
+            int distance = position - i_layer;
+            if ( distance < 0 ) distance = - distance;
 
-        distance = distance + 1;
-        float atenuacion = sqrtf( (float)distance );
+            distance = distance + 1;
+            float atenuacion = sqrtf( (float)distance );
 
-        float energy_k = energy / layer_size / atenuacion;
+            float energy_k = energy / layer_size / atenuacion;
 
-        /* Cambiata la threshold con quella pre-calcolata. Almeno cosi facendo i calcoli non verranno ripetuti inutilmente */
-        if ( energy_k >= calc_threshold || energy_k <= -calc_threshold ) {
-            d_layer[i_layer] = d_layer[i_layer] + energy_k;
-        }
+            /* Cambiata la threshold con quella pre-calcolata. Almeno cosi facendo i calcoli non verranno ripetuti inutilmente */
+            if ( energy_k >= calc_threshold || energy_k <= -calc_threshold ) {
+                d_layer[i_layer] = d_layer[i_layer] + energy_k;
+            }
     }
 }
 }

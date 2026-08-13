@@ -35,9 +35,11 @@ COLOUR_MUTED: str = "#898781"
 COLOUR_GRID: str = "#e1e0d9"
 COLOUR_AXIS: str = "#c3c2b7"
 
+SECONDS_TO_MILLISECONDS: float = 1000.0
+
 LABEL_TITLE: str = "Scalabilita rispetto alla dimensione del problema (CUDA)"
 LABEL_X: str = "Dimensione del layer (posizioni)"
-LABEL_Y: str = "Tempo medio di esecuzione (s)"
+LABEL_Y: str = "Tempo medio di esecuzione (ms)"
 LABEL_SINGLE: str = "File singolo"
 LABEL_COMBINED: str = "Suite combinata"
 LABEL_TREND: str = "Media per dimensione"
@@ -144,6 +146,24 @@ def mean_per_size(measurements: list[Measurement]) -> tuple[list[int], list[floa
     return sizes, [sum(totals[size]) / len(totals[size]) for size in sizes]
 
 
+def format_milliseconds(value: float, _position: int) -> str:
+    """
+    Renders an axis tick as a plain millisecond figure instead of the power of
+    ten notation matplotlib uses by default on a logarithmic scale, choosing
+    the number of decimals from the magnitude of the value so that small ticks
+    keep their significant digits and large ticks stay free of trailing zeros.
+    """
+    if value <= 0.0:
+        return ""
+    if value >= 1.0:
+        return f"{value:.0f}"
+    if value >= 0.1:
+        return f"{value:.1f}"
+    if value >= 0.01:
+        return f"{value:.2f}"
+    return f"{value:.3f}"
+
+
 def write_csv(measurements: list[Measurement], path: Path) -> None:
     """
     Dumps the parsed entries as a comma separated table, so that the same data
@@ -176,6 +196,7 @@ def build_plot(
 
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
+        import matplotlib.ticker
     except ImportError:
         raise SystemExit(MISSING_MATPLOTLIB)
 
@@ -195,8 +216,8 @@ def build_plot(
             continue
         series = axes.errorbar(
             [entry.size for entry in entries],
-            [entry.mean for entry in entries],
-            yerr=[entry.stddev for entry in entries],
+            [entry.mean * SECONDS_TO_MILLISECONDS for entry in entries],
+            yerr=[entry.stddev * SECONDS_TO_MILLISECONDS for entry in entries],
             fmt=marker,
             color=colour,
             markersize=8,
@@ -213,7 +234,7 @@ def build_plot(
         trend_sizes, trend_times = mean_per_size(singles)
         trend = axes.plot(
             trend_sizes,
-            trend_times,
+            [value * SECONDS_TO_MILLISECONDS for value in trend_times],
             color=COLOUR_SINGLE,
             linewidth=2.0,
             linestyle="--",
@@ -227,7 +248,7 @@ def build_plot(
         for entry in measurements:
             axes.annotate(
                 entry.label,
-                (entry.size, entry.mean),
+                (entry.size, entry.mean * SECONDS_TO_MILLISECONDS),
                 textcoords="offset points",
                 xytext=(8, 5),
                 fontsize=7,
@@ -237,6 +258,13 @@ def build_plot(
     if use_log_scale:
         axes.set_xscale("log")
         axes.set_yscale("log")
+        axes.yaxis.set_minor_locator(
+            matplotlib.ticker.LogLocator(base=10.0, subs=(2.0, 5.0), numticks=100)
+        )
+
+    tick_formatter = matplotlib.ticker.FuncFormatter(format_milliseconds)
+    axes.yaxis.set_major_formatter(tick_formatter)
+    axes.yaxis.set_minor_formatter(tick_formatter)
 
     axes.set_title(LABEL_TITLE, color=COLOUR_INK, fontsize=13, pad=14)
     axes.set_xlabel(LABEL_X, color=COLOUR_INK_SECONDARY, fontsize=11)
