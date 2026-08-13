@@ -9,28 +9,48 @@
 /* Kernel per il bombardamento. Ora 1D */
 __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, float calc_threshold) {
     unsigned int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    __shared__ int s_pos[BLOCK_SIZE];
+    __shared__ float s_energy[BLOCK_SIZE];
 
-    if (i_layer < layer_size) {
-        for (int j = 0; 
-                j < (d_offsets[i_storm +1] - d_offsets[i_storm]) / 2;
-                    j++) {
-            float energy = (float)d_flattened[d_offsets[i_storm] + j*2+1] * 1000;
-            int position = d_flattened[d_offsets[i_storm] + j*2];
+    unsigned int base = d_offsets[i_storm];
+    int num_particles = (d_offsets[i_storm + 1] - base) / 2;
+    
+    bool active = i_layer < layer_size;
 
-            int distance = position - i_layer;
-            if ( distance < 0 ) distance = - distance;
+    for (int tile = 0; tile < num_particles; tile += BLOCK_SIZE) {
+        int p_in_block = num_particles - tile;
+        if (p_in_block > BLOCK_SIZE) p_in_block = BLOCK_SIZE;
 
-            distance = distance + 1;
-            float atenuacion = sqrtf( (float)distance );
+        __syncthreads();
 
-            float energy_k = energy / layer_size / atenuacion;
+        if (threadIdx.x < p_in_block) {
+            s_pos[threadIdx.x] = d_flattened[base + (tile + threadIdx.x)*2];
+            s_energy[threadIdx.x] = ((float)d_flattened[base + (tile + threadIdx.x)*2 + 1] * 1000) / layer_size;
+        }
 
-            /* Cambiata la threshold con quella pre-calcolata. Almeno cosi facendo i calcoli non verranno ripetuti inutilmente */
-            if ( energy_k >= calc_threshold || energy_k <= -calc_threshold ) {
-                d_layer[i_layer] = d_layer[i_layer] + energy_k;
+        __syncthreads();
+
+        if (active) {
+            for (int j = 0; j < p_in_block; j++) {
+                float energy = s_energy[j];
+                int position = s_pos[j];
+
+                int distance = position - i_layer;
+                if ( distance < 0 ) distance = - distance;
+
+                distance = distance + 1;
+                float atenuacion = sqrtf( (float)distance );
+
+                float energy_k = energy / atenuacion;
+
+                /* Cambiata la threshold con quella pre-calcolata. Almeno cosi facendo i calcoli non verranno ripetuti inutilmente */
+                if ( energy_k >= calc_threshold || energy_k <= -calc_threshold ) {
+                    d_layer[i_layer] = d_layer[i_layer] + energy_k;
+                }
             }
+        }
     }
-}
 }
 
 
