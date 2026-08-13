@@ -11,7 +11,8 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
     unsigned int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i_layer < layer_size) {
-        for (int j = 0; 
+        //float save_cell_energy = d_layer[i_layer];
+        for (int j = 0;
                 j < (d_offsets[i_storm +1] - d_offsets[i_storm]) / 2;
                     j++) {
             float energy = (float)d_flattened[d_offsets[i_storm] + j*2+1] * 1000;
@@ -28,9 +29,11 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
             /* Cambiata la threshold con quella pre-calcolata. Almeno cosi facendo i calcoli non verranno ripetuti inutilmente */
             if ( energy_k >= calc_threshold || energy_k <= -calc_threshold ) {
                 d_layer[i_layer] = d_layer[i_layer] + energy_k;
+                //save_cell_energy += energy_k;
             }
+        }
+        //d_layer[i_layer] = save_cell_energy;
     }
-}
 }
 
 
@@ -231,18 +234,34 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     int grid_bomb = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
     int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
 
-    /*TODO Numero massimo di blocchi lanciati nella prima passata della reduction
-     *int max_reduction_blocks = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
+    /* PARTE NUOVA ( per cudaMalloc() ) -------------------------------------------------------------------------------- */
+    /* Numero massimo di blocchi lanciati nella prima passata della reduction */
+    int max_reduction_blocks = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
+
+    /* Allocazione dei DUE buffer di supporto FUORI dal loop for (una sola volta)
+     * Ne utilizziamo due perché se ne utilizzassi uno singolo, andrei a scrivere e leggere contemporaneamente i dati dallo stesso buffer ( ricorda i thread che lavorano in parallelo )
+     * Usandone due di buffer invece faccio cosi:
+     * 1. Leggo dal layer
+     * 2. Scrivo i risultati su A
+     * 3. Ora leggo i dati da A
+     * 4. Scrivo i risultati su B
+     * 5. Leggo dati da B
+     * 6. Scrivo su A...
      *
-     *Allocazione dei due buffer fissi, uno per il MASSIMO ed uno per gli INDICI
-     *float *d_max_output;
-     *int *d_pos_output;
-     *
-     *Alloco subito ( ed una volta sola ) lo spazio necessario. Invece che usare spazi diversi ogni volta, si va ad utilizzare sempre lo stesso
-     *cosi da risparmiare qualche ciclo di clock.
-     *cudaMalloc(&d_max_output, max_reduction_blocks * sizeof(float));
-     *cudaMalloc(&d_pos_output, max_reduction_blocks * sizeof(int));
+     * una sorta di effetto "ping pong"
      */
+    float *d_max_output[2];
+    int *d_pos_output[2];
+
+    /* Alloco subito ( ed una volta sola ) lo spazio necessario. Invece che usare spazi diversi ogni volta, si va ad utilizzare sempre lo stesso
+     * cosi da risparmiare qualche ciclo di clock.
+     */
+    cudaMalloc((void**)&d_max_output[0], max_reduction_blocks * sizeof(float));
+    cudaMalloc((void**)&d_max_output[1], max_reduction_blocks * sizeof(float));
+    cudaMalloc((void**)&d_pos_output[0], max_reduction_blocks * sizeof(int));
+    cudaMalloc((void**)&d_pos_output[1], max_reduction_blocks * sizeof(int));
+    /* ----------------------------------------------------------------------------------------------------------------- */
+
     for (int i = 0; i < num_storms; i++) {
         /* Ora non utilizziamo più un kernel 2D. Passando con un kernel 1D possiamo calcolare in modo corretto i valori esatti dei bombardamenti
          * ed, inoltre, non vi è più race-condition.
@@ -266,28 +285,25 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         int n = layer_size;                 /* Numero di elementi su cui fare la reduction */
         bool first = true;                  /* Flag per indicare al kernel che si tratta del primo passaggio della riduzione */
 
+        /* Alterna tra 0 ed 1 */
+        int pingpong = 0;
+
         /* Riduce progressivamente la dimensione dei dati su cui lavorare. Da "n" fino ad 1. */
         while (n > 1) {
             int nblocks = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;                            /* Calcolo progressivo dei blocchi che servono per lavorare su "n" elementi */
             /* Queste due variabili vanno commentate/cancellate perché sopra, poche righe prima del for, ne ho create altre che ci servono ora */
-            float *out;                                                                 /* ( Questo ed il successivo ) sono puntatori temporanei per contenere i risultati intermedi di questa specifica passata */
-            int   *out_idx;
+            //float *out;                                                                 /* ( Questo ed il successivo ) sono puntatori temporanei per contenere i risultati intermedi di questa specifica passata */
+            //int   *out_idx;
 
-            /* Allocazione dinamica in VRAM dei buffer di output per i massimi/indici parziali (uno per ogni blocco)
-             * TODO Tecnicamente basta eliminare i due cudaMalloc() qui sotto.
-             */
-            cudaMalloc(&out, nblocks * sizeof(float));
-            cudaMalloc(&out_idx, nblocks * sizeof(int));
+            //cudaMalloc(&out, nblocks * sizeof(float));
+            //cudaMalloc(&out_idx, nblocks * sizeof(int));
 
-            /* Utilizzare questa chiamata di reduce invece che quella sotto
-             *reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, d_max_output, d_pos_output, n, first);*/
-            reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, out, out_idx, n, first);
+            /* Utilizzare questa chiamata di reduce invece che quella sotto*/
+             reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, d_max_output[pingpong], d_pos_output[pingpong], n, first);
+            //reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, out, out_idx, n, first);
 
-            /* TODO Per i passaggi successivi della reduction:
-             * l'input del prossimo giro diventerà l'output di questo giro
-             * in = d_max_output;
-             * in_idx = d_pos_output;
-             */
+            in = d_max_output[pingpong];
+            in_idx = d_pos_output[pingpong];
 
             /* GESTIONE DELLA MEMORIA TEMPORANEA
              * Se non siamo al primo passaggio, 'in' e 'in_idx' puntano a buffer intermedi creati
@@ -295,16 +311,19 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
              * NOTA: Al primo passaggio (first == true) 'in' punta a d_layer, quindi NON deve essere liberato qui!
              *
              * TODO TEORICAMENTE QUESTA PARTE NON DOVREBBE SERVIRE PIU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-             */
-            if (!first) {
-                cudaFree(in); 
-                cudaFree(in_idx); 
+             *
+            * if (!first) {
+                cudaFree(in);
+                cudaFree(in_idx);
             }
+             */
+
 
             /* TODO Queste due possono essere eliminate perché tanto le ho riscritte nel commento sopra */
-            in = out;
-            in_idx = out_idx;
+            //in = out;
+            //in_idx = out_idx;
 
+            pingpong = 1 - pingpong;
             n = nblocks;
             first = false;
         }
@@ -316,19 +335,25 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         float h_max = 0.0f;
         int h_pos = -1;
 
-        /* Copia dei due valori scalari dalla VRAM (GPU) alla memoria RAM (CPU) */
-        cudaMemcpy(&h_max, &in[0], sizeof(float),cudaMemcpyDeviceToHost);
-        cudaMemcpy(&h_pos, &in_idx[0], sizeof(int),cudaMemcpyDeviceToHost);
+        /*CAMBIATOOOOOOO Copia dei due valori scalari dalla VRAM (GPU) alla memoria RAM (CPU) */
+        //cudaMemcpy(&h_max, &in[0], sizeof(float),cudaMemcpyDeviceToHost);
+        //cudaMemcpy(&h_pos, &in_idx[0], sizeof(int),cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_max, &in[0], sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_pos, &in_idx[0], sizeof(int), cudaMemcpyDeviceToHost);
 
         if (h_pos >= 0 && h_max > maximum[i]) {
             maximum[i] = h_max;
             positions[i] = h_pos;
     }
 
-        cudaFree(in);
-        cudaFree(in_idx);
+        //cudaFree(in);
+        //cudaFree(in_idx);
     }
 
+    cudaFree(d_max_output[0]);
+    cudaFree(d_max_output[1]);
+    cudaFree(d_pos_output[0]);
+    cudaFree(d_pos_output[1]);
     cudaFree(d_flattened);
     cudaFree(d_offsets);
     cudaFree(d_layer);
