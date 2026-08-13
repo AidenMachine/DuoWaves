@@ -232,28 +232,45 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
 
     for (int i = 0; i < num_storms; i++) {
-            bomb<<<grid_bomb, BLOCK_SIZE>>>(i, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
+        /* Ora non utilizziamo più un kernel 2D. Passando con un kernel 1D possiamo calcolare in modo corretto i valori esatti dei bombardamenti
+         * ed, inoltre, non vi è più race-condition.
+         * Invece che passare una variabile "dim3" ci basta passsare BLOCK_SIZE. Essendo un singolo valore, i valori di Y e Z saranno uguali ad 1.
+         */
+        bomb<<<grid_bomb, BLOCK_SIZE>>>(i, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
 
+        /* Pointer-swap
+         * Utilizzando questo andiamo a risparmiare tempo. Invece che perdere tempo con la copia, andiamo semplicemente a
+         * swappare gli indirizzi dei puntatori. Lo stesso ragionamento applicato in MPI/OMP.
+         */
         float *temp = d_layer_copy;
         d_layer_copy = d_layer;
         d_layer = temp;
 
+        /* Applicazione del rilassamento. Principalmente molto simile ad MPI/OMP */
         relax<<<grid_copy, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
     
-        float *in = d_layer;
+        float *in = d_layer;                /* Puntatore "d'ingresso" ( che porta all'inizio ) della reduction */
         int   *in_idx = nullptr;
-        int n = layer_size;
-        bool first = true;
+        int n = layer_size;                 /* Numero di elementi su cui fare la reduction */
+        bool first = true;                  /* Flag per indicare al kernel che si tratta del primo passaggio della riduzione */
 
+        /* Riduce progressivamente la dimensione dei dati su cui lavorare. Da "n" fino ad 1. */
         while (n > 1) {
-            int nblocks = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
-            float *out;
+            int nblocks = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;                            /* Calcolo progressivo dei blocchi che servono per lavorare su "n" elementi */
+            float *out;                                                                 /* ( Questo ed il successivo ) sono puntatori temporanei per contenere i risultati intermedi di questa specifica passata */
             int   *out_idx;
+
+            /* Allocazione dinamica in VRAM dei buffer di output per i massimi/indici parziali (uno per ogni blocco) */
             cudaMalloc(&out, nblocks * sizeof(float));
             cudaMalloc(&out_idx, nblocks * sizeof(int));
 
             reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, out, out_idx, n, first);
 
+            /* GESTIONE DELLA MEMORIA TEMPORANEA
+             * Se non siamo al primo passaggio, 'in' e 'in_idx' puntano a buffer intermedi creati
+             * nelle iterazioni precedenti del while, che ora non servono più e vanno liberati per evitare memory leak.
+             * NOTA: Al primo passaggio (first == true) 'in' punta a d_layer, quindi NON deve essere liberato qui!
+             */
             if (!first) {
                 cudaFree(in); 
                 cudaFree(in_idx); 
@@ -265,9 +282,14 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             first = false;
         }
 
+        /* TRASFERIMENTO DEI RISULTATI FINALI ALL'HOST (CPU)
+         * Terminata la riduzione (n == 1), 'in[0]' contiene il massimo globale della tempesta attuale
+         * e 'in_idx[0]' contiene l'indice della cella in cui si trova tale massimo.
+         */
         float h_max = 0.0f;
         int h_pos = -1;
 
+        /* Copia dei due valori scalari dalla VRAM (GPU) alla memoria RAM (CPU) */
         cudaMemcpy(&h_max, &in[0], sizeof(float),cudaMemcpyDeviceToHost);
         cudaMemcpy(&h_pos, &in_idx[0], sizeof(int),cudaMemcpyDeviceToHost);
 
@@ -285,3 +307,28 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     cudaFree(d_layer);
     cudaFree(d_layer_copy);
 }
+
+/* APPUNTO SUL CAMBIAMENTO DEL KERNEL -------------------------------------------------------------------------------------------------------------------
+ * Con il Kernel-2D si hanno due assi di threads:
+ * Asse X -> il vecchio "i_layer"                   IL LAYER SU CUI LAVORAVA
+ * Asse Y -> i_particle                             LA PARTICELLA SU CUI LAVORAVA
+ * La GPU lanciava più threads per la stessa cella. Esempio...
+ * Threads(5, 0) calcolava l'effetto della Particella 0 su layer[5]
+ * Threads(5, 1) calcolava l'effetto della Particella 1 su layer[5]
+ * Threads(5, 2) calcolava l'effetto della Particella 2 su layer[5]
+ * Il problema nasceva quando ogni thread andava a scrivere in VRAM il valore.
+ * Dato che non vi è nessun ordine e che ogni thread poteva finire prima dell'altro, succedeva che
+ * magari nel primo test finiva il thread 2. Nel successivo lo 0... e così via.
+ * Di conseguenza, dato che sulla macchina i float sommati in ordine diverso possono portare a risultati diversi, questo portava a risultati errati.
+ *
+ * Con il Kernel-1D invece le cose cambiano perché, semplicemente, ogni thread prende una SINGOLA CELLA DEL LAYER e cicla tutte le particelle.
+ * In questo modo non vi è race-condition e non serve utilizzare AtomicAdd() perché quel singolo thread sarà l'unico ad accedere
+ * a quell'area di memoria/registro. Inoltre non vi sarà alcuna "Data race" quindi l'ordine d'acccesso in memoria sarà sempre uguale e, quindi,
+ * il risultato del programma sarà sempre deterministico.
+ * ------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
+/* Possibile ottimizzazione:
+ * Invece che chiamare CudaMalloc() nel while per cosi tante volte, non sarebbe male chiamarlo una singola volta.ù
+ * Limitando le chiamate, in teoria, andiamo a risparmiare qualche ms.
+ * In teoria credo si faccia prima del ciclo for finale.
+ */
