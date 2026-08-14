@@ -1,9 +1,0 @@
-energy_storms_mpi_omp_core.c: In function ‘core’:
-energy_storms_mpi_omp_core.c:142:64: error: ‘right_neighbor’ undeclared (first use in this function)
-  142 |                 MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
-      |                                                                ^~~~~~~~~~~~~~
-energy_storms_mpi_omp_core.c:142:64: note: each undeclared identifier is reported only once for each function it appears in
-energy_storms_mpi_omp_core.c:143:55: error: ‘left_neighbor’ undeclared (first use in this function)
-  143 |                              &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
-      |                                                       ^~~~~~~~~~~~~
-make: *** [Makefile:57: energy_storms_mpi_omp_core.o] Error 1

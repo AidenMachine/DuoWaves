@@ -1,9 +1,0 @@
-=== JOB INFO ===
-Job ID:        934559
-Nodes:         4 (node[108,114,116,120])
-MPI tasks:     8
-CPUs per task: 30 (OMP_NUM_THREADS=30)
-================
---- COMPILAZIONE ---
-make: 'energy_storms_mpi_omp' is up to date.
---- ESECUZIONE (10 run) ---
