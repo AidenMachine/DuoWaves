@@ -10,6 +10,7 @@
 __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, float calc_threshold) {
     unsigned int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
     
+    /* Variabili in memoria condivisa. */
     __shared__ int s_pos[BLOCK_SIZE];
     __shared__ float s_energy[BLOCK_SIZE];
 
@@ -19,12 +20,14 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
     bool active = i_layer < layer_size;
 
     for (int tile = 0; tile < num_particles; tile += BLOCK_SIZE) {
-        int p_in_block = num_particles - tile;
-        if (p_in_block > BLOCK_SIZE) p_in_block = BLOCK_SIZE;
+        int n = num_particles - tile;
+        if (n > BLOCK_SIZE) n = BLOCK_SIZE;
 
+        /* Sezione in cui si carica il blocco corrispondente al thread in questione in shared memory. */
         __syncthreads();
 
-        if (threadIdx.x < p_in_block) {
+        /* Controllo nel caso in cui fosse l'ultimo pezzo e quindi n non fosse per forza BLOCK_SIZE. */
+        if (threadIdx.x < n) {
             s_pos[threadIdx.x] = d_flattened[base + (tile + threadIdx.x)*2];
             s_energy[threadIdx.x] = ((float)d_flattened[base + (tile + threadIdx.x)*2 + 1] * 1000) / layer_size;
         }
@@ -32,7 +35,7 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
         __syncthreads();
 
         if (active) {
-            for (int j = 0; j < p_in_block; j++) {
+            for (int j = 0; j < n; j++) {
                 float energy = s_energy[j];
                 int position = s_pos[j];
 
@@ -143,7 +146,6 @@ void DEBUG_print_host_array(unsigned int *h_layer, int layer_size) {
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     /* Per ottimizzare un pò i calcoli, calcolo la "THRESHOLD" da controllare in "bomb" subito ed una sola volta */
     float calc_threshold = (float) THRESHOLD / layer_size;
-    printf("calc_threshold: %f\n", calc_threshold);
 
     /* Prima parte: il problema principale da affrontare è che storms sia un array di strutture con
      * puntatori ad altri array, e  quindi allocare tutto nel device diventerebbe lungo. Per tale 
