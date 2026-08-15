@@ -4,7 +4,11 @@
 #include "energy_storms.h"
 #include <cuda.h>
 
+/* Questo permette agli script, volendo, di definire la dimensione 
+ * del blocco nel flag di compilazione. */
+#ifndef BLOCK_SIZE
 #define BLOCK_SIZE 256
+#endif
 
 /* Kernel per il bombardamento. Ora 1D */
 __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, float calc_threshold) {
@@ -250,8 +254,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * Il principio è praticamente lo stesso per la Y
      * La Z invece la manteniamo ad 1, cosi da avere una "griglia 2D ( a due dimensioni )
      */
-    int grid_bomb = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
-    int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
+    int grid_bomb, grid_copy = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
     /*TODO Numero massimo di blocchi lanciati nella prima passata della reduction
      *int max_reduction_blocks = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
