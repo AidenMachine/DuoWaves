@@ -124,7 +124,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     // float *layer_copy = calloc( (local_size + 2), sizeof( float ));
 
     // ---------------------------------------------------------------------
-    
+
     /* Le storms non possono essere parallelizzate perché vale come "fattore temporale".
      * C'è la storm_0 che avviene PRIMA della storm_1. Se le parallelizzassimo allora i core e threads
      * andrebbero a lavorare su dati sbagliati. Il che non va bene perché uscirebbero risultati errati
@@ -206,7 +206,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         float temp = *layer_copy;
         *layer_copy = *layer;
         *layer = temp;
-        * TODO NO WAY FRA... Avevo sbagliato a passare i valori... avevo scambiato solo il valore della PRIMA cella... 
+        * TODO NO WAY FRA... Avevo sbagliato a passare i valori... avevo scambiato solo il valore della PRIMA cella...
         */
 
         // TEST_2
