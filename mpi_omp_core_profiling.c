@@ -77,7 +77,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         int left_neighbor = (rank == 0) ? MPI_PROC_NULL : rank - 1;
         int right_neighbor = (rank == size - 1) ? MPI_PROC_NULL : rank + 1;
 
-        /* CALCOLO TEMPO SCAMBIO 1 (HALO EXCHANGE) */
+        /* CALCOLO TEMPO SCAMBIO 1 */
         t0 = MPI_Wtime();
         MPI_Sendrecv(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0,
                      &layer[0], 1, MPI_FLOAT, left_neighbor, 0,
