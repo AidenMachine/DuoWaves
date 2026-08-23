@@ -251,7 +251,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * La Z invece la manteniamo ad 1, cosi da avere una "griglia 2D ( a due dimensioni )
      */
     int grid_bomb = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
-    int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
+    int grid_copy = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
 
     /*TODO Numero massimo di blocchi lanciati nella prima passata della reduction
      *int max_reduction_blocks = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
