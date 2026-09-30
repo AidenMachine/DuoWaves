@@ -260,8 +260,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * Il principio è praticamente lo stesso per la Y
      * La Z invece la manteniamo ad 1, cosi da avere una "griglia 2D ( a due dimensioni )
      */
-    int grid_bomb = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
-    int grid_copy = (layer_size + 256 - 1)/256;                     /* Essendo solo la copia di un array il lavoro verrà fatto in una struttura ad una dimensione */
+    int grid = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
     /* PARTE NUOVA ( per cudaMalloc() ) -------------------------------------------------------------------------------- */
     /* Numero massimo di blocchi lanciati nella prima passata della reduction */
@@ -296,7 +295,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
          * ed, inoltre, non vi è più race-condition.
          * Invece che passare una variabile "dim3" ci basta passsare BLOCK_SIZE. Essendo un singolo valore, i valori di Y e Z saranno uguali ad 1.
          */
-        bomb<<<grid_bomb, BLOCK_SIZE>>>(i, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
+        bomb<<<grid, BLOCK_SIZE>>>(i, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
 
         /* Pointer-swap
          * Utilizzando questo andiamo a risparmiare tempo. Invece che perdere tempo con la copia, andiamo semplicemente a
@@ -307,7 +306,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         d_layer = temp;
 
         /* Applicazione del rilassamento. Principalmente molto simile ad MPI/OMP */
-        relax<<<grid_copy, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
+        relax<<<grid, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
     
         float *in = d_layer;                /* Puntatore "d'ingresso" ( che porta all'inizio ) della reduction */
         int   *in_idx = nullptr;
