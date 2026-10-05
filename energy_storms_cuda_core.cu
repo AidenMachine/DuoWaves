@@ -27,22 +27,22 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
     }
 
     for (int tile = 0; tile < num_particles; tile += BLOCK_SIZE) {
-        int n = num_particles - tile;
-        if (n > BLOCK_SIZE) n = BLOCK_SIZE;
+        int tile_count = num_particles - tile;
+        if (tile_count > BLOCK_SIZE) tile_count = BLOCK_SIZE;
 
         /* Sezione in cui si carica il blocco corrispondente al thread in questione in shared memory. */
         __syncthreads();
 
-        /* Controllo nel caso in cui fosse l'ultimo pezzo e quindi n non fosse per forza BLOCK_SIZE. */
-        if (threadIdx.x < n) {
+        if (threadIdx.x < tile_count) {
             s_pos[threadIdx.x] = d_flattened[base + (tile + threadIdx.x)*2];
             s_energy[threadIdx.x] = ((float)d_flattened[base + (tile + threadIdx.x)*2 + 1] * 1000) / layer_size;
         }
 
         __syncthreads();
         
+        /* Calcolo del contributo di ogni particella del tile */
         if (active) {
-            for (int j = 0; j < n; j++) {
+            for (int j = 0; j < tile_count; j++) {
                 float energy = s_energy[j];
                 int position = s_pos[j];
 
