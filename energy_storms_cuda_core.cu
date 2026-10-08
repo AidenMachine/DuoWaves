@@ -310,18 +310,18 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     
         float *in = d_layer;                /* Puntatore "d'ingresso" ( che porta all'inizio ) della reduction */
         int   *in_idx = nullptr;
-        int n = layer_size;                 /* Numero di elementi su cui fare la reduction */
+        int num_candidates = layer_size;                 /* Numero di elementi su cui fare la reduction */
         bool first = true;                  /* Flag per indicare al kernel che si tratta del primo passaggio della riduzione */
 
         /* Alterna tra 0 ed 1 */
         int pingpong = 0;
 
         /* Riduce progressivamente la dimensione dei dati su cui lavorare. Da "n" fino ad 1. */
-        while (n > 1) {
-            int nblocks = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;                            /* Calcolo progressivo dei blocchi che servono per lavorare su "n" elementi */
+        while (num_candidates > 1) {
+            int nblocks = (num_candidates + BLOCK_SIZE - 1) / BLOCK_SIZE;                            /* Calcolo progressivo dei blocchi che servono per lavorare su "n" elementi */
 
             /* Utilizzare questa chiamata di reduce invece che quella sotto*/
-             reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, d_max_output[pingpong], d_pos_output[pingpong], n, first);
+             reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, d_max_output[pingpong], d_pos_output[pingpong], num_candidates, first);
             //reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, out, out_idx, n, first);
 
             in = d_max_output[pingpong];
@@ -333,7 +333,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
              * NOTA: Al primo passaggio (first == true) 'in' punta a d_layer, quindi NON deve essere liberato qui!*/
 
             pingpong = 1 - pingpong;
-            n = nblocks;
+            num_candidates = nblocks;
             first = false;
         }
 

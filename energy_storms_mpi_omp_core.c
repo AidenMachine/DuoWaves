@@ -12,7 +12,6 @@ typedef struct{
     int local_positions;
 }LocalData;
 
-// Ricorda di inserire nel "verbale" il fatto di aver aggiunto due parametri alla funzione
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     int i, j, k, size, rank;
 
