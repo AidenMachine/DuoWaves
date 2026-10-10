@@ -1,0 +1,30 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               982552
+Nodes:                1 (node126)
+Section:              HYB
+Branch:               Layers_OptimizationV2 (5ea4398)
+Configuration:        hyb_1n_4x4
+MPI processes:        4 (4 per node)
+OpenMP threads:       4
+CUDA block size:      not applicable
+Runs per test:        5
+================
+--- BUILD ---
+make: Entering directory '/home/salvati_2/multicore-relation/build/job_982552'
+make: 'energy_storms_mpi_omp' is up to date.
+make: Leaving directory '/home/salvati_2/multicore-relation/build/job_982552'
+
+--- TEST A_20k (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: 0.523853 s, correctness FAIL
+Run 2: 0.523902 s, correctness FAIL
+Run 3: 0.965660 s, correctness FAIL
+Run 4: 0.523560 s, correctness FAIL
+Run 5: 0.522699 s, correctness FAIL
+
+--- JOB COMPLETE ---

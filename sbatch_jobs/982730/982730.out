@@ -1,0 +1,37 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               982730
+Nodes:                1 (node149)
+Section:              HYB
+Branch:               immediate (8f37339)
+Configuration:        hyb_1n_2x4
+MPI processes:        2 (2 per node)
+OpenMP threads:       4
+CUDA block size:      not applicable
+Runs per test:        5
+================
+--- BUILD ---
+make: Entering directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/job_982730'
+make: 'energy_storms_mpi_omp' is up to date.
+make: Leaving directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/job_982730'
+
+--- TEST A_20k (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: already recorded, skipped
+Run 2: already recorded, skipped
+Run 3: already recorded, skipped
+Run 4: already recorded, skipped
+Run 5: already recorded, skipped
+
+--- TEST A_100k (size 100000, 1 storm file(s), workload s100000_779ff3bc5c) ---
+Run 1: 1.974217 s, correctness PASS
+Run 2: 1.864845 s, correctness PASS
+Run 3: 1.284891 s, correctness PASS
+Run 4: 1.204045 s, correctness PASS
+Run 5: 1.238748 s, correctness PASS
+
+--- JOB COMPLETE ---

@@ -1,0 +1,52 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+physical cores/node: 32   nodes: 1   branch: immediate
+HEAD is now at 4e9476d Aggiunta versione di profiling. Per i commenti su codice guarda il file originale MPI/OMP ( ovvero versione non di profiling ). Plus i vari tests di riferimento. Plus i test di riferimento.
+mpicc  -fopenmp -O3 -c energy_storms_mpi_omp_core.c -lm  -o energy_storms_mpi_omp_core.o
+mpicc  -fopenmp -O3 energy_storms_mpi_omp.c energy_storms_mpi_omp_core.o -lm  -o energy_storms_mpi_omp
+profiled binary md5: 3b15c235b52fcc2096f87ec97354033f
+immediate|hyb_1n_1x1|A_20k|1 already recorded
+immediate|hyb_1n_1x1|A_100k|1 already recorded
+immediate|hyb_1n_1x1|A_1M|1 already recorded
+immediate|hyb_1n_1x1|B_10|1  wall=17.912194  bomb=17.9107 exch=0.0000 relax=0.0005 reduce=0.0009
+immediate|hyb_1n_1x1|C_5k|1  wall=0.449056  bomb=0.4488 exch=0.0000 relax=0.0000 reduce=0.0001
+immediate|hyb_1n_1x2|A_20k|1 already recorded
+immediate|hyb_1n_1x2|A_100k|1 already recorded
+immediate|hyb_1n_1x2|A_1M|1 already recorded
+immediate|hyb_1n_1x2|B_10|1  wall=8.998199  bomb=8.9972 exch=0.0000 relax=0.0002 reduce=0.0005
+immediate|hyb_1n_1x2|C_5k|1  wall=0.223976  bomb=0.2237 exch=0.0000 relax=0.0000 reduce=0.0001
+immediate|hyb_1n_2x1|A_20k|1 already recorded
+immediate|hyb_1n_2x1|A_100k|1 already recorded
+immediate|hyb_1n_2x1|A_1M|1 already recorded
+immediate|hyb_1n_2x1|B_10|1  wall=8.949516  bomb=8.9484 exch=0.0115 relax=0.0002 reduce=0.0005
+immediate|hyb_1n_2x1|C_5k|1  wall=0.223665  bomb=0.2237 exch=0.0000 relax=0.0000 reduce=0.0001
+immediate|hyb_1n_2x4|A_20k|1 already recorded
+immediate|hyb_1n_2x4|A_100k|1 already recorded
+immediate|hyb_1n_2x4|A_1M|1 already recorded
+immediate|hyb_1n_2x4|B_10|1  wall=2.240879  bomb=2.2386 exch=0.0016 relax=0.0001 reduce=0.0002
+immediate|hyb_1n_2x4|C_5k|1  wall=0.056642  bomb=0.0561 exch=0.0003 relax=0.0000 reduce=0.0000
+immediate|hyb_1n_4x2|A_20k|1 already recorded
+immediate|hyb_1n_4x2|A_100k|1 already recorded
+immediate|hyb_1n_4x2|A_1M|1 already recorded
+immediate|hyb_1n_4x2|B_10|1  wall=2.239341  bomb=2.2377 exch=0.0016 relax=0.0001 reduce=0.0008
+immediate|hyb_1n_4x2|C_5k|1  wall=0.056634  bomb=0.0564 exch=0.0001 relax=0.0000 reduce=0.0001
+immediate|hyb_1n_4x4|A_20k|1 already recorded
+immediate|hyb_1n_4x4|A_100k|1 already recorded
+immediate|hyb_1n_4x4|A_1M|1 already recorded
+immediate|hyb_1n_4x4|B_10|1  wall=1.122905  bomb=1.1219 exch=0.0023 relax=0.0001 reduce=0.0002
+immediate|hyb_1n_4x4|C_5k|1  wall=0.028523  bomb=0.0281 exch=0.0001 relax=0.0000 reduce=0.0000
+immediate|hyb_1n_4x8|A_20k|1 already recorded
+immediate|hyb_1n_4x8|A_100k|1 already recorded
+immediate|hyb_1n_4x8|A_1M|1 already recorded
+immediate|hyb_1n_4x8|B_10|1  wall=0.567917  bomb=0.5634 exch=0.0059 relax=0.0001 reduce=0.0012
+immediate|hyb_1n_4x8|C_5k|1  wall=0.016942  bomb=0.0163 exch=0.0021 relax=0.0000 reduce=0.0000
+immediate|hyb_1n_8x4|A_20k|1 already recorded
+immediate|hyb_1n_8x4|A_100k|1 already recorded
+immediate|hyb_1n_8x4|A_1M|1 already recorded
+immediate|hyb_1n_8x4|B_10|1  wall=0.562500  bomb=0.5615 exch=0.0006 relax=0.0000 reduce=0.0007
+immediate|hyb_1n_8x4|C_5k|1  wall=0.014647  bomb=0.0142 exch=0.0001 relax=0.0000 reduce=0.0001
+--- DONE -> /home/salvati_2/multicore-relation/results/profiling/prof_immediate_1n.csv ---

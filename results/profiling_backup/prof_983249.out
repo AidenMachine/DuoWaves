@@ -1,0 +1,52 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+physical cores/node: 32   nodes: 1   branch: Add_SIMD_Directives
+HEAD is now at 32cf0cf Aggiunta versione di profiling. Per i commenti su codice guarda il file originale MPI/OMP ( ovvero versione non di profiling ). Plus i vari tests di riferimento.
+mpicc  -fopenmp -O3 -march=znver1 -mtune=znver1 -mavx2 -mprefer-vector-width=256 -fno-math-errno -ffinite-math-only -fno-signaling-nans -fno-rounding-math -fcx-limited-range -fno-signed-zeros -fno-trapping-math -fprefetch-loop-arrays -funroll-loops -mfma -c energy_storms_mpi_omp_core.c -lm  -o energy_storms_mpi_omp_core.o
+mpicc  -fopenmp -O3 -march=znver1 -mtune=znver1 -mavx2 -mprefer-vector-width=256 -fno-math-errno -ffinite-math-only -fno-signaling-nans -fno-rounding-math -fcx-limited-range -fno-signed-zeros -fno-trapping-math -fprefetch-loop-arrays -funroll-loops -mfma energy_storms_mpi_omp.c energy_storms_mpi_omp_core.o -lm  -o energy_storms_mpi_omp
+profiled binary md5: a6ef69f37f903b3eda427583fa584616
+Add_SIMD_Directives|hyb_1n_1x1|A_20k|1 already recorded
+Add_SIMD_Directives|hyb_1n_1x1|A_100k|1 already recorded
+Add_SIMD_Directives|hyb_1n_1x1|A_1M|1 already recorded
+Add_SIMD_Directives|hyb_1n_1x1|B_10|1  wall=8.404013  bomb=8.4028 exch=0.0000 relax=0.0002 reduce=0.0008
+Add_SIMD_Directives|hyb_1n_1x1|C_5k|1  wall=0.210723  bomb=0.2105 exch=0.0000 relax=0.0000 reduce=0.0001
+Add_SIMD_Directives|hyb_1n_1x2|A_20k|1 already recorded
+Add_SIMD_Directives|hyb_1n_1x2|A_100k|1 already recorded
+Add_SIMD_Directives|hyb_1n_1x2|A_1M|1 already recorded
+Add_SIMD_Directives|hyb_1n_1x2|B_10|1  wall=4.205523  bomb=4.2047 exch=0.0000 relax=0.0001 reduce=0.0005
+Add_SIMD_Directives|hyb_1n_1x2|C_5k|1  wall=0.105954  bomb=0.1057 exch=0.0000 relax=0.0000 reduce=0.0001
+Add_SIMD_Directives|hyb_1n_2x1|A_20k|1 already recorded
+Add_SIMD_Directives|hyb_1n_2x1|A_100k|1 already recorded
+Add_SIMD_Directives|hyb_1n_2x1|A_1M|1 already recorded
+Add_SIMD_Directives|hyb_1n_2x1|B_10|1  wall=4.181010  bomb=4.1786 exch=0.0181 relax=0.0001 reduce=0.0005
+Add_SIMD_Directives|hyb_1n_2x1|C_5k|1  wall=0.105320  bomb=0.1052 exch=0.0038 relax=0.0000 reduce=0.0001
+Add_SIMD_Directives|hyb_1n_2x4|A_20k|1 already recorded
+Add_SIMD_Directives|hyb_1n_2x4|A_100k|1 already recorded
+Add_SIMD_Directives|hyb_1n_2x4|A_1M|1 already recorded
+Add_SIMD_Directives|hyb_1n_2x4|B_10|1  wall=1.044073  bomb=1.0432 exch=0.0014 relax=0.0001 reduce=0.0002
+Add_SIMD_Directives|hyb_1n_2x4|C_5k|1  wall=0.026517  bomb=0.0261 exch=0.0000 relax=0.0000 reduce=0.0000
+Add_SIMD_Directives|hyb_1n_4x2|A_20k|1 already recorded
+Add_SIMD_Directives|hyb_1n_4x2|A_100k|1 already recorded
+Add_SIMD_Directives|hyb_1n_4x2|A_1M|1 already recorded
+Add_SIMD_Directives|hyb_1n_4x2|B_10|1  wall=1.045635  bomb=1.0438 exch=0.0034 relax=0.0000 reduce=0.0023
+Add_SIMD_Directives|hyb_1n_4x2|C_5k|1  wall=0.026523  bomb=0.0263 exch=0.0002 relax=0.0000 reduce=0.0000
+Add_SIMD_Directives|hyb_1n_4x4|A_20k|1 already recorded
+Add_SIMD_Directives|hyb_1n_4x4|A_100k|1 already recorded
+Add_SIMD_Directives|hyb_1n_4x4|A_1M|1 already recorded
+Add_SIMD_Directives|hyb_1n_4x4|B_10|1  wall=0.524394  bomb=0.5231 exch=0.0029 relax=0.0000 reduce=0.0023
+Add_SIMD_Directives|hyb_1n_4x4|C_5k|1  wall=0.013494  bomb=0.0132 exch=0.0001 relax=0.0000 reduce=0.0000
+Add_SIMD_Directives|hyb_1n_4x8|A_20k|1 already recorded
+Add_SIMD_Directives|hyb_1n_4x8|A_100k|1 already recorded
+Add_SIMD_Directives|hyb_1n_4x8|A_1M|1 already recorded
+Add_SIMD_Directives|hyb_1n_4x8|B_10|1  wall=0.271236  bomb=0.2637 exch=0.0076 relax=0.0011 reduce=0.0064
+Add_SIMD_Directives|hyb_1n_4x8|C_5k|1  wall=0.008801  bomb=0.0077 exch=0.0016 relax=0.0000 reduce=0.0015
+Add_SIMD_Directives|hyb_1n_8x4|A_20k|1 already recorded
+Add_SIMD_Directives|hyb_1n_8x4|A_100k|1 already recorded
+Add_SIMD_Directives|hyb_1n_8x4|A_1M|1 already recorded
+Add_SIMD_Directives|hyb_1n_8x4|B_10|1  wall=0.265090  bomb=0.2638 exch=0.0033 relax=0.0000 reduce=0.0031
+Add_SIMD_Directives|hyb_1n_8x4|C_5k|1  wall=0.007304  bomb=0.0068 exch=0.0002 relax=0.0000 reduce=0.0002
+--- DONE -> /home/salvati_2/multicore-relation/results/profiling/prof_Add_SIMD_Directives_1n.csv ---

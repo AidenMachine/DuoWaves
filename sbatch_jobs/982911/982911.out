@@ -1,0 +1,102 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               982911
+Nodes:                2 (node[103,106])
+Section:              HYB
+Branch:               AddParallelZone (88b94cf)
+Configuration:        hyb_2n_4x2
+MPI processes:        8 (4 per node)
+OpenMP threads:       2
+CUDA block size:      not applicable
+Runs per test:        5
+================
+--- BUILD ---
+make: Entering directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/job_982911'
+mpicc  -fopenmp -O3  -c energy_storms_mpi_omp_core.c -lm  -o energy_storms_mpi_omp_core.o
+mpicc  -fopenmp -O3  energy_storms_mpi_omp.c energy_storms_mpi_omp_core.o -lm  -o energy_storms_mpi_omp
+make: Leaving directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/job_982911'
+Binary md5:           daaabdb0b53aa303d5153f6e98c00e6f
+
+--- TEST A_20k (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: 3.777956 s, correctness PASS
+Run 2: 0.469724 s, correctness PASS
+Run 3: 0.590659 s, correctness PASS
+Run 4: 0.978324 s, correctness PASS
+Run 5: 0.806886 s, correctness PASS
+
+--- TEST A_100k (size 100000, 1 storm file(s), workload s100000_779ff3bc5c) ---
+Run 1: 2.263389 s, correctness PASS
+Run 2: 1.876358 s, correctness PASS
+Run 3: 2.892944 s, correctness PASS
+Run 4: 2.541940 s, correctness PASS
+Run 5: 2.801613 s, correctness PASS
+
+--- TEST A_1M (size 1000000, 1 storm file(s), workload s1000000_15729929c0) ---
+Run 1: 27.111628 s, correctness PASS
+Run 2: 27.451521 s, correctness PASS
+Run 3: 21.170658 s, correctness PASS
+Run 4: 11.788786 s, correctness PASS
+Run 5: 11.774581 s, correctness PASS
+
+--- TEST B_1 (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: 0.245581 s, correctness PASS
+Run 2: 0.251349 s, correctness PASS
+Run 3: 0.317913 s, correctness PASS
+Run 4: 0.284542 s, correctness PASS
+Run 5: 0.294831 s, correctness PASS
+
+--- TEST B_3 (size 20000, 3 storm file(s), workload s20000_5841cc46db) ---
+Run 1: 0.817825 s, correctness PASS
+Run 2: 0.772109 s, correctness PASS
+Run 3: 0.774597 s, correctness PASS
+Run 4: 0.722182 s, correctness PASS
+Run 5: 0.816192 s, correctness PASS
+
+--- TEST B_5 (size 20000, 5 storm file(s), workload s20000_2f8b6f9675) ---
+Run 1: 1.343551 s, correctness PASS
+Run 2: 1.351649 s, correctness PASS
+Run 3: 1.182876 s, correctness PASS
+Run 4: 1.172113 s, correctness PASS
+Run 5: 1.380879 s, correctness PASS
+
+--- TEST B_10 (size 20000, 10 storm file(s), workload s20000_49747c11c3) ---
+Run 1: 2.631466 s, correctness PASS
+Run 2: 2.560182 s, correctness PASS
+Run 3: 2.544900 s, correctness PASS
+Run 4: 2.703855 s, correctness PASS
+Run 5: 2.448195 s, correctness PASS
+
+--- TEST C_3 (size 20000, 1 storm file(s), workload s20000_5af44766bc) ---
+Run 1: 0.017836 s, correctness PASS
+Run 2: 0.021623 s, correctness PASS
+Run 3: 0.025874 s, correctness PASS
+Run 4: 0.023916 s, correctness PASS
+Run 5: 0.074371 s, correctness PASS
+
+--- TEST C_100 (size 20000, 1 storm file(s), workload s20000_78115621ca) ---
+Run 1: 0.020046 s, correctness PASS
+Run 2: 0.032110 s, correctness PASS
+Run 3: 0.011089 s, correctness PASS
+Run 4: 0.014768 s, correctness PASS
+Run 5: 0.011018 s, correctness PASS
+
+--- TEST C_1k (size 20000, 1 storm file(s), workload s20000_9270e8f3d6) ---
+Run 1: 0.071197 s, correctness PASS
+Run 2: 0.034342 s, correctness PASS
+Run 3: 0.075386 s, correctness PASS
+Run 4: 0.051519 s, correctness PASS
+Run 5: 0.091227 s, correctness PASS
+
+--- TEST C_5k (size 20000, 1 storm file(s), workload s20000_a966c0a2c1) ---
+Run 1: 0.120614 s, correctness PASS
+Run 2: 0.089459 s, correctness PASS
+Run 3: 0.071930 s, correctness PASS
+Run 4: 0.142699 s, correctness PASS
+Run 5: 0.088947 s, correctness PASS
+
+--- JOB COMPLETE ---

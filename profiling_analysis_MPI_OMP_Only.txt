@@ -1,0 +1,306 @@
+================================================================================
+PROFILING CAMPAIGN - ANALYSIS REPORT
+Multicore Programming 2025/2026 Exam - DuoWaves / energy_storms
+Generated: 2026-08-22
+================================================================================
+
+--------------------------------------------------------------------------------
+0. CAMPAIGN SUMMARY
+--------------------------------------------------------------------------------
+
+Measurements collected : 240 rows
+Branches               : 2  (Add_SIMD_Directives, immediate)
+Configurations         : 24 (3 node counts x 8 layouts)
+Tests                  : 5  (A_20k, A_100k, A_1M, B_10, C_5k)
+Repetitions            : 1 per cell
+Slurm jobs             : 6
+Wall-clock duration    : ~15 minutes (2026-08-22 18:25 - 18:40 UTC)
+
+Binary fingerprints (md5):
+  Add_SIMD_Directives  a6ef69f37f903b3eda427583fa584616
+  immediate            3b15c235b52fcc2096f87ec97354033f
+
+Reference (non-profiled campaign binary, for provenance):
+  Add_SIMD_Directives  39c5ff838b1dd2a5f9063e490a140b5d
+
+Method: timers use MPI_Wtime around four phases inside the storm loop
+(bombardment, ghost-cell exchange, relaxation, reduction). Each phase is
+reduced with MPI_MAX across all ranks and printed by rank 0.
+
+Output files:
+  results/profiling/prof_Add_SIMD_Directives_{1n,2n,4n}.csv
+  results/profiling/prof_immediate_{1n,2n,4n}.csv
+
+CSV row format:
+  branch|config|test|run, wall_s, bomb_s, exchange_s, relax_s, reduce_s,
+  md5, nodelist, timestamp, "Result payload"
+
+
+--------------------------------------------------------------------------------
+1. VERIFICATION
+--------------------------------------------------------------------------------
+
+1.1 CORRECTNESS
+Every Result payload is byte-identical across both branches, all 8 layouts and
+all 3 node counts.
+
+  A_1M  -> "17197 33.095032"          (all 48 rows)
+  C_5k  -> "10470 526.928284"         (all 48 rows)
+  B_10  -> identical 10 position/value pairs (all 48 rows)
+
+This establishes two things at once:
+  (a) both profiled binaries compute correct results;
+  (b) the custom-tests input files used here are the same ones the main
+      campaign used, despite having been re-copied to the cluster.
+
+1.2 NODE HOMOGENEITY
+  1 node  -> node147
+  2 nodes -> node[147-148]
+  4 nodes -> node[147-149,151]
+
+All allocated nodes belong to the SMT-disabled group. The profiling campaign is
+therefore internally homogeneous, and absolute times are directly comparable
+across all 240 rows. This is a stronger position than the main strong-scaling
+campaign, whose baselines are split across SMT-on and SMT-off nodes with a
+declared, uncorrected bias.
+
+1.3 KNOWN MEASUREMENT ARTEFACT - PHASE SUMS
+The four phases are reduced with MPI_MAX INDEPENDENTLY. Different ranks can win
+different phases, so their sum corresponds to no single real execution and can
+exceed the measured wall time.
+
+  Example, Add_SIMD_Directives / hyb_4n_8x4 / A_1M:
+    bombardment  0.3288
+    exchange     0.0108
+    relaxation   0.0000
+    reduction    0.0082
+    ------------------
+    sum          0.3478   vs measured wall time 0.3365
+
+CONSEQUENCE: phases must be reported as proportions of the measured WALL TIME,
+never as a percentage of their own sum, and the four percentages are not
+required to add to 100%.
+
+Additionally, the following are NOT covered by the timers: initial array
+zeroing, memory allocation, and the final MPI_Reduce that aggregates the
+timings themselves.
+
+
+--------------------------------------------------------------------------------
+2. FINDING 1 - BOMBARDMENT IS THE BOTTLENECK
+--------------------------------------------------------------------------------
+
+Branch: Add_SIMD_Directives, test A_1M
+
+  Config       Cores    Wall (s)    Bomb (s)    Bomb % of wall
+  ----------------------------------------------------------------
+  1n 1x1           1     42.1315     42.1243        99.98%
+  1n 8x4          32      1.3070      1.3062        99.94%
+  4n 1x1           4     10.5152     10.4899        99.76%
+  4n 8x4         128      0.3365      0.3288        97.71%
+
+Exchange, relaxation and reduction together never exceed ~3% of wall time, even
+at 128 ranks spread over 4 nodes.
+
+INTERPRETATION
+The nested loop over cells x particles inside the bombardment phase accounts for
+essentially the entire runtime. The application is compute-bound, not
+communication-bound. This is also the explanation for the high parallel
+efficiency observed in the main campaign: there is very little communication
+for parallel overhead to erode.
+
+
+--------------------------------------------------------------------------------
+3. FINDING 2 - OVERHEAD ONLY MATTERS AT SMALL WORKLOADS
+--------------------------------------------------------------------------------
+
+Branch: Add_SIMD_Directives, config hyb_4n_8x4 (128 cores)
+
+  Test      Wall (s)    Bomb %    Exch %    Relax %   Reduce %
+  ---------------------------------------------------------------
+  A_1M       0.3365     97.71%     3.21%     0.00%      2.44%
+  B_10       0.0716     92.19%     7.40%     0.00%      7.12%
+  C_5k       0.0069     27.70%    68.53%     5.83%     62.69%
+
+C_5k inverts completely: the parallel machinery costs more than the work.
+
+IMPORTANT CAVEAT
+C_5k at this configuration measures 0.0069 s, well below the campaign's declared
+timing resolution floor of 0.02 s. At that magnitude the number reflects process
+startup and MPI initialization rather than the program. This row should be
+marked "below floor" and used only as a qualitative illustration of where the
+parallel version stops paying off - never as a quantitative result.
+
+
+--------------------------------------------------------------------------------
+4. FINDING 3 - MEASURED BENEFIT OF THE SIMD DIRECTIVES
+--------------------------------------------------------------------------------
+
+Comparison of bombardment time, both branches at 4 nodes, test A_1M:
+
+  Layout    immediate (s)   Add_SIMD (s)   Speedup
+  ------------------------------------------------
+  1x1          22.3864        10.4899       2.13x
+  1x2          11.1814         5.2299       2.14x
+  2x1          11.1830         5.2780       2.12x
+  2x4           2.8001         1.3584       2.06x
+  4x2           2.7995         1.3074       2.14x
+  4x4           1.4025         0.6536       2.15x
+  4x8           0.7078         0.3292       2.15x
+  8x4           0.7528         0.3288       2.29x
+
+The gain is consistently ~2.1x and holds across the entire layout range, from a
+single rank per node to 32 ranks per node.
+
+INTERPRETATION
+Because bombardment is ~98-100% of runtime, this 2.1x on the dominant phase
+translates almost directly into a 2.1x on total wall time. This is a clean,
+directly measured attribution of what the SIMD branch contributed, independent
+of the end-to-end timings in the main campaign.
+
+
+--------------------------------------------------------------------------------
+5. FINDING 4 - TWO SECONDARY OBSERVATIONS
+--------------------------------------------------------------------------------
+
+5.1 EXCHANGE COST IS HIGHER IN THE SIMD BRANCH
+
+  4 nodes, A_1M, layout 1x1:
+    immediate           exchange = 0.0114 s
+    Add_SIMD_Directives exchange = 0.1088 s   (~9.5x higher)
+
+Two explanations are consistent with the data, and the measurement cannot
+separate them:
+
+  (a) ALGORITHMIC. Add_SIMD_Directives uses blocking MPI_Sendrecv; immediate
+      uses non-blocking MPI_Isend/MPI_Irecv followed by MPI_Waitall. Blocking
+      calls expose imbalance as wait time.
+
+  (b) SLACK. immediate's bombardment phase is ~2x slower, giving ranks more
+      opportunity to converge before the exchange, so less imbalance surfaces
+      at the communication point.
+
+Since the exchange is at most ~3% of wall time in both branches, the effect is
+not material to overall performance. It should be reported as an observation,
+not as a defect, and both explanations should be stated.
+
+A further outlier: Add_SIMD_Directives / hyb_1n_2x1 / A_1M shows exchange =
+0.2583 s against ~0.003 s for comparable single-node layouts. Same mechanism -
+with only two ranks the blocking Sendrecv absorbs the full imbalance.
+
+5.2 REDUCTION COST GROWS WITH THREADS PER RANK
+
+  Same 32 cores on one node, A_1M:
+    hyb_1n_4x8 (4 ranks x 8 threads)   reduction = 0.0080 s
+    hyb_1n_8x4 (8 ranks x 4 threads)   reduction = 0.0015 s   (5.3x lower)
+
+CAUSE
+After the parallel maximum search, the master thread scans threads_results[]
+serially to combine per-thread results. With 8 threads per rank that scan is
+twice as long, and the LocalData struct is 8 bytes, so eight entries share a
+single 64-byte cache line - producing false sharing on every write.
+
+This is the clearest candidate for the next optimization, and a concrete answer
+to the question "what would you improve next".
+
+
+--------------------------------------------------------------------------------
+6. SCALING (PROFILING CAMPAIGN)
+--------------------------------------------------------------------------------
+
+Branch: Add_SIMD_Directives, test A_1M, single repetition, SMT-off nodes only
+
+  Cores    Config         Wall (s)    Speedup    Efficiency
+  -----------------------------------------------------------
+      1    1n 1x1          42.1315      1.00x       100.0%
+      2    1n 1x2          20.8660      2.02x       101.0%
+      8    1n 2x4           5.2123      8.08x       101.0%
+     16    1n 4x4           2.6311     16.01x       100.1%
+     32    1n 8x4           1.3070     32.23x       100.7%
+    128    4n 8x4           0.3365    125.20x        97.8%
+
+RELATIONSHIP TO THE MAIN CAMPAIGN
+These figures are higher than the ~80% parallel efficiency reported by the
+strong-scaling campaign. The difference is explained, not contradictory:
+
+  - all profiling jobs landed on SMT-disabled nodes, whereas the campaign's
+    baselines are split across both node types;
+  - a single repetition per cell, whereas the campaign reports a median over
+    five repetitions on a shared, contended cluster;
+  - the reference point here is the 1-core hybrid binary, not the sequential
+    binary used for the campaign's end-to-end speedup figures.
+
+These numbers should be presented as a complementary, best-case measurement
+alongside the campaign figures, with the reasons for the difference stated
+explicitly. They do not replace the campaign results.
+
+
+--------------------------------------------------------------------------------
+7. METHODOLOGICAL NOTES FOR THE REPORT
+--------------------------------------------------------------------------------
+
+7.1 INSTRUMENTATION OVERHEAD
+The timers are placed in the storm loop, which runs at most 10 iterations
+(test B_10). Only the master thread calls MPI_Wtime. The instrumentation adds
+approximately 10 OpenMP barriers per storm iteration, i.e. on the order of 100
+barriers per run - sub-millisecond against runtimes of 0.0069 s to 42 s.
+Overhead is negligible for all tests except C_5k, which is already below the
+resolution floor.
+
+7.2 SAFELEN VERIFICATION
+The maximum-search loop in Add_SIMD_Directives carries the pragma:
+
+    #pragma omp for simd schedule(static) safelen(4)
+
+The loop has a loop-carried dependence (the running maximum and its position),
+so safelen(4) asserts an independence that does not hold - formally undefined
+behaviour.
+
+An empirical check was performed on the cluster (job safelen_check, 4 ranks x
+4 threads, A_1M, gcc with -O3 -march=znver1 -mavx2):
+
+    unmodified   Time: 4.986813   md5 39c5ff838b1dd2a5f9063e490a140b5d
+    simd removed Time: 5.036362   md5 c303c0782554c1ad4003834c738af8ce
+    diff of Result lines: EMPTY (identical)
+
+The two binaries produce identical results. The measured campaign data is
+therefore unaffected. The unmodified build reproduces the campaign binary md5
+exactly, confirming the provenance chain from the branch tip to the recorded
+measurements.
+
+7.3 ENVIRONMENT NOTE
+OpenMPI reports that it could not create an xpmem segment and falls back to an
+alternative shared-memory single-copy mechanism. This affects intra-node
+transport performance and applies uniformly to every run, so it does not affect
+comparability, but it is worth one sentence in the report.
+
+7.4 REPRODUCTION
+Profiled binaries were produced by copying mpi_omp_core_profiling.c over
+energy_storms_mpi_omp_core.c inside a disposable git worktree, then building the
+standard energy_storms_mpi_omp target with the unmodified Makefile and
+student.mk flags. No branch was modified and no commit was made. The worktree
+was created on shared storage so that all ranks across nodes could reach the
+binary.
+
+
+--------------------------------------------------------------------------------
+8. OPEN ITEMS
+--------------------------------------------------------------------------------
+
+  1. CUDA section: no measurements collected. Note that MPI_Wtime is unsuitable
+     for CUDA kernels because launches are asynchronous; cudaEvent timers or
+     nsys would be required.
+
+  2. Repetitions: profiling used 1 run per cell. Sufficient for phase
+     attribution; insufficient for statistical claims about the timings.
+
+  3. C_3, C_100, C_1k tests were not profiled. C_3 and C_100 fall below the
+     resolution floor on wide layouts in the main campaign.
+
+  4. The custom-tests input directory is untracked by git and was found missing
+     on the cluster before this campaign. It has been restored, but it remains
+     outside version control and could disappear again.
+
+================================================================================
+END OF REPORT
+================================================================================

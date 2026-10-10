@@ -1,0 +1,104 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               983372
+Nodes:                1 (node122)
+Section:              CUDA
+Branch:               cuda-shared (6b05a7d)
+Configuration:        cuda_bs64
+MPI processes:        1 (1 per node)
+OpenMP threads:       1
+CUDA block size:      64
+Runs per test:        5
+================
+Quadro RTX 6000, 23040 MiB, 580.173.02
+--- BUILD ---
+NOTE: branch cuda-shared hardcodes BLOCK_SIZE, patching the worktree copy with an ifndef guard
+make: Entering directory '/home/salvati_2/multicore-relation/build/job_983372'
+nvcc -arch=sm_75  -O3 -DBLOCK_SIZE=64 -c energy_storms_cuda_core.cu -lm  -o energy_storms_cuda_core.o
+nvcc -arch=sm_75  -O3 -DBLOCK_SIZE=64 energy_storms_cuda.cpp energy_storms_cuda_core.o -lm  -o energy_storms_cuda
+make: Leaving directory '/home/salvati_2/multicore-relation/build/job_983372'
+Binary md5:           96bca056d7db395e2c9b4139ac73bd7b
+
+--- TEST A_20k (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: 0.004501 s, correctness PASS
+Run 2: 0.004517 s, correctness PASS
+Run 3: 0.004528 s, correctness PASS
+Run 4: 0.004518 s, correctness PASS
+Run 5: 0.004501 s, correctness PASS
+
+--- TEST A_100k (size 100000, 1 storm file(s), workload s100000_779ff3bc5c) ---
+Run 1: 0.009915 s, correctness PASS
+Run 2: 0.009918 s, correctness PASS
+Run 3: 0.009937 s, correctness PASS
+Run 4: 0.009915 s, correctness PASS
+Run 5: 0.009933 s, correctness PASS
+
+--- TEST A_1M (size 1000000, 1 storm file(s), workload s1000000_15729929c0) ---
+Run 1: 0.077305 s, correctness PASS
+Run 2: 0.077052 s, correctness PASS
+Run 3: 0.077019 s, correctness PASS
+Run 4: 0.077207 s, correctness PASS
+Run 5: 0.077158 s, correctness PASS
+
+--- TEST B_1 (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: 0.004508 s, correctness PASS
+Run 2: 0.004536 s, correctness PASS
+Run 3: 0.004525 s, correctness PASS
+Run 4: 0.004480 s, correctness PASS
+Run 5: 0.004493 s, correctness PASS
+
+--- TEST B_3 (size 20000, 3 storm file(s), workload s20000_5841cc46db) ---
+Run 1: 0.012249 s, correctness PASS
+Run 2: 0.012256 s, correctness PASS
+Run 3: 0.012275 s, correctness PASS
+Run 4: 0.012282 s, correctness PASS
+Run 5: 0.012257 s, correctness PASS
+
+--- TEST B_5 (size 20000, 5 storm file(s), workload s20000_2f8b6f9675) ---
+Run 1: 0.020079 s, correctness PASS
+Run 2: 0.020037 s, correctness PASS
+Run 3: 0.020049 s, correctness PASS
+Run 4: 0.020038 s, correctness PASS
+Run 5: 0.020024 s, correctness PASS
+
+--- TEST B_10 (size 20000, 10 storm file(s), workload s20000_49747c11c3) ---
+Run 1: 0.039598 s, correctness PASS
+Run 2: 0.039595 s, correctness PASS
+Run 3: 0.039520 s, correctness PASS
+Run 4: 0.039638 s, correctness PASS
+Run 5: 0.039608 s, correctness PASS
+
+--- TEST C_3 (size 20000, 1 storm file(s), workload s20000_5af44766bc) ---
+Run 1: 0.000797 s, correctness PASS
+Run 2: 0.000800 s, correctness PASS
+Run 3: 0.000789 s, correctness PASS
+Run 4: 0.000811 s, correctness PASS
+Run 5: 0.000798 s, correctness PASS
+
+--- TEST C_100 (size 20000, 1 storm file(s), workload s20000_78115621ca) ---
+Run 1: 0.000882 s, correctness PASS
+Run 2: 0.000799 s, correctness PASS
+Run 3: 0.000810 s, correctness PASS
+Run 4: 0.000795 s, correctness PASS
+Run 5: 0.000802 s, correctness PASS
+
+--- TEST C_1k (size 20000, 1 storm file(s), workload s20000_9270e8f3d6) ---
+Run 1: 0.000932 s, correctness PASS
+Run 2: 0.000920 s, correctness PASS
+Run 3: 0.000945 s, correctness PASS
+Run 4: 0.000929 s, correctness PASS
+Run 5: 0.000926 s, correctness PASS
+
+--- TEST C_5k (size 20000, 1 storm file(s), workload s20000_a966c0a2c1) ---
+Run 1: 0.001689 s, correctness PASS
+Run 2: 0.001682 s, correctness PASS
+Run 3: 0.001667 s, correctness PASS
+Run 4: 0.001679 s, correctness PASS
+Run 5: 0.001688 s, correctness PASS
+
+--- JOB COMPLETE ---

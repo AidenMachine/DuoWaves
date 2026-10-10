@@ -1,0 +1,31 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               982466
+Nodes:                1 (node126)
+Section:              HYB
+Branch:               firstTry (f14688d)
+Configuration:        hyb_1n_2x4
+MPI processes:        2 (2 per node)
+OpenMP threads:       4
+CUDA block size:      not applicable
+Runs per test:        5
+================
+--- BUILD ---
+make: Entering directory '/home/salvati_2/multicore-relation/build/job_982466'
+mpicc  -fopenmp  -c energy_storms_mpi_omp_core.c -lm  -o energy_storms_mpi_omp_core.o
+mpicc  -fopenmp  energy_storms_mpi_omp.c energy_storms_mpi_omp_core.o -lm  -o energy_storms_mpi_omp
+make: Leaving directory '/home/salvati_2/multicore-relation/build/job_982466'
+
+--- TEST A_20k (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: 8.882994 s, correctness PASS
+Run 2: 9.122411 s, correctness PASS
+Run 3: 9.135310 s, correctness PASS
+Run 4: 9.125476 s, correctness PASS
+Run 5: 9.128148 s, correctness PASS
+
+--- JOB COMPLETE ---

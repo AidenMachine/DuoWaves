@@ -1,0 +1,220 @@
+[node103:77576] MCW rank 0 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77576] MCW rank 1 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77576] MCW rank 2 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node103:77576] MCW rank 3 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node103:77576] MCW rank 4 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node103:77576] MCW rank 5 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node103:77576] MCW rank 6 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node103:77576] MCW rank 7 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node106:734146] MCW rank 8 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143011] MCW rank 16 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734146] MCW rank 9 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143011] MCW rank 17 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734146] MCW rank 10 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143011] MCW rank 18 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node111:836556] MCW rank 24 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734146] MCW rank 11 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node107:4143011] MCW rank 19 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node111:836556] MCW rank 25 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734146] MCW rank 12 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node107:4143011] MCW rank 20 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node111:836556] MCW rank 26 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node106:734146] MCW rank 13 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node107:4143011] MCW rank 21 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node111:836556] MCW rank 27 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node106:734146] MCW rank 14 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node107:4143011] MCW rank 22 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836556] MCW rank 28 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node106:734146] MCW rank 15 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node107:4143011] MCW rank 23 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node111:836556] MCW rank 29 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node111:836556] MCW rank 30 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836556] MCW rank 31 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node111
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node103:77576] 7 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node103:77576] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[node103:77658] MCW rank 0 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77658] MCW rank 1 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77658] MCW rank 2 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node103:77658] MCW rank 3 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node103:77658] MCW rank 4 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node103:77658] MCW rank 5 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node103:77658] MCW rank 6 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node103:77658] MCW rank 7 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node106:734227] MCW rank 8 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734227] MCW rank 9 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734227] MCW rank 10 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143101] MCW rank 16 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734227] MCW rank 11 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node107:4143101] MCW rank 17 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734227] MCW rank 12 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node107:4143101] MCW rank 18 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node106:734227] MCW rank 13 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node107:4143101] MCW rank 19 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node111:836662] MCW rank 24 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734227] MCW rank 14 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node107:4143101] MCW rank 20 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node111:836662] MCW rank 25 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734227] MCW rank 15 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node107:4143101] MCW rank 21 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node111:836662] MCW rank 26 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143101] MCW rank 22 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836662] MCW rank 27 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node107:4143101] MCW rank 23 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node111:836662] MCW rank 28 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node111:836662] MCW rank 29 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node111:836662] MCW rank 30 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836662] MCW rank 31 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node111
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node103:77658] 7 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node103:77658] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[node103:77736] MCW rank 0 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77736] MCW rank 1 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77736] MCW rank 2 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node103:77736] MCW rank 3 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node103:77736] MCW rank 4 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node103:77736] MCW rank 5 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node103:77736] MCW rank 6 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node103:77736] MCW rank 7 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node107:4143180] MCW rank 16 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143180] MCW rank 17 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143180] MCW rank 18 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node106:734305] MCW rank 8 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143180] MCW rank 19 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node106:734305] MCW rank 9 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143180] MCW rank 20 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node111:836760] MCW rank 24 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734305] MCW rank 10 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143180] MCW rank 21 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node111:836760] MCW rank 25 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734305] MCW rank 11 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node107:4143180] MCW rank 22 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836760] MCW rank 26 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node106:734305] MCW rank 12 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node107:4143180] MCW rank 23 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node111:836760] MCW rank 27 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node106:734305] MCW rank 13 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node111:836760] MCW rank 28 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node106:734305] MCW rank 14 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836760] MCW rank 29 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node106:734305] MCW rank 15 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node111:836760] MCW rank 30 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836760] MCW rank 31 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node111
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node103:77736] 7 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node103:77736] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[node103:77814] MCW rank 0 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77814] MCW rank 1 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77814] MCW rank 2 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node103:77814] MCW rank 3 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node103:77814] MCW rank 4 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node103:77814] MCW rank 5 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node103:77814] MCW rank 6 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node103:77814] MCW rank 7 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node106:734384] MCW rank 8 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734384] MCW rank 9 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143259] MCW rank 16 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734384] MCW rank 10 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143259] MCW rank 17 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node106:734384] MCW rank 11 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node111:836858] MCW rank 24 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143259] MCW rank 18 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node106:734384] MCW rank 12 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node111:836858] MCW rank 25 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143259] MCW rank 19 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node106:734384] MCW rank 13 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node111:836858] MCW rank 26 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143259] MCW rank 20 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node106:734384] MCW rank 14 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836858] MCW rank 27 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node107:4143259] MCW rank 21 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node106:734384] MCW rank 15 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node111:836858] MCW rank 28 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node107:4143259] MCW rank 22 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836858] MCW rank 29 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node107:4143259] MCW rank 23 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node111:836858] MCW rank 30 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node111:836858] MCW rank 31 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node111
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node103:77814] 7 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node103:77814] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[node103:77893] MCW rank 0 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77893] MCW rank 1 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node103:77893] MCW rank 2 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node103:77893] MCW rank 3 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node103:77893] MCW rank 4 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node103:77893] MCW rank 5 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node103:77893] MCW rank 6 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node103:77893] MCW rank 7 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node111:836956] MCW rank 24 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node111:836956] MCW rank 25 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node111:836956] MCW rank 26 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node106:734463] MCW rank 8 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node111:836956] MCW rank 27 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node106:734463] MCW rank 9 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node111:836956] MCW rank 28 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node106:734463] MCW rank 10 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node107:4143338] MCW rank 16 bound to socket 0[core 0[hwt 0-1]], socket 0[core 1[hwt 0-1]], socket 0[core 2[hwt 0-1]], socket 0[core 3[hwt 0-1]]: [BB/BB/BB/BB/../../../../../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node111:836956] MCW rank 29 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node106:734463] MCW rank 11 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node107:4143338] MCW rank 17 bound to socket 0[core 4[hwt 0-1]], socket 0[core 5[hwt 0-1]], socket 0[core 6[hwt 0-1]], socket 0[core 7[hwt 0-1]]: [../../../../BB/BB/BB/BB/../../../../../../../..][../../../../../../../../../../../../../../../..]
+[node111:836956] MCW rank 30 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node106:734463] MCW rank 12 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node107:4143338] MCW rank 18 bound to socket 0[core 8[hwt 0-1]], socket 0[core 9[hwt 0-1]], socket 0[core 10[hwt 0-1]], socket 0[core 11[hwt 0-1]]: [../../../../../../../../BB/BB/BB/BB/../../../..][../../../../../../../../../../../../../../../..]
+[node111:836956] MCW rank 31 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node106:734463] MCW rank 13 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node107:4143338] MCW rank 19 bound to socket 0[core 12[hwt 0-1]], socket 0[core 13[hwt 0-1]], socket 0[core 14[hwt 0-1]], socket 0[core 15[hwt 0-1]]: [../../../../../../../../../../../../BB/BB/BB/BB][../../../../../../../../../../../../../../../..]
+[node106:734463] MCW rank 14 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node107:4143338] MCW rank 20 bound to socket 1[core 16[hwt 0-1]], socket 1[core 17[hwt 0-1]], socket 1[core 18[hwt 0-1]], socket 1[core 19[hwt 0-1]]: [../../../../../../../../../../../../../../../..][BB/BB/BB/BB/../../../../../../../../../../../..]
+[node106:734463] MCW rank 15 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+[node107:4143338] MCW rank 21 bound to socket 1[core 20[hwt 0-1]], socket 1[core 21[hwt 0-1]], socket 1[core 22[hwt 0-1]], socket 1[core 23[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../BB/BB/BB/BB/../../../../../../../..]
+[node107:4143338] MCW rank 22 bound to socket 1[core 24[hwt 0-1]], socket 1[core 25[hwt 0-1]], socket 1[core 26[hwt 0-1]], socket 1[core 27[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../BB/BB/BB/BB/../../../..]
+[node107:4143338] MCW rank 23 bound to socket 1[core 28[hwt 0-1]], socket 1[core 29[hwt 0-1]], socket 1[core 30[hwt 0-1]], socket 1[core 31[hwt 0-1]]: [../../../../../../../../../../../../../../../..][../../../../../../../../../../../../BB/BB/BB/BB]
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node111
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node103:77893] 7 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node103:77893] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages

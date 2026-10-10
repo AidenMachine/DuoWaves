@@ -1,0 +1,104 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               983366
+Nodes:                1 (node122)
+Section:              CUDA
+Branch:               cuda-1D (7d86f1e)
+Configuration:        cuda_bs32
+MPI processes:        1 (1 per node)
+OpenMP threads:       1
+CUDA block size:      32
+Runs per test:        5
+================
+Quadro RTX 6000, 23040 MiB, 580.173.02
+--- BUILD ---
+NOTE: branch cuda-1D hardcodes BLOCK_SIZE, patching the worktree copy with an ifndef guard
+make: Entering directory '/home/salvati_2/multicore-relation/build/job_983366'
+nvcc -arch=sm_75  -O3 -DBLOCK_SIZE=32 -c energy_storms_cuda_core.cu -lm  -o energy_storms_cuda_core.o
+nvcc -arch=sm_75  -O3 -DBLOCK_SIZE=32 energy_storms_cuda.cpp energy_storms_cuda_core.o -lm  -o energy_storms_cuda
+make: Leaving directory '/home/salvati_2/multicore-relation/build/job_983366'
+Binary md5:           2bb9a081e233c57f31c08a1577104061
+
+--- TEST A_20k (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: 0.007860 s, correctness PASS
+Run 2: 0.007847 s, correctness PASS
+Run 3: 0.007885 s, correctness PASS
+Run 4: 0.007841 s, correctness PASS
+Run 5: 0.007854 s, correctness PASS
+
+--- TEST A_100k (size 100000, 1 storm file(s), workload s100000_779ff3bc5c) ---
+Run 1: 0.023300 s, correctness PASS
+Run 2: 0.023319 s, correctness PASS
+Run 3: 0.023315 s, correctness PASS
+Run 4: 0.023324 s, correctness PASS
+Run 5: 0.023330 s, correctness PASS
+
+--- TEST A_1M (size 1000000, 1 storm file(s), workload s1000000_15729929c0) ---
+Run 1: 0.205520 s, correctness PASS
+Run 2: 0.206229 s, correctness PASS
+Run 3: 0.205376 s, correctness PASS
+Run 4: 0.206386 s, correctness PASS
+Run 5: 0.206021 s, correctness PASS
+
+--- TEST B_1 (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: 0.007830 s, correctness PASS
+Run 2: 0.007841 s, correctness PASS
+Run 3: 0.007825 s, correctness PASS
+Run 4: 0.007835 s, correctness PASS
+Run 5: 0.007859 s, correctness PASS
+
+--- TEST B_3 (size 20000, 3 storm file(s), workload s20000_5841cc46db) ---
+Run 1: 0.022228 s, correctness PASS
+Run 2: 0.022241 s, correctness PASS
+Run 3: 0.022257 s, correctness PASS
+Run 4: 0.022221 s, correctness PASS
+Run 5: 0.022236 s, correctness PASS
+
+--- TEST B_5 (size 20000, 5 storm file(s), workload s20000_2f8b6f9675) ---
+Run 1: 0.036638 s, correctness PASS
+Run 2: 0.036630 s, correctness PASS
+Run 3: 0.036637 s, correctness PASS
+Run 4: 0.036621 s, correctness PASS
+Run 5: 0.036648 s, correctness PASS
+
+--- TEST B_10 (size 20000, 10 storm file(s), workload s20000_49747c11c3) ---
+Run 1: 0.072853 s, correctness PASS
+Run 2: 0.072776 s, correctness PASS
+Run 3: 0.072812 s, correctness PASS
+Run 4: 0.072762 s, correctness PASS
+Run 5: 0.072785 s, correctness PASS
+
+--- TEST C_3 (size 20000, 1 storm file(s), workload s20000_5af44766bc) ---
+Run 1: 0.000769 s, correctness PASS
+Run 2: 0.000783 s, correctness PASS
+Run 3: 0.000776 s, correctness PASS
+Run 4: 0.000758 s, correctness PASS
+Run 5: 0.000786 s, correctness PASS
+
+--- TEST C_100 (size 20000, 1 storm file(s), workload s20000_78115621ca) ---
+Run 1: 0.000767 s, correctness PASS
+Run 2: 0.000765 s, correctness PASS
+Run 3: 0.000756 s, correctness PASS
+Run 4: 0.000784 s, correctness PASS
+Run 5: 0.000748 s, correctness PASS
+
+--- TEST C_1k (size 20000, 1 storm file(s), workload s20000_9270e8f3d6) ---
+Run 1: 0.001092 s, correctness PASS
+Run 2: 0.001083 s, correctness PASS
+Run 3: 0.001101 s, correctness PASS
+Run 4: 0.001100 s, correctness PASS
+Run 5: 0.001065 s, correctness PASS
+
+--- TEST C_5k (size 20000, 1 storm file(s), workload s20000_a966c0a2c1) ---
+Run 1: 0.002484 s, correctness PASS
+Run 2: 0.002497 s, correctness PASS
+Run 3: 0.002484 s, correctness PASS
+Run 4: 0.002538 s, correctness PASS
+Run 5: 0.002501 s, correctness PASS
+
+--- JOB COMPLETE ---

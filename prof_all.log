@@ -1,0 +1,20 @@
+nohup: ignoring input
+=== 2026-08-22T18:25:54+00:00 submitting Add_SIMD_Directives 1n ===
+job 983249 submitted
+job 983249 finished
+=== 2026-08-22T18:26:54+00:00 submitting Add_SIMD_Directives 2n ===
+job 983251 submitted
+job 983251 finished
+=== 2026-08-22T18:29:35+00:00 submitting Add_SIMD_Directives 4n ===
+job 983252 submitted
+job 983252 finished
+=== 2026-08-22T18:31:55+00:00 submitting immediate 1n ===
+job 983253 submitted
+job 983253 finished
+=== 2026-08-22T18:33:35+00:00 submitting immediate 2n ===
+job 983255 submitted
+job 983255 finished
+=== 2026-08-22T18:37:56+00:00 submitting immediate 4n ===
+job 983256 submitted
+job 983256 finished
+=== ALL DONE 2026-08-22T18:40:56+00:00 ===
