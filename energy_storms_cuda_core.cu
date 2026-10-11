@@ -6,7 +6,6 @@
 
 #define BLOCK_SIZE 256
 
-/* -------------------------------------- NUOVA PARTE --------------------------------------------- */
 /* Kernel per il bombardamento. Ora 1D */
 __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int* d_offsets, int layer_size, float calc_threshold) {
     unsigned int i_layer = blockIdx.x * blockDim.x + threadIdx.x;
@@ -54,7 +53,7 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
 
                 float energy_k = energy / atenuacion;
 
-                /* Cambiata la threshold con quella pre-calcolata. Almeno cosi facendo i calcoli non verranno ripetuti inutilmente */
+                /* Cambiata la threshold con quella pre-calcolata, come nella versione MPI/OMP. */
                 if ( energy_k >= calc_threshold || energy_k <= -calc_threshold ) {
                     save_cell_energy += energy_k;
                 }
@@ -64,7 +63,6 @@ __global__ void bomb(int i_storm, int *d_flattened, float *d_layer, unsigned int
     /* Solo fuori dal for andiamo a salvare i dati in VRAM. Meno accessi == piu veloce */
     if(active) d_layer[i_layer] = save_cell_energy;
 }
-/* ----------------------------------------------------------------------------------- */
 
 /* Kernel per la fase di rilassamento */
 __global__ void relax(float * layer, float * layer_copy, int layer_size) {
@@ -76,7 +74,7 @@ __global__ void relax(float * layer, float * layer_copy, int layer_size) {
         layer[i] = (layer_copy[i-1] + layer_copy[i] + layer_copy[i+1]) / 3.0f;
     }
 }
-/* Kernel per il calcolo del massimo, sfrutta la tecnica di reduce */
+/* Kernel per il calcolo del massimo, è nei fatti una riduzione. */
 __global__ void reduce_argmax(float* in, int* in_idx, float* out, int* out_idx, int n, bool first_pass) {
     unsigned int tid = threadIdx.x;
     unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -142,7 +140,7 @@ void DEBUG_print_host_array(int *h_layer, int layer_size) {
     printf("\n");
 }
 
-/* Versione con interi perché non so come cazzo se fa sennò */
+/* Versione con interi */
 void DEBUG_print_host_array(unsigned int *h_layer, int layer_size) {
     for (int i = 0; i < layer_size; i++) {
         if (i > 35)
@@ -157,28 +155,8 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     float calc_threshold = (float) THRESHOLD / layer_size;
     printf("calc_threshold: %f\n", calc_threshold);
 
-    /* Prima parte: il problema principale da affrontare è che storms sia un array di strutture con
-     * puntatori ad altri array, e  quindi allocare tutto nel device diventerebbe lungo. Per tale 
-     * motivo, prima di allocare nel device si effettua una operazione di "flattening" dell'arrray 
-     * di storms in un gigantesco array che contenga i valori di tutte le storms uno dietro l'altro,
-     * con un array di offset che per ogni storm dice esattamente dove si trova l'inizio della storm */
+    unsigned int *h_offsets = (unsigned int *)malloc((num_storms + 1) * sizeof(unsigned int));
 
-    /* Spiegazione per me ( Anto )
-     * Essnzialmente, l'offset viene calcolato con una "tempesta extra" per capire dove finisce l'ultima tempesta ( ovvero la [num_storms - 1] )
-     * Con il "+1" abbiamo che:
-     * h_offset[0] = 0 ( T1 inizia a 0 )
-     * h_offset[1] = 4 ( finisce T1 ed inizia T2 )
-     * h_offset[2] = 10 ( finisce T2 ed inizia T3 )
-     * h_offset[3] = 12 ( finisce T3 e basta )
-     *
-     * Senza il "+1" abbiamo invece che:
-     * h_offset[0] = 0 ( T1 inizia a 0 )
-     * h_offset[1] = 4 ( finisce T1 ed inizia T2 )
-     * h_offset[2] = 10 ( finisce T2 ed inizia T3 ma cosi facendo non sappiamo dove finisce T3! )
-     */
-    unsigned int *h_offsets = (unsigned int *)malloc((num_storms + 1) * sizeof(unsigned int));                 // Contiene gli indici di partenza di ogni tempesta
-
-    /* Qui inizia la prima tempesta */
     h_offsets[0] = 0;
 
     /* Popolazione dell'array di offset nell'host. ATTENZIONE: per ogni struct di una Storm si ha
@@ -197,17 +175,12 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     /* Popolazione dell'array flattened nell'host tramite memcpy dal posval corrispondente. Stesse
      * attenzioni di cui sopra quando si tratta di definire la dimensione. */
     for (int i = 0; i < num_storms; i++) {
-        /* Letteralmente
-         * 1. Dove incollare i dati
-         * 2. Da dove copiare i dati
-         * 3. Quanti byte incollare
-         */
         memcpy(h_flattened + h_offsets[i], storms[i].posval, storms[i].size * 2 * sizeof(int));
     }
 
 
     /* Trasferimento nel device: creazione e popolazione di tutte le strutture che serviranno nel
-     * device. VALUTARE SPOSTAMENTO IN UNA FUNZIONE A PARTE */
+     * device. */
     float *d_layer, *d_layer_copy;
     unsigned int * d_offsets;
     int *d_flattened;
@@ -244,26 +217,16 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
     int max_storm = 0;
     for (int i = 0; i + 1 < num_storms + 1; i++) {
-        /* Calcola la grandezza di ogni tempesta. Nello specifico vede quanti elementi ha ogni tempesta */
+        /* Calcola la grandezza di ogni tempesta. */
         int gap = h_offsets[i + 1] - h_offsets[i];
-        if (gap > max_storm) max_storm = gap;                           /* Se il valore è superiore al massimo registrato fino ad ora allora lo cambia */
+        if (gap > max_storm) max_storm = gap;
     }
 
-    /* Liberazione della memoria degli array sull'host */
     free(h_offsets);
     free(h_flattened);
 
-    /* Non utilizziamo "ceil()" per limitare conversioni etc... in teoria cosi facendo dovremo salvare qualche ciclo di clock
-     * Inoltre, la X viene calcolata in questo modo perché cosi facendo possiamo ottenere incrementare il risultato. Questo serve perché
-     * C tronca il risultato. Senza quel "+31" essenzialmente andremo a creare un valore inferiore a quello che ci serve per il block
-     *
-     * Il principio è praticamente lo stesso per la Y
-     * La Z invece la manteniamo ad 1, cosi da avere una "griglia 2D ( a due dimensioni )
-     */
     int grid = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-    /* PARTE NUOVA ( per cudaMalloc() ) -------------------------------------------------------------------------------- */
-    /* Numero massimo di blocchi lanciati nella prima passata della reduction */
     int max_reduction_blocks = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
     /* Allocazione dei DUE buffer di supporto FUORI dal loop for (una sola volta)
@@ -291,16 +254,9 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     /* ----------------------------------------------------------------------------------------------------------------- */
 
     for (int i = 0; i < num_storms; i++) {
-        /* Ora non utilizziamo più un kernel 2D. Passando con un kernel 1D possiamo calcolare in modo corretto i valori esatti dei bombardamenti
-         * ed, inoltre, non vi è più race-condition.
-         * Invece che passare una variabile "dim3" ci basta passsare BLOCK_SIZE. Essendo un singolo valore, i valori di Y e Z saranno uguali ad 1.
-         */
         bomb<<<grid, BLOCK_SIZE>>>(i, d_flattened, d_layer, d_offsets, layer_size, calc_threshold);
 
-        /* Pointer-swap
-         * Utilizzando questo andiamo a risparmiare tempo. Invece che perdere tempo con la copia, andiamo semplicemente a
-         * swappare gli indirizzi dei puntatori. Lo stesso ragionamento applicato in MPI/OMP.
-         */
+        /* Pointer-swap, come in MPI/OMP. */
         float *temp = d_layer_copy;
         d_layer_copy = d_layer;
         d_layer = temp;
@@ -308,29 +264,27 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         /* Applicazione del rilassamento. Principalmente molto simile ad MPI/OMP */
         relax<<<grid, BLOCK_SIZE>>>(d_layer, d_layer_copy, layer_size);
     
-        float *in = d_layer;                /* Puntatore "d'ingresso" ( che porta all'inizio ) della reduction */
+        float *in = d_layer;
         int   *in_idx = nullptr;
-        int n = layer_size;                 /* Numero di elementi su cui fare la reduction */
-        bool first = true;                  /* Flag per indicare al kernel che si tratta del primo passaggio della riduzione */
+        int n = layer_size;
+        bool first = true;
 
         /* Alterna tra 0 ed 1 */
         int pingpong = 0;
 
         /* Riduce progressivamente la dimensione dei dati su cui lavorare. Da "n" fino ad 1. */
         while (n > 1) {
-            int nblocks = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;                            /* Calcolo progressivo dei blocchi che servono per lavorare su "n" elementi */
+            /* Calcolo progressivo dei blocchi che servono per lavorare su "n" elementi */
+            int nblocks = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-            /* Utilizzare questa chiamata di reduce invece che quella sotto*/
              reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, d_max_output[pingpong], d_pos_output[pingpong], n, first);
-            //reduce_argmax<<<nblocks, BLOCK_SIZE>>>(in, in_idx, out, out_idx, n, first);
 
             in = d_max_output[pingpong];
             in_idx = d_pos_output[pingpong];
 
             /* GESTIONE DELLA MEMORIA TEMPORANEA
              * Se non siamo al primo passaggio, 'in' e 'in_idx' puntano a buffer intermedi creati
-             * nelle iterazioni precedenti del while, che ora non servono più e vanno liberati per evitare memory leak.
-             * NOTA: Al primo passaggio (first == true) 'in' punta a d_layer, quindi NON deve essere liberato qui!*/
+             * nelle iterazioni precedenti del while, che ora non servono più e vanno liberati per evitare memory leak. */
 
             pingpong = 1 - pingpong;
             n = nblocks;
@@ -362,22 +316,3 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
     cudaFree(d_layer);
     cudaFree(d_layer_copy);
 }
-
-/* APPUNTO SUL CAMBIAMENTO DEL KERNEL -------------------------------------------------------------------------------------------------------------------
- * Con il Kernel-2D si hanno due assi di threads:
- * Asse X -> il vecchio "i_layer"                   IL LAYER SU CUI LAVORAVA
- * Asse Y -> i_particle                             LA PARTICELLA SU CUI LAVORAVA
- * La GPU lanciava più threads per la stessa cella. Esempio...
- * Threads(5, 0) calcolava l'effetto della Particella 0 su layer[5]
- * Threads(5, 1) calcolava l'effetto della Particella 1 su layer[5]
- * Threads(5, 2) calcolava l'effetto della Particella 2 su layer[5]
- * Il problema nasceva quando ogni thread andava a scrivere in VRAM il valore.
- * Dato che non vi è nessun ordine e che ogni thread poteva finire prima dell'altro, succedeva che
- * magari nel primo test finiva il thread 2. Nel successivo lo 0... e così via.
- * Di conseguenza, dato che sulla macchina i float sommati in ordine diverso possono portare a risultati diversi, questo portava a risultati errati.
- *
- * Con il Kernel-1D invece le cose cambiano perché, semplicemente, ogni thread prende una SINGOLA CELLA DEL LAYER e cicla tutte le particelle.
- * In questo modo non vi è race-condition e non serve utilizzare AtomicAdd() perché quel singolo thread sarà l'unico ad accedere
- * a quell'area di memoria/registro. Inoltre non vi sarà alcuna "Data race" quindi l'ordine d'acccesso in memoria sarà sempre uguale e, quindi,
- * il risultato del programma sarà sempre deterministico.
- * ------------------------------------------------------------------------------------------------------------------------------------------------------ */

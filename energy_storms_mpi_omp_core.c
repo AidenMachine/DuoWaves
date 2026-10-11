@@ -12,28 +12,26 @@ typedef struct{
     int local_positions;
 }LocalData;
 
-// Ricorda di inserire nel "verbale" il fatto di aver aggiunto due parametri alla funzione
 void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *positions) {
     int i, j, k, size, rank;
 
-    // Invece che farla calcolare volta per volta nell'if, è possibile calcolarla una singola volta e risparmiare molti cicli
+    /* Invece che farla calcolare volta per volta nell'if, è possibile calcolarla una singola volta e risparmiare molti cicli */
     float local_threshold = THRESHOLD / layer_size;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    // Le variabili le ho dovute spostare qui perché altrimenti avrebbero mandato in crash il programma ( le avevo create in una zona parallela "single" )
     int left_neighbor = (rank == 0) ? MPI_PROC_NULL : rank - 1;
     int right_neighbor = (rank == size - 1) ? MPI_PROC_NULL : rank + 1;
 
-    // Per eliminazione lock(), vedi a fine codice ( nella zona parallela con dentro anche un "for" ) ------------------
+    /* Per eliminazione lock(), vedi a fine codice ( nella zona parallela con dentro anche un "for" ) */
     int n_threads = omp_get_max_threads();
     LocalData *threads_results = malloc( n_threads * sizeof( LocalData ) );
-    // -----------------------------------------------------------------------------------------------------------------
+    /* ----------------------------------------------------------------------------------------------------------------- */
 
-    // Calcolo chunk_locale
+    /* Calcolo chunk_locale */
     int local_chunk = layer_size / size;            // Il chunk è "per tutti"
-    int resto = layer_size % size;                  // Remainder come parola mi fa cagare quindi uso "resto"
+    int resto = layer_size % size;                  
 
     int local_size;             // Quante celle devo calcolare
     int offset;                 // Da quale indice ( della var. globale ) devo partire ( sul chunk locale )
@@ -50,16 +48,17 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
      * Utilizziamo sempre due copie per la fase futura di "rilassamento"
      * Aggiungiamo inoltre 2 CELLE EXTRA per layer ( perché per la fase di rilassamento ci
      * serve sapere che valore ha la cella precedente ( che però risiede nel layer di un altro
-     * processo. APPLICARE RAGIONAMENTO DOPO BOMBARDAMENTO
+     * processo.
      *
      * Va fatto ( local_size + 2 ) e non lasciando il 2 fuori dalla parentesi perché altrimenti
      * si andrebbe incontro alla creazione di "n" celle di memoria ( da 4 byte ) piu 2 celle da 2
      * Tutto questo perché l'operatore * con "sizeof" ha la precedenza
      */
-    //float *layer = malloc( sizeof( float ) * (local_size + 2) );
-    //float *layer_copy = malloc( sizeof( float ) * (local_size + 2) );
 
-    // PROVA CON POSIX_MEMALIGN PER EVITARE FALSE_SHARING
+    /* float *layer = malloc( sizeof( float ) * (local_size + 2) );
+     * float *layer_copy = malloc( sizeof( float ) * (local_size + 2) ); */
+
+    /* POSIX_MEMALIGN PER EVITARE FALSE_SHARING */
     float *layer = NULL, *layer_copy = NULL;
     int err_layer = posix_memalign((void**) &layer, 64, sizeof( float ) * (local_size + 2));
     int err_layer_copy = posix_memalign((void**) &layer_copy, 64, sizeof( float ) * (local_size + 2));
@@ -74,11 +73,6 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
         exit( EXIT_FAILURE );
     }
 
-    /* TODO Tramite parallelizzazione sembra che questa rimanga l'opzione migliore...
-     * peccato... tutte quelle ricerche sono state inutili. Almeno "chiamo" i threads una volta sola, cosi mi risparmio il tempo di
-     * "richiamarli" in futuro ( vedi branch precedenti per capire di cosa sto parlando )
-     */
-
     #pragma omp parallel private(i,j,k)
     {
         #pragma omp for
@@ -87,17 +81,15 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             layer_copy[k] = 0.0f;
         }
 
-        /* INTERA TEMPESTA. Qui ogni thread fa la stessa cosa aimé... che spreco Zi ------------------------------------*/
         for( i=0; i<num_storms; i++) {
 
             #pragma omp for
             for (k = 1; k <= local_size; k++) {
                 int global_k = offset + k - 1;
 
-                // L'idea è la stessa di prima ma con una roba diversa ovvero creiamo si la var. per salvare l'energia volta per vola
-                // ( essendo nel for e con -O3, in teoria, dovrebbe essere una var. salvata tra i registri del core )
-                // Andiamo a salvare il valore del layer[k] nel registro ( valore corretto ) -> andiamo ad aggiornare il registro volta per volta ( cosi non ci perdiamo nessun val. post virgola )
-                // SOLO ALLA FINE del ciclo mettiamo tutto in RAM. In teoria i valori dovrebbero uscire sempre corretti e saltiamo tanti passaggi in RAM
+                /* Andiamo a salvare il valore del layer[k] nel registro ( valore corretto ) -> andiamo ad aggiornare il registro volta per volta ( cosi non ci perdiamo nessun val. post virgola )*/
+
+                /* SOLO ALLA FINE del ciclo mettiamo tutto in RAM. In teoria i valori dovrebbero uscire sempre corretti e saltiamo tanti passaggi in RAM */
                 float save_cell_energy = layer[k];
 
                 for (j=0; j<storms[i].size; j++) {
@@ -114,21 +106,20 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
                     float energy_k = energy / layer_size / atenuacion;
 
-                    // Qui dovremmo risparmiare un pò di tempo
+                    /* Qui risparmiamo un po' di tempo */
                     if ( energy_k >= local_threshold || energy_k <= -local_threshold ) {
                         save_cell_energy += energy_k;
-                        //layer[k] += energy_k;
+                        /* layer[k] += energy_k; */
                     }
                 }
                 layer[k] = save_cell_energy;
             }
-            // ---------------------------------------------------------------------------------------------------------
+            /* --------------------------------------------------------------------------------------------------------- */
 
-            // Solo un thread fa questa parte ( anche perché altrimenti volerebbero pacchetti a destra e sinistra )     <- #pragma omp single
-            // Dato che però è il "thread master" che deve entrare per primo, cambio in #pragma omp master ( ma devo aggiungere la barriera manualmente perché non la ha )
+            /* Solo un thread fa questa parte ( anche perché altrimenti volerebbero pacchetti a destra e sinistra )     <- #pragma omp single
+             * Dato che però è il "thread master" che deve entrare per primo, cambio in #pragma omp master ( ma devo aggiungere la barriera manualmente perché non la ha ) */
             #pragma omp master
             {
-                // Bro, ti sei sbagliato ed hai messo MPI_STATUS_IGNORE quando in realtà li andava l'oggetto "request"
                 MPI_Request request[4];
 
                 MPI_Isend(&layer[local_size], 1, MPI_FLOAT, right_neighbor, 0, 
@@ -141,11 +132,11 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                 MPI_Irecv(&layer[local_size + 1], 1, MPI_FLOAT, right_neighbor, 0, 
                     MPI_COMM_WORLD,  &request[3]);
 
-                // Attesa di fine di tutte e 4 le comunicazioni. Anche se la CPU è ferma, la scheda di rete in teoria fa viaggiare i "pacchetti"
-                // in parallelo. Ergo, il tempo totale non è più la somma dei 4 viaggi, ma è pari al tempo del pacco più lento.
+                /* Attesa di fine di tutte e 4 le comunicazioni. Anche se la CPU è ferma, la scheda di rete in teoria fa viaggiare i "pacchetti"
+                 * in parallelo. Ergo, il tempo totale non è più la somma dei 4 viaggi, ma è pari al tempo del pacco più lento. */
                 MPI_Waitall(4, request, MPI_STATUSES_IGNORE);
 
-                // Pointer-swap ( risparmia un bel pò di tempo utile )
+                /* Pointer-swap ( risparmia un bel pò di tempo utile ) */
                 float *temp = layer_copy;
                 layer_copy = layer;
                 layer = temp;
@@ -154,7 +145,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
             #pragma omp for
             for (k = 1; k <= local_size; k++) {
-                // Con il pointer-swap i valori ai bordi rimangono del vecchio layer. Bisogna dunque copiarli per ottenere i valori corretti
+                /* Con il pointer-swap i valori ai bordi rimangono del vecchio layer. Bisogna dunque copiarli per ottenere i valori corretti */
                 if (rank == 0 && k == 1) {
                     layer[k] = layer_copy[k];
                     continue;
@@ -182,8 +173,7 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
 
                 MPI_Waitall(4, request, MPI_STATUSES_IGNORE);
 
-                // Per eliminare i locks  ----------------------------------------------------------------------------------
-                // Proviamo a dividere lo stesso il lavoro
+                /* ----------------------------------------------------------------------------------------------------- */
                 for ( k = 0; k < n_threads; k++ ) {
                     threads_results[k].local_maximum = -1.0f;
                     threads_results[k].local_positions = -1;
@@ -195,11 +185,11 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
             if ( rank == 0 ) start++;
             if ( rank == size - 1 ) end--;
 
-            // Ogni thread calcola il singolo
+            /* Ogni thread calcola il singolo */
             int my_id = omp_get_thread_num();
             LocalData my_data = { -1.0,-1 };
 
-            // Il calcolo è praticamente lo stesso, solo che si va a scrivere i dati in un array condiviso, evitando il delay delle attese
+            /* Il calcolo è praticamente lo stesso, solo che si va a scrivere i dati in un array condiviso, evitando il delay delle attese */
             #pragma omp for
             for( k = start; k <= end; k++ ) {
                 if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
@@ -209,15 +199,13 @@ void core(int layer_size, int num_storms, Storm *storms, float *maximum, int *po
                     }
                 }
             }
-            // A fine "zona parallela" si va a scrivere tutto sull'array
             threads_results[my_id] = my_data;
 
-            // Per provare a fixare la non-associatività dei float
             #pragma omp barrier
 
             #pragma omp master
             {
-                // Calcolo del massimo dell'array ( evito di usare OMP perché tanto il tempo di settarlo che perdo solo tempo )
+                /* Calcolo del massimo dell'array */
                 LocalData global_max = { -1.0,-1 };
                 for ( k = 0; k < n_threads; k++ ) {
                     if ( threads_results[k].local_maximum > global_max.local_maximum ) {
