@@ -1,0 +1,372 @@
+================================================================================
+DEFECT REPORT - CUDA RELAXATION KERNEL LAUNCH CONFIGURATION
+Multicore Programming 2025/2026 Exam - DuoWaves / energy_storms
+File: energy_storms_cuda_core.cu
+Status: CONFIRMED, FIXED AND VERIFIED
+Affects: 110+ of 1440 recorded CUDA measurements (re-measurement pending)
+Revision: v2, 2026-08-22
+================================================================================
+
+REVISION NOTE
+This supersedes cuda_blocksize_defect.txt (v1). Section 3 of v1 predicted that
+LARGE layers would fail. The campaign data showed the opposite: small and
+medium layers fail while A_1M passes. The corrected mechanism is in section 4
+below. The defect itself, and the fix, are unchanged.
+
+
+--------------------------------------------------------------------------------
+1. SUMMARY
+--------------------------------------------------------------------------------
+
+The relaxation kernel was launched with a grid size computed for a hardcoded
+block width of 256 threads, while the actual block width passed to the launch
+was BLOCK_SIZE, which the test suite varies from 32 to 1024.
+
+When BLOCK_SIZE < 256 the launch provided fewer threads than the layer had
+cells, so part of the layer was never relaxed and the program produced a wrong
+Result.
+
+The campaign's correctness checking caught this: every configuration below 256
+has FAIL rows on all four CUDA branches; 256 and above pass.
+
+The fix is one line. It has been applied to cuda-1D and cuda-shared, pushed,
+and verified by a dedicated job across 7 tests x 6 block sizes x 2 branches.
+
+
+--------------------------------------------------------------------------------
+2. THE DEFECT
+--------------------------------------------------------------------------------
+
+In core(), two grid sizes were computed:
+
+    int grid_bomb = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;     <-- correct
+    int grid_copy = (layer_size + 256 - 1) / 256;                   <-- DEFECT
+
+Both kernels were then launched with BLOCK_SIZE threads per block:
+
+    bomb <<<grid_bomb, BLOCK_SIZE>>> (...)
+    relax<<<grid_copy, BLOCK_SIZE>>> (...)
+
+grid_bomb is derived from BLOCK_SIZE, so blocks and threads always agree.
+grid_copy was derived from the literal 256, so blocks and threads only agreed
+when BLOCK_SIZE happened to equal 256.
+
+The two lines sit one after the other in the source. This is a copy-paste slip
+in a single line, not a design error.
+
+SCOPE
+The defective line was present, with identical text and comment, on all four
+CUDA branches:
+
+    cuda-first    line 231
+    cuda-1D       line 235
+    cuda-shared   line 254
+    main          line 264
+
+It was inherited from the first CUDA implementation and never revisited.
+
+
+--------------------------------------------------------------------------------
+3. WHY IT WAS INVISIBLE
+--------------------------------------------------------------------------------
+
+At BLOCK_SIZE = 256 the two expressions are literally identical:
+
+    (layer_size + 256 - 1) / 256  ==  (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE
+
+So the default configuration always worked. The defect only appears when the
+suite sweeps BLOCK_SIZE below 256, which is exactly what the block-size study
+does and what ordinary development never does.
+
+At BLOCK_SIZE above 256 more threads are launched than there are cells, but the
+kernel's own bounds test discards the surplus:
+
+    if (i == 0 || i == layer_size - 1) { ... }
+    else if (i < layer_size - 1) { ... }
+
+so over-provisioning is harmless.
+
+
+--------------------------------------------------------------------------------
+4. MECHANISM - WHICH TESTS FAIL, AND WHY
+--------------------------------------------------------------------------------
+
+Threads launched for relax() = grid_copy * BLOCK_SIZE, which covers only a
+PREFIX of the layer:
+
+    covered = ceil(layer_size / 256) * BLOCK_SIZE
+
+Correctness is judged on the POSITION OF THE MAXIMUM. A run therefore passes if
+the maximum happens to fall inside the covered prefix, and fails otherwise.
+
+This is why the failures land on SMALL and MEDIUM layers rather than large ones:
+a large layer produces a large grid_copy, so its covered prefix is large in
+absolute terms, and the maximum sits early enough to be inside it.
+
+Worked example, BLOCK_SIZE = 32, maximum at index 17197:
+
+    Test      layer_size   grid_copy   covered cells   max inside?   verdict
+    -------------------------------------------------------------------------
+    A_1M         1000000        3907          125024        yes       PASS
+    A_100k        100000         391           12512        no        FAIL
+    A_20k          20000          79            2528        no        FAIL
+
+At BLOCK_SIZE = 64 the same A_100k run covers 391 * 64 = 25024 cells, which now
+contains index 17197, so A_100k passes. The campaign data confirms this exactly:
+A_100k appears in the FAIL list at bs32 and disappears at bs64 and bs128.
+
+C_5k behaves the same way with its maximum at index 10470: covered at bs256
+(20224 cells) but not at bs128 (10112 cells).
+
+The apparent pass of A_1M at every block size is therefore ACCIDENTAL, not
+evidence of correctness. It passed because its maximum lies early in the array.
+
+
+--------------------------------------------------------------------------------
+5. EVIDENCE FROM THE CAMPAIGN
+--------------------------------------------------------------------------------
+
+Correctness verdicts, 60 measurements per block size (12 tests x 5 repetitions):
+
+  Block size     cuda-1D        cuda-shared       main         cuda-first
+  -------------------------------------------------------------------------
+          32   40F / 20P       40F / 20P       40F / 20P      40F / 20P
+          64   35F / 25P       35F / 25P       35F / 25P      37F / 23P
+         128   35F / 25P       35F / 25P       35F / 25P      37F / 23P
+         256    0F / 60P        0F / 60P        0F / 60P      22F / 38P
+         512    0F / 60P        0F / 60P        0F / 60P      23F / 37P
+        1024    0F / 60P        0F / 60P        0F / 60P      24F / 36P
+
+For cuda-1D, cuda-shared and main the boundary sits exactly at 256, precisely
+where the mechanism in section 4 predicts it.
+
+Tests failing on cuda-1D, identical at all three broken block sizes except
+A_100k which recovers at bs64:
+
+    bs32:   A_20k, A_100k, B_1, B_3, B_5, B_10, C_1k, C_5k
+    bs64:   A_20k,         B_1, B_3, B_5, B_10, C_1k, C_5k
+    bs128:  A_20k,         B_1, B_3, B_5, B_10, C_1k, C_5k
+
+These are 8 of the 11 tests that appear in the spreadsheet. A_100M is excluded
+from the spreadsheet by build_ods.py and is not a factor.
+
+SEPARATE DEFECT ON cuda-first
+cuda-first fails at EVERY block size, including 256, 512 and 1024 where
+grid_copy is harmless. Its failures therefore have a different cause: it uses
+the original 2D bombardment kernel
+
+    dim3 grid_bomb((layer_size + 31)/32, (max_storm + 4)/4, 1);
+
+in which multiple threads accumulate into the same d_layer cell without
+ordering. Floating-point addition is not associative, so the result depended on
+thread completion order and was non-deterministic. This is documented in the
+source's own closing comment and is the stated reason for moving to the 1D
+kernel.
+
+The ~22-24 failures out of 60 at every block size are direct measured evidence
+that the 2D -> 1D redesign fixed a real correctness bug. cuda-first should be
+left unfixed and reported as-is: its failures are the justification for the
+redesign, and repairing them would erase the evidence.
+
+
+--------------------------------------------------------------------------------
+6. WHAT IS *NOT* WRONG - THE BLOCK-SIZE SWEEP IS GENUINE
+--------------------------------------------------------------------------------
+
+An earlier hypothesis was that the block-size sweep never happened, because the
+source contains
+
+    #define BLOCK_SIZE 256
+
+which would override the -DBLOCK_SIZE=<n> passed by the build, making all six
+configurations compile to the same binary.
+
+THIS IS NOT THE CASE. The suite defends against it in
+scripts/suite/parallel_job.sbatch, in ensure_block_size_guard(), which rewrites
+the hardcoded #define into an #ifndef/#endif pair inside the disposable
+worktree before calling
+
+    make -C "$WORKTREE" energy_storms_cuda CUDA_EXTRA_CFLAGS="-O3 -DBLOCK_SIZE=$BLOCK_SIZE"
+
+Two independent proofs that the guard works:
+
+  (a) The correctness data. If every binary had been compiled at 256, every
+      configuration would have passed. Failures below 256 can only occur if
+      BLOCK_SIZE really took the values 32, 64 and 128.
+
+  (b) The verification job (section 7) produced six distinct binary digests per
+      branch, one per block size.
+
+The block-size study is therefore valid. The defect was in the kernel launch,
+not in the build.
+
+
+--------------------------------------------------------------------------------
+7. FIX AND VERIFICATION
+--------------------------------------------------------------------------------
+
+7.1 THE FIX
+One line, in core(), on cuda-1D and cuda-shared:
+
+  BEFORE
+    int grid_copy = (layer_size + 256 - 1) / 256;
+
+  AFTER
+    int grid_copy = (layer_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
+
+This makes grid_copy consistent with grid_bomb on the line above. Blocks and
+threads then agree by construction at every block size:
+
+    grid_copy * BLOCK_SIZE = ceil(layer_size / BLOCK_SIZE) * BLOCK_SIZE
+                           >= layer_size                    (always)
+
+Committed and pushed as:
+    cuda-1D       7d86f1e  "Cambiato il calcolo per grid_copy"
+    cuda-shared   6b05a7d  "Cambiato il calcolo per grid_copy"
+
+7.2 VERIFICATION METHOD
+A dedicated Slurm job (cuda_verify.sbatch, job 983362, Quadro RTX 6000, driver
+580.173.02) built each branch at all six block sizes and ran seven tests on
+each build, comparing every Result line against the same test's result at
+BLOCK_SIZE = 256.
+
+BLOCK_SIZE = 256 is valid ground truth for this comparison because the old and
+new expressions are identical at 256, and that configuration independently
+scored 60/60 PASS against the sequential baselines during the campaign.
+
+Tests used: A_20k, A_100k, A_1M, B_3, B_10, C_1k, C_5k. The multi-storm tests
+B_3 and B_10 are included deliberately: the relaxation defect corrupts d_layer,
+which then feeds the next storm's bombardment, so errors compound across storms
+and a single-storm test would not exercise that path.
+
+7.3 RESULT
+
+    VERDICT: ALL MATCH
+
+    2 branches x 6 block sizes x 7 tests
+      = 14 reference results + 70 comparisons
+      = 70 MATCH, 0 MISMATCH, 0 build failures, 0 run failures
+
+Reference results, identical on both branches:
+
+    A_20k    17197 1654.755371
+    A_100k   17197 330.951508
+    A_1M     17197 33.095032
+    B_3      17197 1654.755371 17223 3274.642578 17229 5727.363281
+    B_10     (10 pairs, first 17197 1654.755371, last 14423 21124.162109)
+    C_1k     14175 109.234200
+    C_5k     10470 526.928284
+
+A_20k failed at bs32, bs64 and bs128 during the campaign and now passes at
+every block size. That is the before/after proof.
+
+7.4 SHARED MEMORY AT BLOCK_SIZE = 1024
+A concern was raised that reduce_argmax declares
+
+    __shared__ float sdata[BLOCK_SIZE];
+    __shared__ int   sidx[BLOCK_SIZE];
+
+i.e. BLOCK_SIZE * 8 bytes = 8192 bytes at BLOCK_SIZE = 1024, and that
+cuda-shared might add further shared memory in bomb() and exceed the 48 KiB
+per-block limit of the Quadro RTX 6000.
+
+The verification job built and ran both branches successfully at BLOCK_SIZE =
+1024 on all seven tests. The concern is unfounded. Note that 1024 is exactly
+the device's maximum threads per block, so there is no headroom above it.
+
+
+--------------------------------------------------------------------------------
+8. TWO OBSERVATIONS FOR THE REPORT
+--------------------------------------------------------------------------------
+
+8.1 CROSS-IMPLEMENTATION AGREEMENT
+The CUDA reference results are byte-identical to the results recorded by the
+MPI/OpenMP implementation during the hybrid profiling campaign:
+
+    A_1M    CUDA: 17197 33.095032     hybrid: 17197 33.095032
+    C_5k    CUDA: 10470 526.928284    hybrid: 10470 526.928284
+
+Two independently written implementations, executing on different hardware
+(Quadro RTX 6000 vs AMD EPYC nodes) with different parallel decompositions,
+agree exactly. This is stronger correctness evidence than either implementation
+passing its baseline in isolation, and it is worth stating explicitly.
+
+8.2 nvcc BUILDS ARE NOT BYTE-REPRODUCIBLE
+The same commit, built with the same flags in two different jobs, produced
+different binary digests:
+
+                          job 983360        job 983362
+    cuda-1D      bs256    3aa671a1...       df7c72f4...
+    cuda-shared  bs256    cccfa9ae...       4c75be6c...
+
+The only difference between the two builds was the worktree path
+(.prof_worktrees/cudaver_983360 vs _983362), which nvcc embeds in the output.
+
+CONSEQUENCE FOR PROVENANCE
+For the CUDA section, the md5 column identifies WHICH BUILD produced a
+measurement, but two different digests do not imply two different programs.
+Within a single job the digests remain a valid way to distinguish
+configurations, which is how section 6(b) uses them.
+
+The MPI/OpenMP binaries do not have this property: the hybrid campaign binary
+reproduced the digest 39c5ff838b1dd2a5f9063e490a140b5d exactly across separate
+jobs and separate days, so the provenance chain there is stronger.
+
+
+--------------------------------------------------------------------------------
+9. REMAINING WORK
+--------------------------------------------------------------------------------
+
+9.1 RE-MEASUREMENT REQUIRED
+The fix is verified, but the campaign CSVs still contain the measurements taken
+with the defective binaries. Six configurations must be re-measured:
+
+    cuda-1D      cuda_bs32, cuda_bs64, cuda_bs128
+    cuda-shared  cuda_bs32, cuda_bs64, cuda_bs128
+
+The 256, 512 and 1024 data is unaffected and remains valid.
+
+CAUTION - RESUME COLLISION
+The re-measured rows carry keys identical to the existing ones, for example
+CUDA|cuda-1D|cuda_bs32|A_20k|1. suite_run_recorded() completes a configuration
+on the presence of the key alone, so the affected rows must be removed from
+results/raw/ first, or every re-run will be skipped and the job will report
+success having done nothing. Back up results/raw/ before deleting anything.
+
+9.2 BRANCHES NOT FIXED
+cuda-first and main still carry the defective line. main is not among the
+branches under active development; cuda-first should be left as-is for the
+reason given in section 5.
+
+9.3 DEBUG OUTPUT IN THE MEASURED BINARY
+core() begins with
+
+    printf("calc_threshold: %f\n", calc_threshold);
+
+which prints on every run of the graded binary. It does not collide with the
+suite's parsers, which match "Time:" and "^Result:", but it should be removed
+or guarded before submission.
+
+Note that the CUDA branch of execute_once() ends with 2>&1, unlike the MPI
+branch which uses 2>&2. Anything a CUDA binary writes to either stream
+therefore reaches suite_parse_time(). Any future CUDA profiling output must
+avoid the string "Time:" for this reason.
+
+9.4 GLOBAL MEMORY TRAFFIC IN THE BOMBARDMENT KERNEL
+The bomb kernel accumulates directly into global memory inside the particle
+loop:
+
+    d_layer[i_layer] = d_layer[i_layer] + energy_k;
+
+with a register-accumulator version present but commented out immediately
+above. This performs a global read-modify-write per particle rather than one
+write per cell. It is a plausible target for the shared-memory branch and
+should be visible once the CUDA phases are profiled.
+
+9.5 CUDA PROFILING NOT YET STARTED
+No CUDA phase profiling exists. MPI_Wtime is unsuitable because kernel launches
+are asynchronous; cudaEvent_t with cudaEventElapsedTime, or nsys, is required.
+
+================================================================================
+END OF REPORT
+================================================================================

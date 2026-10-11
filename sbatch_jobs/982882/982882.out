@@ -1,0 +1,100 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               982882
+Nodes:                4 (node[103,106-107,111])
+Section:              HYB
+Branch:               Add_SIMD_Directives (b46f448)
+Configuration:        hyb_4n_4x2
+MPI processes:        16 (4 per node)
+OpenMP threads:       2
+CUDA block size:      not applicable
+Runs per test:        5
+================
+--- BUILD ---
+make: Entering directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/job_982882'
+mpicc  -fopenmp -O3 -march=znver1 -mtune=znver1 -mavx2 -mprefer-vector-width=256 -fno-math-errno -ffinite-math-only -fno-signaling-nans -fno-rounding-math -fcx-limited-range -fno-signed-zeros -fno-trapping-math -fprefetch-loop-arrays -funroll-loops -mfma energy_storms_mpi_omp.c energy_storms_mpi_omp_core.o -lm  -o energy_storms_mpi_omp
+make: Leaving directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/job_982882'
+
+--- TEST A_20k (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: already recorded, skipped
+Run 2: already recorded, skipped
+Run 3: already recorded, skipped
+Run 4: already recorded, skipped
+Run 5: already recorded, skipped
+
+--- TEST A_100k (size 100000, 1 storm file(s), workload s100000_779ff3bc5c) ---
+Run 1: 1.233290 s, correctness FAIL
+Run 2: 0.975313 s, correctness FAIL
+Run 3: 0.906673 s, correctness FAIL
+Run 4: 0.868536 s, correctness FAIL
+Run 5: 0.897015 s, correctness FAIL
+
+--- TEST A_1M (size 1000000, 1 storm file(s), workload s1000000_15729929c0) ---
+Run 1: 7.525416 s, correctness PASS
+Run 2: 7.534323 s, correctness FAIL
+Run 3: 7.591710 s, correctness FAIL
+Run 4: 7.447441 s, correctness FAIL
+Run 5: 8.089746 s, correctness PASS
+
+--- TEST B_1 (size 20000, 1 storm file(s), workload s20000_95809a8180) ---
+Run 1: 0.187250 s, correctness FAIL
+Run 2: 0.204349 s, correctness FAIL
+Run 3: 0.248387 s, correctness FAIL
+Run 4: 0.238589 s, correctness FAIL
+Run 5: 0.250203 s, correctness FAIL
+
+--- TEST B_3 (size 20000, 3 storm file(s), workload s20000_5841cc46db) ---
+Run 1: 0.702289 s, correctness FAIL
+Run 2: 0.674580 s, correctness FAIL
+Run 3: 0.571139 s, correctness FAIL
+Run 4: 0.630319 s, correctness FAIL
+Run 5: 0.678197 s, correctness FAIL
+
+--- TEST B_5 (size 20000, 5 storm file(s), workload s20000_2f8b6f9675) ---
+Run 1: 1.152645 s, correctness FAIL
+Run 2: 1.020127 s, correctness FAIL
+Run 3: 0.994874 s, correctness FAIL
+Run 4: 0.989812 s, correctness FAIL
+Run 5: 1.125700 s, correctness FAIL
+
+--- TEST B_10 (size 20000, 10 storm file(s), workload s20000_49747c11c3) ---
+Run 1: 2.211411 s, correctness FAIL
+Run 2: 2.226789 s, correctness FAIL
+Run 3: 2.174976 s, correctness FAIL
+Run 4: 2.056113 s, correctness FAIL
+Run 5: 1.962735 s, correctness FAIL
+
+--- TEST C_3 (size 20000, 1 storm file(s), workload s20000_5af44766bc) ---
+Run 1: 0.014478 s, correctness PASS
+Run 2: 0.008599 s, correctness PASS
+Run 3: 0.014041 s, correctness PASS
+Run 4: 0.012117 s, correctness PASS
+Run 5: 0.013628 s, correctness PASS
+
+--- TEST C_100 (size 20000, 1 storm file(s), workload s20000_78115621ca) ---
+Run 1: 0.011932 s, correctness PASS
+Run 2: 0.015336 s, correctness PASS
+Run 3: 0.009149 s, correctness PASS
+Run 4: 0.017687 s, correctness PASS
+Run 5: 0.012768 s, correctness PASS
+
+--- TEST C_1k (size 20000, 1 storm file(s), workload s20000_9270e8f3d6) ---
+Run 1: 0.020661 s, correctness FAIL
+Run 2: 0.027696 s, correctness FAIL
+Run 3: 0.025394 s, correctness PASS
+Run 4: 0.025347 s, correctness FAIL
+Run 5: 0.023822 s, correctness FAIL
+
+--- TEST C_5k (size 20000, 1 storm file(s), workload s20000_a966c0a2c1) ---
+Run 1: 0.073335 s, correctness FAIL
+Run 2: 0.060306 s, correctness FAIL
+Run 3: 0.060893 s, correctness FAIL
+Run 4: 0.067235 s, correctness FAIL
+Run 5: 0.069823 s, correctness PASS
+
+--- JOB COMPLETE ---

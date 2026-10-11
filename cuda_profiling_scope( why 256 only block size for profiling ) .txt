@@ -1,0 +1,231 @@
+================================================================================
+DECISION MEMO - SCOPE OF THE CUDA PROFILING CAMPAIGN
+Which block sizes to profile, and why
+Multicore Programming 2025/2026 Exam - DuoWaves / energy_storms
+Date: 2026-08-23
+================================================================================
+
+--------------------------------------------------------------------------------
+0. THE QUESTION
+--------------------------------------------------------------------------------
+
+The CUDA section is measured at six thread block sizes: 32, 64, 128, 256, 512
+and 1024. The profiling campaign does not have to cover all six. The options
+are:
+
+    OPTION A   256 only            2 jobs
+    OPTION B   32 and 256          4 jobs
+    OPTION C   all six             12 jobs
+
+The recommendation is OPTION A, with OPTION B as a reasonable upgrade. The
+reasoning is below. Section 6 contains the one check that could overturn it.
+
+
+--------------------------------------------------------------------------------
+1. WHAT THE PROFILING IS FOR
+--------------------------------------------------------------------------------
+
+The profiling exists to answer ONE question for the report: WHERE DOES THE TIME
+GO, and therefore what is the bottleneck.
+
+It is NOT there to answer "which block size is fastest". That question is
+already answered, completely and with five repetitions per cell, by the
+measurement campaign itself: 1410 rows covering all six block sizes on four
+branches. Nothing the profiler produces improves on that.
+
+So the profiling campaign needs enough configurations to characterise the phase
+breakdown, and no more. Extra configurations do not add evidence; they add
+queue time.
+
+
+--------------------------------------------------------------------------------
+2. WHY 256 SPECIFICALLY
+--------------------------------------------------------------------------------
+
+2.1 IT IS THE CONFIGURATION THE CODE WAS WRITTEN FOR
+The source declares
+
+    #define BLOCK_SIZE 256
+
+on every CUDA branch. Every other block size only exists because the suite
+overrides that value at build time through ensure_block_size_guard(). 256 is
+the value the authors chose, tuned around, and would ship.
+
+2.2 IT IS THE ONLY BLOCK SIZE WHOSE DATA WAS NEVER IN DOUBT
+The grid_copy defect made every configuration below 256 produce wrong results.
+Those three have now been fixed and re-measured, but 256, 512 and 1024 were
+correct throughout the entire campaign and were never re-run. Their data has
+the longest unbroken provenance chain.
+
+2.3 IT IS THE MIDDLE OF THE VALID RANGE
+Below 256 the layer was under-covered (now fixed); at 1024 the device is at its
+hard limit of max_threads_per_block, with zero headroom. 256 sits in the middle
+with no boundary effects on either side.
+
+
+--------------------------------------------------------------------------------
+3. WHY MORE BLOCK SIZES ADD LITTLE
+--------------------------------------------------------------------------------
+
+The report needs PROPORTIONS - statements of the form "phase X accounts for N%
+of runtime". Block size changes how fast each phase runs; it does not usually
+change which phase dominates.
+
+This is exactly what the hybrid profiling campaign already demonstrated. Across
+24 configurations spanning 1 to 128 cores, the bombardment share of runtime
+moved only from 99.98% to 97.71%. The bottleneck was the same everywhere. The
+configuration axis added almost nothing to the conclusion; the WORKLOAD axis
+(A_1M vs C_5k) is what actually changed the picture, and that axis is already
+covered because every profiling run executes all the tests.
+
+There is no reason to expect the CUDA section to behave differently in kind.
+If the bombardment kernel dominates at 256, it will almost certainly dominate
+at 128 and at 512 too.
+
+
+--------------------------------------------------------------------------------
+4. COST, USING REAL MEASURED PACING
+--------------------------------------------------------------------------------
+
+The CUDA re-measurement campaign of 2026-08-23 provides exact figures. Six jobs
+were submitted between 09:47:13 and 10:08:01, with these gaps between
+consecutive submissions:
+
+    271 s, 270 s, 286 s, 210 s, 211 s      mean 250 s = 4.2 min
+
+The gap is dominated by MaxSubmitPU=1: only one job may exist in the system at
+a time, so every job waits for its predecessor to finish completely.
+
+    OPTION A    2 jobs   ->  approx  8 minutes
+    OPTION B    4 jobs   ->  approx 17 minutes
+    OPTION C   12 jobs   ->  approx 50 minutes
+
+GPU nodes are also scarcer than CPU nodes: 8 nodes carry a GPU
+(node[111-113,123-126] with two each, node122 with one) against 20+ CPU-only
+nodes. Queue pressure there is higher and less predictable than the figures
+above suggest.
+
+Fifty minutes is affordable with the deadline on 7 September. The argument
+against Option C is not that it is expensive; it is that it buys nothing the
+report will use.
+
+
+--------------------------------------------------------------------------------
+5. WHEN A LARGER SCOPE WOULD BE JUSTIFIED
+--------------------------------------------------------------------------------
+
+Option B (32 and 256) becomes worthwhile if the report wants to make a claim of
+this shape:
+
+    "the phase breakdown shifts with block size: at 32 the reduction dominates
+     because the tree needs more passes, while at 256 the bombardment dominates"
+
+That claim is plausible for the reduction phase specifically, because the number
+of reduction passes depends directly on block size:
+
+    passes = ceil(log_BLOCK_SIZE(layer_size))
+
+For layer_size = 1000000, the reduction chain and its number of kernel launches:
+
+    BLOCK_SIZE = 32   1000000 -> 31250 -> 977 -> 31 -> 1        4 passes
+    BLOCK_SIZE = 256  1000000 -> 3907 -> 16 -> 1                3 passes
+    BLOCK_SIZE = 1024 1000000 -> 977 -> 1                       2 passes
+
+So a smaller block size means more kernel launches in the reduction - twice as
+many at 32 as at 1024. If the reduction is a meaningful share of runtime, the
+effect will be visible.
+
+IMPORTANT: this matters much more on cuda-shared than on cuda-1D, because
+cuda-shared calls cudaMalloc and cudaFree INSIDE the reduction loop. More
+passes means more allocations. At BLOCK_SIZE = 32 that branch performs 4
+allocation pairs per storm instead of 3 - and each allocation is a
+synchronising, comparatively expensive driver call.
+
+If the 256-only profile shows the reduction taking a non-trivial share on
+cuda-shared, adding block size 32 is then well motivated and costs 2 extra
+jobs. That is a decision better taken WITH the first result in hand than
+guessed at beforehand.
+
+
+--------------------------------------------------------------------------------
+6. THE CHECK THAT COULD OVERTURN THIS
+--------------------------------------------------------------------------------
+
+The recommendation of 256 rests on it being the configuration the report leads
+with. That has NOT been verified against the measurement data. If the
+spreadsheet shows a different block size is clearly fastest, the report will
+lead with that one, and the profiling should follow it.
+
+Run this to find out:
+
+    cd ~/multicore-relation
+    for b in cuda-1D cuda-shared; do
+      echo "--- $b ---"
+      for bs in 32 64 128 256 512 1024; do
+        printf "  bs%-5s " "$bs"
+        grep -h "^CUDA|$b|cuda_bs${bs}|A_1M|" results/raw/*.csv \
+          | cut -d, -f2 \
+          | awk '{s+=$1; n++} END {if (n) printf "%.4f s  (%d runs)\n", s/n, n; else print "no data"}'
+      done
+    done
+
+INTERPRETATION
+  - 256 fastest, or within a few percent of the fastest
+        -> profile 256. Recommendation stands.
+  - another block size clearly fastest
+        -> profile THAT one instead of 256, for the same reason: profile the
+           configuration the report leads with.
+  - all six within noise of each other
+        -> profile 256, and state in the report that block size had no
+           significant effect on this workload. That is itself a result worth
+           reporting.
+
+
+--------------------------------------------------------------------------------
+7. WHAT IS NOT AFFECTED BY THIS DECISION
+--------------------------------------------------------------------------------
+
+Both branches are profiled regardless of the answer. cuda-1D and cuda-shared
+differ in TWO ways, not one:
+
+    (a) shared-memory tiling in the bombardment kernel
+    (b) cuda-1D pre-allocates the two ping-pong reduction buffers once;
+        cuda-shared calls cudaMalloc and cudaFree inside the reduction loop
+
+This is a confound for any end-to-end comparison of the two branches: if
+cuda-shared is slower overall, the wall time alone cannot say whether shared
+memory failed to help or the allocation overhead swamped it.
+
+The profiling resolves it, because the two effects land in different phases:
+
+    t_bomb    isolates the effect of shared-memory tiling
+    t_reduce  isolates the cost of per-pass allocation
+
+That separation is the single most valuable thing the CUDA profiling will
+produce, and it works at any block size. It is another reason the block size
+axis is not where the effort belongs.
+
+All tests are also run in every job regardless, so the workload axis - which
+the hybrid campaign showed to be the axis that actually matters - is fully
+covered either way.
+
+
+--------------------------------------------------------------------------------
+8. RECOMMENDATION
+--------------------------------------------------------------------------------
+
+Profile at BLOCK_SIZE = 256 only, on both branches. Two jobs, roughly eight
+minutes.
+
+Confirm first with the query in section 6 that 256 is in fact the configuration
+the report will lead with. If a different block size wins clearly, substitute
+it.
+
+After seeing the result, decide whether block size 32 adds anything - it will
+if and only if the reduction phase turns out to be a significant share of
+runtime on cuda-shared. That decision costs 2 more jobs and is better made with
+data than without.
+
+================================================================================
+END OF MEMO
+================================================================================

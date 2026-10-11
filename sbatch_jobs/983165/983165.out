@@ -1,0 +1,29 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+=== JOB INFO ===
+Job ID:               983165
+Nodes:                1 (node106)
+Section:              SEQ
+Branch:               main (06bd838)
+Test:                 A_1M
+Repetitions:          5
+================
+--- BUILD ---
+make: Entering directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/job_983165'
+gcc  -c energy_storms_core.c -lm -o energy_storms_core.o
+gcc  energy_storms_seq.c energy_storms_core.o -lm -o energy_storms_seq
+make: Leaving directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/job_983165'
+Binary md5:           1dae04b2745e23656852d955d62f8ee3
+
+--- TEST A_1M (size 1000000, 1 storm file(s), workload s1000000_15729929c0) ---
+Run 1: 451.851030 s, correctness PASS
+Run 2: already recorded, skipped
+Run 3: already recorded, skipped
+Run 4: already recorded, skipped
+Run 5: already recorded, skipped
+
+--- JOB COMPLETE ---

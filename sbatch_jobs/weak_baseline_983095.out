@@ -1,0 +1,12 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+make: Entering directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/weakseq_983095'
+gcc  -c energy_storms_core.c -lm -o energy_storms_core.o
+gcc  energy_storms_seq.c energy_storms_core.o -lm -o energy_storms_seq
+make: Leaving directory '/home/martinelli_2129604/progetto-multicore/multicore-relation/build/weakseq_983095'
+storm file: test_files/test_02_a30k_p20k_w1
+binary md5: 1dae04b2745e23656852d955d62f8ee3

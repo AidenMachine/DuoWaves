@@ -1,0 +1,198 @@
+mpirun -np 16 --bind-to none ./energy_storms_mpi_omp 20000 test_files/test_02_a30k_p20k_w1 test_files/test_02_a30k_p20k_w2 test_files/test_02_a30k_p20k_w3 test_files/test_02_a30k_p20k_w4 test_files/test_02_a30k_p20k_w5 test_files/test_02_a30k_p20k_w6
+[submitter:3370704:0:3370704] Caught signal 8 (Floating point exception: integer divide by zero)
+[submitter:3370706:0:3370706] Caught signal 8 (Floating point exception: integer divide by zero)
+[submitter:3370708:0:3370708] Caught signal 8 (Floating point exception: integer divide by zero)
+[submitter:3370719:0:3370719] Caught signal 8 (Floating point exception: integer divide by zero)
+[submitter:3370716:0:3370716] Caught signal 8 (Floating point exception: integer divide by zero)
+[submitter:3370705:0:3370705] Caught signal 8 (Floating point exception: integer divide by zero)
+[submitter:3370714:0:3370714] Caught signal 8 (Floating point exception: integer divide by zero)
+[submitter:3370707:0:3370707] Caught signal 8 (Floating point exception: integer divide by zero)
+[submitter:3370709:0:3370709] Caught signal 8 (Floating point exception: integer divide by zero)
+==== backtrace (tid:3370709) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x7b5581c8529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x7b5581c86e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x7b5581c87142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x7b5581a45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x58168497321d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x581684972b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7b5581a2a1ca]
+[submitter:3370718:0:3370718] Caught signal 8 (Floating point exception: integer divide by zero)
+==== backtrace (tid:3370718) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x70fe0f9c229c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x70fe0f9c3e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x70fe0f9c4142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x70fe0fc45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x57e4ee0a621d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x57e4ee0a5b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x70fe0fc2a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x70fe0fc2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x57e4ee0a53c5]
+=================================
+[submitter:3370702:0:3370702] Caught signal 8 (Floating point exception: integer divide by zero)
+==== backtrace (tid:3370702) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x75b1f93d029c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x75b1f93d1e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x75b1f93d2142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x75b1f8c45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x58224b4cb21d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x58224b4cab7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x75b1f8c2a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x75b1f8c2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x58224b4ca3c5]
+=================================
+[submitter:3370703:0:3370703] Caught signal 8 (Floating point exception: integer divide by zero)
+==== backtrace (tid:3370703) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x771d59a8529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x771d59a86e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x771d59a87142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x771d59845330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x5cd2feed621d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x5cd2feed5b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x771d5982a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x771d5982a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x5cd2feed53c5]
+=================================
+[submitter:3370715:0:3370715] Caught signal 8 (Floating point exception: integer divide by zero)
+==== backtrace (tid:3370715) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x765ffcc8529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x765ffcc86e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x765ffcc87142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x765ffca45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x5779302eb21d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x5779302eab7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x765ffca2a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x765ffca2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x5779302ea3c5]
+=================================
+[submitter:3370717:0:3370717] Caught signal 8 (Floating point exception: integer divide by zero)
+==== backtrace (tid:3370717) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x7cd0a288529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x7cd0a2886e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x7cd0a2887142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x7cd0a2645330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x5602d3e0521d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x5602d3e04b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7cd0a262a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7cd0a262a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x5602d3e043c5]
+=================================
+[submitter:3370710:0:3370710] Caught signal 8 (Floating point exception: integer divide by zero)
+==== backtrace (tid:3370710) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x7733a149629c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x7733a1497e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x7733a1498142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x7733a1245330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x5a0fcdf2a21d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x5a0fcdf29b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7733a122a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7733a122a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x5a0fcdf293c5]
+=================================
+[submitter:3370713:0:3370713] Caught signal 8 (Floating point exception: integer divide by zero)
+==== backtrace (tid:3370704) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x7732d3e8529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x7732d3e86e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x7732d3e87142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x7732d3c45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x57b7cbf8321d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x57b7cbf82b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7732d3c2a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7732d3c2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x57b7cbf823c5]
+=================================
+==== backtrace (tid:3370706) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x7677dd88529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x7677dd886e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x7677dd887142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x7677dd645330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x60fae683821d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x60fae6837b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7677dd62a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7677dd62a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x60fae68373c5]
+=================================
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7b5581a2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x5816849723c5]
+=================================
+==== backtrace (tid:3370716) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x73811009629c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x738110097e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x738110098142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x73810fe45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x55588deb221d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x55588deb1b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x73810fe2a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x73810fe2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x55588deb13c5]
+=================================
+==== backtrace (tid:3370708) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x7a57943ed29c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x7a57943eee6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x7a57943ef142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x7a5793c45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x55bb272a721d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x55bb272a6b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7a5793c2a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7a5793c2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x55bb272a63c5]
+=================================
+==== backtrace (tid:3370719) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x79f2c468529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x79f2c4686e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x79f2c4687142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x79f2c4445330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x5d7b1dbc221d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x5d7b1dbc1b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x79f2c442a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x79f2c442a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x5d7b1dbc13c5]
+=================================
+==== backtrace (tid:3370707) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x721401e8529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x721401e86e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x721401e87142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x721401c45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x55757a9e921d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x55757a9e8b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x721401c2a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x721401c2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x55757a9e83c5]
+=================================
+==== backtrace (tid:3370705) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x778ab7a8529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x778ab7a86e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x778ab7a87142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x778ab7845330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x5992a73bb21d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x5992a73bab7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x778ab782a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x778ab782a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x5992a73ba3c5]
+=================================
+==== backtrace (tid:3370714) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x7b54921e529c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x7b54921e6e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x7b54921e7142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x7b5491a45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x5f8eeef8621d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x5f8eeef85b7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7b5491a2a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7b5491a2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x5f8eeef853c5]
+=================================
+==== backtrace (tid:3370713) ====
+ 0  /lib/libucs.so.0(ucs_handle_error+0x2ec) [0x778a4209629c]
+ 1  /lib/libucs.so.0(+0x26e6d) [0x778a42097e6d]
+ 2  /lib/libucs.so.0(+0x27142) [0x778a42098142]
+ 3  /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x778a41e45330]
+ 4  ./energy_storms_mpi_omp(+0x221d) [0x5e9fbe75021d]
+ 5  ./energy_storms_mpi_omp(+0x1b7b) [0x5e9fbe74fb7b]
+ 6  /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x778a41e2a1ca]
+ 7  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x778a41e2a28b]
+ 8  ./energy_storms_mpi_omp(+0x13c5) [0x5e9fbe74f3c5]
+=================================
+--------------------------------------------------------------------------
+prterun noticed that process rank 3 with PID 3370705 on node submitter exited on
+signal 8 (Floating point exception).
+--------------------------------------------------------------------------
+make: *** [Makefile:77: run_mpi] Error 136

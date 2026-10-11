@@ -1,0 +1,52 @@
+==================================================
+   Custom OpenMPI Environment Loaded
+==================================================
+MPI_HOME: /home/guest/openmpi-4.1.6
+mpicc is: /home/guest/openmpi-4.1.6/bin/mpicc
+Version:  mpirun (Open MPI) 4.1.6
+physical cores/node: 32   nodes: 4   branch: immediate
+HEAD is now at 4e9476d Aggiunta versione di profiling. Per i commenti su codice guarda il file originale MPI/OMP ( ovvero versione non di profiling ). Plus i vari tests di riferimento. Plus i test di riferimento.
+mpicc  -fopenmp -O3 -c energy_storms_mpi_omp_core.c -lm  -o energy_storms_mpi_omp_core.o
+mpicc  -fopenmp -O3 energy_storms_mpi_omp.c energy_storms_mpi_omp_core.o -lm  -o energy_storms_mpi_omp
+profiled binary md5: 3b15c235b52fcc2096f87ec97354033f
+immediate|hyb_4n_1x1|A_20k|1  wall=0.462348  bomb=0.4478 exch=0.0127 relax=0.0000 reduce=0.0049
+immediate|hyb_4n_1x1|A_100k|1  wall=2.254941  bomb=2.2404 exch=0.0137 relax=0.0001 reduce=0.0029
+immediate|hyb_4n_1x1|A_1M|1  wall=22.394868  bomb=22.3864 exch=0.0114 relax=0.0007 reduce=0.0036
+immediate|hyb_4n_1x1|B_10|1  wall=4.494201  bomb=4.4794 exch=0.0166 relax=0.0001 reduce=0.0029
+immediate|hyb_4n_1x1|C_5k|1  wall=0.122506  bomb=0.1120 exch=0.0078 relax=0.0000 reduce=0.0057
+immediate|hyb_4n_1x2|A_20k|1  wall=0.231983  bomb=0.2239 exch=0.0064 relax=0.0000 reduce=0.0017
+immediate|hyb_4n_1x2|A_100k|1  wall=1.127640  bomb=1.1189 exch=0.0083 relax=0.0000 reduce=0.0016
+immediate|hyb_4n_1x2|A_1M|1  wall=11.188612  bomb=11.1814 exch=0.0095 relax=0.0004 reduce=0.0020
+immediate|hyb_4n_1x2|B_10|1  wall=2.246643  bomb=2.2372 exch=0.0090 relax=0.0001 reduce=0.0020
+immediate|hyb_4n_1x2|C_5k|1  wall=0.062046  bomb=0.0560 exch=0.0048 relax=0.0000 reduce=0.0017
+immediate|hyb_4n_2x1|A_20k|1  wall=0.239046  bomb=0.2239 exch=0.0120 relax=0.0000 reduce=0.0021
+immediate|hyb_4n_2x1|A_100k|1  wall=1.131022  bomb=1.1193 exch=0.0093 relax=0.0000 reduce=0.0031
+immediate|hyb_4n_2x1|A_1M|1  wall=11.194955  bomb=11.1830 exch=0.0183 relax=0.0005 reduce=0.0036
+immediate|hyb_4n_2x1|B_10|1  wall=2.256317  bomb=2.2378 exch=0.0146 relax=0.0001 reduce=0.0040
+immediate|hyb_4n_2x1|C_5k|1  wall=0.066902  bomb=0.0560 exch=0.0068 relax=0.0000 reduce=0.0011
+immediate|hyb_4n_2x4|A_20k|1  wall=0.066349  bomb=0.0561 exch=0.0059 relax=0.0000 reduce=0.0002
+immediate|hyb_4n_2x4|A_100k|1  wall=0.290117  bomb=0.2799 exch=0.0060 relax=0.0000 reduce=0.0001
+immediate|hyb_4n_2x4|A_1M|1  wall=2.808969  bomb=2.8001 exch=0.0100 relax=0.0001 reduce=0.0005
+immediate|hyb_4n_2x4|B_10|1  wall=0.579445  bomb=0.5598 exch=0.0083 relax=0.0004 reduce=0.0017
+immediate|hyb_4n_2x4|C_5k|1  wall=0.025188  bomb=0.0141 exch=0.0069 relax=0.0007 reduce=0.0042
+immediate|hyb_4n_4x2|A_20k|1  wall=0.070877  bomb=0.0561 exch=0.0060 relax=0.0000 reduce=0.0056
+immediate|hyb_4n_4x2|A_100k|1  wall=0.292834  bomb=0.2800 exch=0.0066 relax=0.0000 reduce=0.0062
+immediate|hyb_4n_4x2|A_1M|1  wall=2.812005  bomb=2.7995 exch=0.0095 relax=0.0001 reduce=0.0075
+immediate|hyb_4n_4x2|B_10|1  wall=0.582143  bomb=0.5603 exch=0.0050 relax=0.0000 reduce=0.0046
+immediate|hyb_4n_4x2|C_5k|1  wall=0.088923  bomb=0.0748 exch=0.0658 relax=0.0000 reduce=0.0657
+immediate|hyb_4n_4x4|A_20k|1  wall=0.041424  bomb=0.0282 exch=0.0064 relax=0.0000 reduce=0.0005
+immediate|hyb_4n_4x4|A_100k|1  wall=0.153597  bomb=0.1404 exch=0.0062 relax=0.0000 reduce=0.0007
+immediate|hyb_4n_4x4|A_1M|1  wall=1.414327  bomb=1.4025 exch=0.0084 relax=0.0001 reduce=0.0033
+immediate|hyb_4n_4x4|B_10|1  wall=0.303685  bomb=0.2822 exch=0.0071 relax=0.0000 reduce=0.0010
+immediate|hyb_4n_4x4|C_5k|1  wall=0.020034  bomb=0.0091 exch=0.0063 relax=0.0000 reduce=0.0003
+immediate|hyb_4n_4x8|A_20k|1  wall=0.025680  bomb=0.0164 exch=0.0132 relax=0.0000 reduce=0.0053
+immediate|hyb_4n_4x8|A_100k|1  wall=0.082647  bomb=0.0722 exch=0.0094 relax=0.0000 reduce=0.0042
+immediate|hyb_4n_4x8|A_1M|1  wall=0.718200  bomb=0.7078 exch=0.0147 relax=0.0001 reduce=0.0099
+immediate|hyb_4n_4x8|B_10|1  wall=0.161821  bomb=0.1445 exch=0.0080 relax=0.0001 reduce=0.0058
+immediate|hyb_4n_4x8|C_5k|1  wall=0.012028  bomb=0.0059 exch=0.0080 relax=0.0004 reduce=0.0025
+immediate|hyb_4n_8x4|A_20k|1  wall=0.021592  bomb=0.0143 exch=0.0068 relax=0.0004 reduce=0.0053
+immediate|hyb_4n_8x4|A_100k|1  wall=0.075835  bomb=0.0706 exch=0.0050 relax=0.0000 reduce=0.0045
+immediate|hyb_4n_8x4|A_1M|1  wall=0.757344  bomb=0.7528 exch=0.0530 relax=0.0001 reduce=0.0522
+immediate|hyb_4n_8x4|B_10|1  wall=0.157214  bomb=0.1446 exch=0.0132 relax=0.0007 reduce=0.0130
+immediate|hyb_4n_8x4|C_5k|1  wall=0.007650  bomb=0.0060 exch=0.0059 relax=0.0000 reduce=0.0037
+--- DONE -> /home/salvati_2/multicore-relation/results/profiling/prof_immediate_4n.csv ---
