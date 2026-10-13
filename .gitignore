@@ -197,17 +197,6 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/cuda,c,clion,c++
 
-### DuoWaves measurement harness ###
-
-# Per-job build worktrees and the laptop-side virtual environment of the
-# spreadsheet builder are disposable and never belong in the history.
-build/
-.venv/
-
-# Generated wave files are large and fully reproducible from their seed and the
-# generator, so the checksums are committed and the files themselves are not.
-generated_inputs/
-
 # Executables produced by the project Makefile (without file extensions).
 /energy_storms_seq
 /energy_storms_mpi_omp
@@ -251,10 +240,3 @@ gmon.out
 *.nvvp
 *.nsys-rep
 *.qdrep
-
-# The template above ignores every *.out, which would also swallow the Slurm job
-# logs and the campaign logs. Those are the raw evidence behind every number in
-# the report and have to stay under version control.
-!sbatch_jobs/**/*.out
-!sbatch_jobs/**/*.err
-!results/**/*.out

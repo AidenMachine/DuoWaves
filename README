@@ -13,10 +13,8 @@ In the submission, you are not allowed to modify any other files except those tw
 To see a description of the Makefile options execute:
 $ make help 
 
-Use the input files in the `test_files` directory for your first tests.
-Students are encouraged to manually write or automatically generate
-their own input files for more complete tests. See a description of
-the input files format in the handout.
+Testing instructions, scripts, results, and profiling material are in
+[`../multicore-relation`](../multicore-relation/README.md).
 
 # Credits
 Code adapted from the EduHPC 2018 Peachy assignment materials
