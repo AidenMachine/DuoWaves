@@ -208,6 +208,50 @@ build/
 # generator, so the checksums are committed and the files themselves are not.
 generated_inputs/
 
+# Executables produced by the project Makefile (without file extensions).
+/energy_storms_seq
+/energy_storms_mpi_omp
+/energy_storms_cuda
+
+# Python bytecode, tool caches, and local virtual environments.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+venv/
+.env/
+
+# Local IDE configuration and generated CMake metadata.
+.idea/
+.vscode/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Editor backups, temporary files, and operating-system metadata.
+*~
+*.swp
+*.swo
+*.tmp
+*.bak
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Disposable profiler captures. Keep the explicitly named archival capture.
+perf.data
+perf.data.old
+gmon.out
+*.nvvp
+*.nsys-rep
+*.qdrep
+
 # The template above ignores every *.out, which would also swallow the Slurm job
 # logs and the campaign logs. Those are the raw evidence behind every number in
 # the report and have to stay under version control.
