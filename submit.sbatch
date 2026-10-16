@@ -7,6 +7,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --cpu-freq=performance
 #SBATCH --time=00:15:00
+#SBATCH --exclude=node103
+#SBATCH --nodelist=node[130,132-134]
 #SBATCH --output=sbatch_jobs/%j/%j.out
 #SBATCH --error=sbatch_jobs/%j/%j.err
 

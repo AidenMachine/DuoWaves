@@ -1,0 +1,9 @@
+ERROR: You have attempted to pass environment variables to Open MPI
+with both the "-x" method and by setting the MCA parameter "mca_base_env_list".
+
+Open MPI does not support mixing these two methods.  Please choose one
+method and try launching your job again.
+
+Your job will now abort.
+[node106:2252150] [[31924,0],0] ORTE_ERROR_LOG: Fatal in file base/schizo_base_stubs.c at line 86
+make: *** [Makefile:77: run_mpi] Error 1

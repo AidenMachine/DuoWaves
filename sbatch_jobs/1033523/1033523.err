@@ -1,0 +1,120 @@
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node112
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252209] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252209] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node112
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252284] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252284] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node112
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252357] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252357] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node111
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252430] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252430] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node112
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252503] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252503] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node112
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252576] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252576] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node111
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252650] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252650] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node112
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252723] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252723] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node111
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252799] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252799] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: Could not generate an xpmem segment id for this process'
+address space.
+
+The vader shared memory BTL will fall back on another single-copy
+mechanism if one is available. This may result in lower performance.
+
+  Local host: node112
+  Error code: 2 (No such file or directory)
+--------------------------------------------------------------------------
+[node106:2252872] 15 more processes have sent help message help-btl-vader.txt / xpmem-make-failed
+[node106:2252872] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
