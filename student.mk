@@ -1,12 +1,16 @@
 # --- Execution Parameters ---
-OMP_NUM_THREADS=2
-MPI_PROCS=10
+export OMP_NUM_THREADS = 4
+export OMP_PROC_BIND = true
+export OMP_PLACES = cores
+MPI_PROCS = 32
 
 # --- MPI Run Flags ---
-MPIRUN_FLAGS = -np $(MPI_PROCS) --bind-to numa -map-by numa
+MPIRUN_FLAGS = -np $(MPI_PROCS) --oversubscribe --bind-to numa -map-by numa
+#MPIRUN_FLAGS = -np $(MPI_PROCS) --map-by l3cache --bind-to core --report-bindings
 
 # --- Compiler Flags ---
-MPI_OMP_EXTRA_CFLAGS = -O3
+MPI_OMP_EXTRA_CFLAGS = -O3 -march=znver1 -mtune=znver1 -mavx2 -mprefer-vector-width=256 -fno-math-errno -ffinite-math-only -fno-signaling-nans -fno-rounding-math -fcx-limited-range -fno-signed-zeros -fno-trapping-math -fprefetch-loop-arrays -funroll-loops -mfma
+#( serve per Valgrind )
 #MPI_OMP_EXTRA_LIBS =
 
 # Flags for CUDA code
