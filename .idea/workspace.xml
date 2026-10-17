@@ -19,14 +19,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1fa60b89-f570-4f0d-9f35-2f24b1cbc420" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/energy_storms_core.o" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_core.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/energy_storms_mpi_omp" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_mpi_omp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/energy_storms_mpi_omp_core.o" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_mpi_omp_core.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/energy_storms_seq" beforeDir="false" afterPath="$PROJECT_DIR$/energy_storms_seq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/student.mk" beforeDir="false" afterPath="$PROJECT_DIR$/student.mk" afterDir="false" />
-    </list>
+    <list default="true" id="1fa60b89-f570-4f0d-9f35-2f24b1cbc420" name="Changes" comment="Modificato lo sbatch ed il file .mk in modo che sia funzionale al 100%. Pulito il makefile. Adesso, utilizzando il comando salloc, si riesce ad ottenere un tempo di 73ms. Via sbatch invece un tempo di 53ms. Controlla le foto in chat di Luca per capire di quali comandi io stia parlando." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -134,13 +127,6 @@
       <recent name="$PROJECT_DIR$/Ideas" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
-  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="1fa60b89-f570-4f0d-9f35-2f24b1cbc420" name="Changes" comment="" />
@@ -153,6 +139,10 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Modificato lo sbatch ed il file .mk in modo che sia funzionale al 100%. Pulito il makefile. Adesso, utilizzando il comando salloc, si riesce ad ottenere un tempo di 73ms. Via sbatch invece un tempo di 53ms. Controlla le foto in chat di Luca per capire di quali comandi io stia parlando." />
+    <option name="LAST_COMMIT_MESSAGE" value="Modificato lo sbatch ed il file .mk in modo che sia funzionale al 100%. Pulito il makefile. Adesso, utilizzando il comando salloc, si riesce ad ottenere un tempo di 73ms. Via sbatch invece un tempo di 53ms. Controlla le foto in chat di Luca per capire di quali comandi io stia parlando." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

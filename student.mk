@@ -1,9 +1,11 @@
 # --- Execution Parameters ---
-OMP_NUM_THREADS ?= 4
-MPI_PROCS ?= 32
+export OMP_NUM_THREADS = 4
+export OMP_PROC_BIND = true
+export OMP_PLACES = cores
+MPI_PROCS = 32
 
 # --- MPI Run Flags ---
-MPIRUN_FLAGS = -np $(MPI_PROCS) --bind-to numa -map-by numa
+MPIRUN_FLAGS = -np $(MPI_PROCS) --oversubscribe --bind-to numa -map-by numa
 #MPIRUN_FLAGS = -np $(MPI_PROCS) --map-by l3cache --bind-to core --report-bindings
 
 # --- Compiler Flags ---
